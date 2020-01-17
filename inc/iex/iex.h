@@ -2,6 +2,7 @@
 #define IEX_
 
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  * Processes the IEX Deep data feed

@@ -1,1 +1,3 @@
+ADD_SUBDIRECTORY(iex/)
+ADD_SUBDIRECTORY(logger/)
 
