@@ -3,6 +3,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <pcap.h>
+#include <log/log.h>
+#include <string.h>
+#include <stdbool.h>
+
+#include <net/ethernet.h>
+#include <arpa/inet.h>
+#include <netinet/ip.h>
+#include <netinet/udp.h>
 
 /**
  * Processes the IEX Deep data feed
