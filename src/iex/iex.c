@@ -172,7 +172,8 @@ void parse_security_directory_message(void* payload) {
 void parse_trading_status_message(void* payload) {
   struct iex_trading_status_message* payload_data = 
     (struct iex_trading_status_message*) (payload);
- 
+
+
   // TODO do something with this information
   (void) payload_data;
 }
@@ -247,6 +248,11 @@ void parse_trade_report_message(void* payload) {
 
   // TODO send the information to the market to update
   // the latest price
+ 
+
+  log_trace("symbol %.8s price %4.4f\n", payload_data->symbol, 
+      (float)payload_data->price/10000.0);
+
   (void) payload_data;
 
 }

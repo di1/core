@@ -1,1 +1,1 @@
-echo "windows builds are not supported"
+rem a windows version of build.sh has currently not been written

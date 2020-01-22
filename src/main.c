@@ -1,8 +1,10 @@
 #include <stdio.h>
-#include <iex/iex.h>
-#include <log/log.h>
 #include <stdbool.h>
 #include <string.h>
+#include <iex/iex.h>
+#include <log/log.h>
+#include <book/book.h>
+
 
 /**
  * Defines the command line arguments
@@ -23,8 +25,10 @@ void agreement() {
   printf("\n\n");
 }
 
+/**
+ * Parses the comand line arguments
+ */
 cli* cli_parse(int argc, char** argv) {
-
   cli* options = (cli*) malloc(1*sizeof(cli));
   options->pcap_feed = false;
   options->pcap_feed_file = NULL;
@@ -45,15 +49,31 @@ cli* cli_parse(int argc, char** argv) {
   return options;
 }
 
+void usage(char* path) {
+  printf("%s [-pcap_feed FILE]\n", path);
+  exit(1);
+}
+
+void test() {
+  test_book();
+}
+
 int main(int argc, char** argv) {
-  agreement();
+#if RUN_TESTS
+  (void) argc;
+  (void) argv;
+  test();
+  return 0;
+#endif
+  if (argc == 1)
+    usage(argv[0]);
 
   cli* options = cli_parse(argc, argv);
 
   if (options->pcap_feed) {
     iex_parse_deep(options->pcap_feed_file);
   }
-  
+
   free(options);
   return 0;
 }

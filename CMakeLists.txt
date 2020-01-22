@@ -21,11 +21,18 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 FIND_PACKAGE(PCAP REQUIRED)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-ADD_COMPILE_OPTIONS("-Wall" "-Wextra" "-Werror" "-Wpedantic" "-O3")
+ADD_COMPILE_OPTIONS("-g" "-Wall" "-Wextra" "-Werror" "-Wpedantic" "-O3")
+ADD_COMPILE_DEFINITIONS(RUN_TESTS=$ENV{RUN_TESTS})
+MESSAGE($ENV{RUN_TESTS})
 
+INCLUDE_DIRECTORIES(
+  inc/
+  /usr/include/ 
+  /usr/local/include/ 
+  ${PCAP_INCLUDE_DIRS} 
+)
 
-INCLUDE_DIRECTORIES(inc/ /usr/include/ /usr/local/include/ ${PCAP_INCLUDE_DIRS} )
 ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} log iex)
+TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} log book iex)
