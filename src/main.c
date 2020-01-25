@@ -7,6 +7,7 @@
 #include <book/book.h>
 #include <chart/candle.h>
 #include <chart/chart.h>
+#include <security/security.h>
 
 /**
  * Defines the command line arguments
@@ -50,6 +51,7 @@ void test() {
   test_book();
   test_candle();
   test_chart();
+  test_security();
 }
 
 int main(int argc, char** argv) {
