@@ -9,6 +9,7 @@
 #include <log/log.h>
 
 #define SECURITY_INTERVAL_MINUTE_NANOSECONDS 1e+9
+#define SECURITY_HASH_MODULE_VAL 500
 
 /**
  * Private definition of a security
@@ -52,6 +53,17 @@ void security_chart_update(struct security* sec, int64_t price, uint64_t ts);
  * Frees the security struct
  */
 void security_free(struct security** sec);
+
+/**
+ * Gets the hashed index of the security
+ * hash is of module 1000
+ */
+size_t security_hash(char* n1);
+
+/**
+ * Compares the two security name
+ */
+bool security_cmp(char* n1, char* n2);
 
 /**
  * The test security

@@ -15,16 +15,26 @@ struct security {
   struct chart* cht;
 };
 
-size_t hash(unsigned char *str) {
+size_t hash(unsigned char* str) {
     size_t hash = 5381;
     int c;
-
     while ((c = *str++))
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
-    hash = hash % 1000;
-
+    hash = hash % SECURITY_HASH_MODULE_VAL;
     return hash;
+}
+
+size_t security_hash(char* name) {
+
+  char n[9];
+  strncpy(n, name, 8); // fills index 0-7
+  n[8] = '\x0'; // sets the null bit at the end
+  return hash((unsigned char*)n);
+}
+
+bool security_cmp(char* n1, char* n2) {
+  return (strcmp(n1, n2)) == 0;
 }
 
 // creates a new security
@@ -38,7 +48,7 @@ struct security* security_new(char* name, uint64_t interval) {
   sec->name = n;
   sec->b = book_new();
   sec->cht = chart_new(interval);
-
+  sec->hash = hash((unsigned char*)n);
   return sec;
 }
 
@@ -54,12 +64,12 @@ void security_chart_update(struct security* sec, int64_t price, uint64_t ts) {
 }
 
 void security_free(struct security** sec) {
- book_free(&(*sec)->b);
- chart_free(&(*sec)->cht);
- free((*sec)->name);
- (*sec)->name = NULL;
- free(*sec);
- *sec = NULL;
+  book_free(&(*sec)->b);
+  chart_free(&(*sec)->cht);
+  free((*sec)->name);
+  (*sec)->name = NULL;
+  free(*sec);
+  *sec = NULL;
 }
 
 void test_security() {
@@ -68,6 +78,7 @@ void test_security() {
   ASSERT_TEST(sec->b != NULL);
   ASSERT_TEST(sec->cht != NULL);
   ASSERT_TEST(strcmp(sec->name, "ABC     ") == 0);
+  ASSERT_TEST(security_hash("ABC     ") == sec->hash);
 
   security_free(&sec);
   ASSERT_TEST(sec == NULL);
