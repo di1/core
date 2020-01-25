@@ -14,7 +14,7 @@ struct chart {
   struct candle** candles;
 };
 
-struct chart* chart_new(uint64_t interval) {
+struct chart* chart_new(uint64_t interval) {  
   (void) interval;
   return NULL;
 }

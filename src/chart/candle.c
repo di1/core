@@ -54,6 +54,36 @@ void candle_free(struct candle** c) {
   *c = NULL;
 }
 
+// convert a candle struct to json
+char* candle_json(struct candle* c) {
+  /**
+   * {
+   *  "candle" : {
+   *    "o": 00000000000000000000,
+   *    "h": 00000000000000000000,
+   *    "l": 00000000000000000000,
+   *    "c": 00000000000000000000,
+   *    "s": 00000000000000000000,
+   *    "e": 00000000000000000000
+   *  }
+   * }
+   */
+  
+  // max 170 characters (no whitespace or new lines
+  char* buf = (char*) malloc(170*sizeof(char));
+  int ret = sprintf(buf, "{\"candle\":{"
+      "\"o\":%ld,\"h\":%ld,\"l\":%ld,\"c\":%ld,\"s\":%lu,\"e\":%lu}}",
+      c->open, c->high, c->low, c->close, c->start_time, c->end_time);
+
+  if (ret == -1) {
+    log_error("sprintf on candle ran out of space in buf of 170 allocated"
+        " characters");
+  }
+
+  return buf;
+
+}
+
 void test_candle() {
   
   // make sure candle creation is good
@@ -106,7 +136,16 @@ void test_candle() {
   ASSERT_TEST(c->low == -5);
   ASSERT_TEST(c->close == 3);
 
+  // make sure the json is correct
+  char* json = candle_json(c);
+  ASSERT_TEST(
+    strcmp(json,
+      "{\"candle\":{\"o\":0,\"h\":5,\"l\":-5,\"c\":3,\"s\":0,\"e\":6}}") == 0);
+
   // make sure freeing works
   candle_free(&c);
   ASSERT_TEST(c == NULL);  
+  
+  // free the candle json
+  free(json);
 }
