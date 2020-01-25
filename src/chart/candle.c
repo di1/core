@@ -70,7 +70,7 @@ char* candle_json(struct candle* c) {
    */
   
   // max 170 characters (no whitespace or new lines
-  char* buf = (char*) malloc(170*sizeof(char));
+  char* buf = (char*) malloc(JSON_CANDLE_MAX_LEN*sizeof(char));
   int ret = sprintf(buf, "{\"candle\":{"
       "\"o\":%ld,\"h\":%ld,\"l\":%ld,\"c\":%ld,\"s\":%lu,\"e\":%lu}}",
       c->open, c->high, c->low, c->close, c->start_time, c->end_time);
