@@ -3,8 +3,9 @@
 #include <string.h>
 #include <iex/iex.h>
 #include <log/log.h>
-#include <book/book.h>
 
+#include <book/book.h>
+#include <chart/candle.h>
 
 /**
  * Defines the command line arguments
@@ -46,6 +47,7 @@ void usage(char* path) {
 
 void test() {
   test_book();
+  test_candle();
 }
 
 int main(int argc, char** argv) {
