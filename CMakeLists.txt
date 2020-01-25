@@ -35,4 +35,5 @@ INCLUDE_DIRECTORIES(
 ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} log book iex chart security)
+TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} log book iex chart security
+  exchange)

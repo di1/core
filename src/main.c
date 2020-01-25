@@ -8,6 +8,7 @@
 #include <chart/candle.h>
 #include <chart/chart.h>
 #include <security/security.h>
+#include <exchange/exchange.h>
 
 /**
  * Defines the command line arguments
@@ -52,6 +53,7 @@ void test() {
   test_candle();
   test_chart();
   test_security();
+  test_exchange();
 }
 
 int main(int argc, char** argv) {

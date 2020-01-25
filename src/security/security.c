@@ -25,6 +25,10 @@ size_t hash(unsigned char* str) {
     return hash;
 }
 
+size_t security_get_hash(struct security* s) {
+  return s->hash;
+}
+
 size_t security_hash(char* name) {
 
   char n[9];
@@ -33,8 +37,8 @@ size_t security_hash(char* name) {
   return hash((unsigned char*)n);
 }
 
-bool security_cmp(char* n1, char* n2) {
-  return (strcmp(n1, n2)) == 0;
+bool security_cmp(char* n1, struct security* s) {
+  return (strcmp(n1, s->name)) == 0;
 }
 
 // creates a new security
@@ -64,7 +68,7 @@ void security_chart_update(struct security* sec, int64_t price, uint64_t ts) {
 }
 
 void security_free(struct security** sec) {
-  book_free(&(*sec)->b);
+  book_free(&((*sec)->b));
   chart_free(&(*sec)->cht);
   free((*sec)->name);
   (*sec)->name = NULL;
@@ -79,7 +83,7 @@ void test_security() {
   ASSERT_TEST(sec->cht != NULL);
   ASSERT_TEST(strcmp(sec->name, "ABC     ") == 0);
   ASSERT_TEST(security_hash("ABC     ") == sec->hash);
-
+  
   security_free(&sec);
   ASSERT_TEST(sec == NULL);
 

@@ -95,8 +95,10 @@ char* chart_json(struct chart* cht) {
 }
 
 void chart_free(struct chart** cht) {
-  for (size_t i = 0; i < ((*cht)->cur_candle+1); ++i) {
-    candle_free(&((*cht)->candles[i]));
+  if ((*cht)->last_update != 0) {
+    for (size_t i = 0; i < ((*cht)->cur_candle+1); ++i) {
+      candle_free(&((*cht)->candles[i]));
+    }
   }
   free((*cht)->candles);
   free(*cht);

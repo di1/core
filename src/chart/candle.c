@@ -50,6 +50,9 @@ void candle_update(struct candle* c, int64_t price, uint64_t time) {
 }
 
 void candle_free(struct candle** c) {
+  if (*c == NULL)
+    return;
+  
   free(*c);
   *c = NULL;
 }

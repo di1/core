@@ -165,10 +165,12 @@ void book_update(bool side, struct book* t, int64_t price, int64_t quantity) {
 }
 
 void book_free(struct book** t) {
-  free((*t)->buys);
+  if ((*t)->buys_len != 0)
+    free((*t)->buys);
   (*t)->buys = NULL;
-  
-  free((*t)->sells);
+ 
+  if ((*t)->sells_len != 0) 
+    free((*t)->sells);
   (*t)->sells = NULL;
   
   free(*t);
