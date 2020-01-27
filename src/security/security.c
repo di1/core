@@ -30,11 +30,11 @@ size_t security_get_hash(struct security* s) {
 }
 
 size_t security_hash(char* name) {
+  return hash((unsigned char*)name);
+}
 
-  char n[9];
-  strncpy(n, name, 8); // fills index 0-7
-  n[8] = '\x0'; // sets the null bit at the end
-  return hash((unsigned char*)n);
+char* security_get_chart(struct security* sec) {
+  return chart_json(sec->cht);
 }
 
 bool security_cmp(char* n1, struct security* s) {
@@ -45,9 +45,8 @@ bool security_cmp(char* n1, struct security* s) {
 struct security* security_new(char* name, uint64_t interval) {
   struct security* sec = (struct security*) malloc(1*sizeof(struct security));
   
-  char* n = (char*) malloc(9*sizeof(char));
-  strncpy(n, name, 8); // fills index 0-7
-  n[8] = '\x0'; // sets the null bit at the end
+  char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
+  strcpy(n, name);
   
   sec->name = n;
   sec->b = book_new();

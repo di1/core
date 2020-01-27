@@ -8,12 +8,12 @@
 #include <chart/chart.h>
 #include <log/log.h>
 
-#define SECURITY_INTERVAL_MINUTE_NANOSECONDS 1e+9
+#define SECURITY_INTERVAL_MINUTE_NANOSECONDS 6e+10
 
 #ifdef RUN_TESTS
 #define SECURITY_HASH_MODULE_VAL 2
 #else
-#define SECURITY_HASH_MODULE_VAL 500
+#define SECURITY_HASH_MODULE_VAL 5000
 #endif
 
 /**
@@ -46,6 +46,12 @@ struct security* security_new(char* name, uint64_t interval);
  */
 void security_book_update(struct security* sec, bool side, int64_t price,
     int64_t quantity);
+
+/**
+ * Returns a json representation of the chart, the user of this function
+ * must free the resulting data
+ */
+char* security_get_chart(struct security* sec);
 
 /**
  * Updates the chart given a fixed point number, which must be of the same

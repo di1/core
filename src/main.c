@@ -44,7 +44,7 @@ cli* cli_parse(int argc, char** argv) {
 }
 
 void usage(char* path) {
-  printf("%s [-pcap_feed FILE]\n", path);
+  printf("%s [-pcap_feed FILE][-pcap_list FILE1 FILE2 ...]\n", path);
   exit(1);
 }
 
@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
   test();
   return 0;
 #endif
+
   if (argc == 1)
     usage(argv[0]);
 

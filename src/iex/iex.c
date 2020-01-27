@@ -3,6 +3,7 @@
 
 
 // iex packet and type data
+#include "security/security.h"
 #include "types.h"
 #include "packet.h"
 
@@ -11,9 +12,40 @@
 #include <netinet/in.h>
 #include <pcap/pcap.h>
 #include <sys/types.h>
+#include <time.h>
+
+// include the exchange
+#include <exchange/exchange.h>
+
+#define TIME(CODE, MESSAGE) do {\
+    clock_t begin = clock();\
+    CODE\
+    clock_t end = clock();\
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;\
+    log_trace("%s %lf", MESSAGE, time_spent);\
+  }while (0);
+
+
+
+// global exchange that will represent all IEX data
+struct exchange* exch;
 
 /**
- * A functionpointer to a handler that will operate on the incoming
+ * Sets or appends a NULL character to the end of
+ * a string that is not NULL terminated
+ */
+void symbol_sanitize(char* s, size_t n) {
+  for (size_t i = 0; i < n; ++i) {
+    if (s[i] == ' ') {
+      s[i] = '\x0';
+      return;
+    }
+  }
+  log_error("%.*s must have (nil) appened", n, s);
+}
+
+/**
+ * A function pointer to a handler that will operate on the incoming
  * packets, the incoming packets from a file are indisquinshible
  * from an interface
  */
@@ -74,10 +106,16 @@ void iex_parse_deep(char* file) {
     exit(1);
   }
 
+  log_trace("creating exchange with name IEX");
+  exch = exchange_new("IEX");
+
   if (pcap_loop(desc, 0, packet_handler, NULL) < 0) {
     log_error("%s", pcap_geterr(desc));
     exit(1);
   }  
+
+  // TODO do some sort of finalization to the data here?
+  exchange_free(&exch); 
 
 }
 
@@ -173,9 +211,9 @@ void parse_trading_status_message(void* payload) {
   struct iex_trading_status_message* payload_data = 
     (struct iex_trading_status_message*) (payload);
 
+  log_trace("trading status message for %.8s", payload_data->symbol);
 
   // TODO do something with this information
-  (void) payload_data;
 }
 
 /**
@@ -184,17 +222,19 @@ void parse_trading_status_message(void* payload) {
 void parse_operational_hault_status_message(void* payload) {
   struct iex_operational_halt_status_message* payload_data =
     (struct iex_operational_halt_status_message*) (payload);
-  
+
+  log_trace("operation hault message for %.8s", payload_data->symbol);
+
   // TODO do something with this information
-  (void) payload_data;
 }
 
 void parse_short_sale_price_test_status_message(void* payload) {
   struct iex_short_sale_price_test_message* payload_data = 
     (struct iex_short_sale_price_test_message*) (payload);
 
+  log_trace("short sale price test message for %.8s", payload_data->symbol);
+
   // TODO do something with this information
-  (void) payload_data;
 }
 
 void parse_security_event_message(void* payload) {
@@ -227,14 +267,31 @@ void parse_security_event_message(void* payload) {
  * though to this function.
  */
 void parse_price_level_update_message(iex_byte_t side, void* payload) {
-  struct iex_security_event_message* payload_data = 
-    (struct iex_security_event_message*) (payload);
+  struct iex_price_level_update_message* payload_data = 
+    (struct iex_price_level_update_message*) (payload);
 
   // TODO send the information to the market book
   // to update the order book
 
-  (void) side;
-  (void) payload_data;
+  // seems like the order book gets updated before the trade
+  // report message gets sent so we will create new listing in
+  // the exchange here
+  //
+  
+  symbol_sanitize((char*)payload_data->symbol, 8);
+  struct security* cur_sec = NULL;
+
+
+ reget_security: 
+  cur_sec = exchange_get(exch, (char*)payload_data->symbol);
+
+  if (cur_sec == NULL) { 
+    exchange_put(exch, (char*)payload_data->symbol, 
+        SECURITY_INTERVAL_MINUTE_NANOSECONDS);
+    goto reget_security; 
+  }
+
+  security_book_update(cur_sec, side, payload_data->price, payload_data->size); 
 }
 
 /**
@@ -248,17 +305,28 @@ void parse_trade_report_message(void* payload) {
 
   // TODO send the information to the market to update
   // the latest price
- 
+  //log_trace("trade report message for %.8s", payload_data->symbol);
+  
+  symbol_sanitize((char*)payload_data->symbol, 8);
+  struct security* cur_sec = NULL;
 
-  log_trace("symbol %.8s price %4.4f\n", payload_data->symbol, 
-      (float)payload_data->price/10000.0);
+ reget_security: 
+  cur_sec = exchange_get(exch, (char*)payload_data->symbol);
 
-  (void) payload_data;
+  if (cur_sec == NULL) { 
+    exchange_put(exch, (char*)payload_data->symbol, 
+        SECURITY_INTERVAL_MINUTE_NANOSECONDS);
+    goto reget_security; 
+  }
+
+  security_chart_update(cur_sec, payload_data->price, payload_data->timestamp);
 
 }
 
 /**
  * Tells us what the official opening and closing prices
+ * Note that is only for stocks traded on IEX and will not
+ * display non IEX opening prices
  */
 void parse_official_price_message(void* payload) {
   struct iex_official_price_message* payload_data = 
@@ -267,7 +335,7 @@ void parse_official_price_message(void* payload) {
   // TODO pass the information to the market about 
   // the official opening and closing prices
 
-  (void) payload_data;
+  log_trace("official price message for %.8s", payload_data->symbol);
 }
 
 /**
@@ -281,7 +349,7 @@ void parse_trade_break_message(void* payload) {
   // TODO this is IEX specific and is considered "rare"
   // TODO I'm unsure what to do with this
 
-  (void) payload_data;
+  log_trace("trade break message %.8s", payload_data->symbol);
 }
 
 void parse_auction_information_message(void* payload) {
@@ -291,8 +359,10 @@ void parse_auction_information_message(void* payload) {
   // TODO this is a best to taccle and understand but 
   // TODO is should not affect the order book or last
   // TODO traded prices and I think can be left alone for now
-  
+ 
+  //log_trace("auction information for %.8s", payload_data->symbol);
   (void) payload_data;
+
 }
 
 /**

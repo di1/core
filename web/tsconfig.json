@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "rootDir": "ts",
+    "outFile": "main.js",
+    "strict": true,
+    "target": "es2015"
+  }
+}

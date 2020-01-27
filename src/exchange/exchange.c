@@ -1,5 +1,7 @@
 #include <exchange/exchange.h>
 
+size_t num_securities = 0;
+
 // linked list prototype
 struct ll {
   // current security value
@@ -41,7 +43,11 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
     next_entry->val = s;
 
     val->next = next_entry;
-  } 
+  }
+
+  num_securities += 1;
+  if (num_securities%200 == 0)
+    log_debug("~%lu securities monitored", num_securities);
 
 }
 
@@ -51,6 +57,8 @@ struct security* exchange_get(struct exchange* e, char* name) {
   struct ll* bin_list = &e->entries[hash];
 
   while (bin_list != NULL) {
+    if (bin_list->val == NULL)
+      return NULL;
     if (security_cmp(name, bin_list->val)) {
       return bin_list->val;
     }

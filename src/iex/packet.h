@@ -63,7 +63,7 @@ struct iex_security_event_message {
   iex_byte_t symbol[8];
 } __attribute__((packed));
 
-struct iex_price_level_update_buy {
+struct iex_price_level_update_message {
   iex_byte_t event_flags;
   iex_timestamp_t timestamp;
   iex_byte_t symbol[8];
