@@ -1,5 +1,37 @@
 #!/bin/bash
 
+# Exit on first error
+set -e
+
+ROOT=`pwd`
+
+# grab 3rd party
+mkdir -p 3rdparty
+cd 3rdparty
+
+if [ -d libwebsockets ];
+then
+  cd libwebsockets
+  git pull
+  cd build
+  cmake ..
+  make
+  sudo make install
+else
+  git clone https://libwebsockets.org/repo/libwebsockets
+  cd libwebsockets
+  mkdir build/
+  cd build/
+  cmake ..
+  make
+  sudo make install
+fi
+
+cd ..
+cp cmake/FindLibWebSockets.cmake $ROOT/cmake/
+
+cd $ROOT
+
 export RUN_TESTS=0
 
 usage() {
@@ -8,9 +40,6 @@ usage() {
 }
 
 mkdir -p build > /dev/null
-
-# Exit on first error
-set -e
 
 # Make sure there is 1 argument
 if (( $# != 1 ))

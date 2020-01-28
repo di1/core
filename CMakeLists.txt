@@ -19,6 +19,7 @@ ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 FIND_PACKAGE(PCAP REQUIRED)
+FIND_PACKAGE(LibWebSockets REQUIRED)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ADD_COMPILE_OPTIONS("-g" "-Wall" "-Wextra" "-Werror" "-Wpedantic" "-O3")
@@ -29,11 +30,12 @@ INCLUDE_DIRECTORIES(
   inc/
   /usr/include/ 
   /usr/local/include/ 
-  ${PCAP_INCLUDE_DIRS} 
+  ${PCAP_INCLUDE_DIRS}
+  ${LIBWEBSOCKETS_INCLUDE_DIR}
 )
 
 ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} log book iex chart security
-  exchange)
+TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES} 
+  log book iex chart security exchange)
