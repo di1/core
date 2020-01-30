@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <pthread.h>
+
 #include <iex/iex.h>
 #include <log/log.h>
-
 #include <book/book.h>
 #include <chart/candle.h>
 #include <chart/chart.h>
 #include <security/security.h>
 #include <exchange/exchange.h>
+#include <server/server.h>
 
 /**
  * Defines the command line arguments
@@ -69,10 +71,17 @@ int main(int argc, char** argv) {
 
   cli* options = cli_parse(argc, argv);
 
+//  pthread_t id;
+//  pthread_create(&id, NULL, server_start, NULL);
+
+  server_start(NULL);
+
   if (options->pcap_feed) {
     iex_parse_deep(options->pcap_feed_file);
   }
 
   free(options);
+
+  //pthread_join(id, NULL);
   return 0;
 }

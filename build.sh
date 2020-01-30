@@ -14,9 +14,9 @@ then
   cd libwebsockets
   git pull
   cd build
-  cmake ..
-  make
-  sudo make install
+  cmake .. 2>/dev/null 1>/dev/null
+  make 2>/dev/null 1>/dev/null
+  sudo make install 2>/dev/null 1>/dev/null
 else
   git clone https://libwebsockets.org/repo/libwebsockets
   cd libwebsockets
