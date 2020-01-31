@@ -8,7 +8,9 @@
 
 ### Frontend
 - [ ] Develop protocol for web socket server
-- [ ] Charting application using HTML5 WebGL
+- [ ] Charting application using canvas
+- [ ] Canvas draw lines
+- [ ] Canvas display chart patterns
 
 ### Simple Candle Stick Patterns
 - [ ] Big Black Candle
