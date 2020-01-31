@@ -1,7 +1,15 @@
 #!/bin/bash
 
-# Exit on first error
+
+#Exit on first error 
 set -e
+
+cd web
+npm update
+sudo npm -g install typescript
+tsc
+
+cd ..
 
 ROOT=`pwd`
 
