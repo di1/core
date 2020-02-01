@@ -1,0 +1,1 @@
+init|SYMBOL # sends the full chart representing "SYMBOL"

@@ -71,10 +71,8 @@ int main(int argc, char** argv) {
 
   cli* options = cli_parse(argc, argv);
 
-//  pthread_t id;
-//  pthread_create(&id, NULL, server_start, NULL);
-
-  server_start(NULL);
+  pthread_t id;
+  pthread_create(&id, NULL, server_start, NULL);
 
   if (options->pcap_feed) {
     iex_parse_deep(options->pcap_feed_file);
@@ -82,6 +80,6 @@ int main(int argc, char** argv) {
 
   free(options);
 
-  //pthread_join(id, NULL);
+  pthread_join(id, NULL);
   return 0;
 }

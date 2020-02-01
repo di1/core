@@ -5,6 +5,8 @@
 #include <string.h>
 #include <signal.h>
 
+#include "message_parser.h"
+
 void* server_start(void*);
 
 #endif

@@ -103,16 +103,21 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     printf("received message: %.*s\n", (int) len, (char*) in);
 
-		vhd->amsg.len = len;
+    char* response = parse_message(in, len);
+    size_t response_len = strlen(response);
+
+		vhd->amsg.len = response_len;
 		/* notice we over-allocate by LWS_PRE */
-		vhd->amsg.payload = malloc(LWS_PRE + len);
+    vhd->amsg.payload = malloc(LWS_PRE + response_len);
 		if (!vhd->amsg.payload) {
 			lwsl_user("OOM: dropping\n");
 			break;
 		}
     
-		memcpy((char *)vhd->amsg.payload + LWS_PRE, in, len);
+		memcpy((char *)vhd->amsg.payload + LWS_PRE, response, response_len);
 		vhd->current++;
+
+    free(response);
 
 		/*
 		 * let everybody know we want to write something on them
@@ -148,29 +153,29 @@ void* server_start(void* s) {
 	signal(SIGINT, sigint_handler);
 
 
-	lws_set_log_level(logs, NULL);
-	lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use TLS / https)\n");
+  lws_set_log_level(logs, NULL);
+  lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use TLS / https)\n");
 
-	memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
-	info.port = 7681;
-	info.mounts = &mount;
-	info.protocols = protocols;
-	info.vhost_name = "riski.local";
-	info.ws_ping_pong_interval = 20;
-	info.options =
-		LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
+  memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
+  info.port = 7681;
+  info.mounts = &mount;
+  info.protocols = protocols;
+  info.vhost_name = "localhost";
+  info.ws_ping_pong_interval = 20;
+  info.options =
+    LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
 	
   context = lws_create_context(&info);
-	if (!context) {
-		lwsl_err("lws init failed\n");
+  if (!context) {
+	  lwsl_err("lws init failed\n");
     exit(1);
-		return NULL;
-	}
+	  return NULL;
+  }
 
-	while (n >= 0 && !interrupted)
-		n = lws_service(context, 0);
+  while (n >= 0 && !interrupted)
+	  n = lws_service(context, 0);
 
-	lws_context_destroy(context);
+  lws_context_destroy(context);
 
-	return 0;
+  return 0;
 }

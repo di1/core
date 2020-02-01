@@ -1,21 +1,10 @@
 // header file that makes iex_parse_deep public
 #include <iex/iex.h>
 
-
 // iex packet and type data
 #include "security/security.h"
 #include "types.h"
 #include "packet.h"
-
-// needed for libpcap
-#include <net/ethernet.h>
-#include <netinet/in.h>
-#include <pcap/pcap.h>
-#include <sys/types.h>
-#include <time.h>
-
-// include the exchange
-#include <exchange/exchange.h>
 
 #define TIME(CODE, MESSAGE) do {\
     clock_t begin = clock();\
@@ -26,9 +15,6 @@
   }while (0);
 
 
-
-// global exchange that will represent all IEX data
-struct exchange* exch;
 
 /**
  * Sets or appends a NULL character to the end of
@@ -107,7 +93,7 @@ void iex_parse_deep(char* file) {
   }
 
   log_trace("creating exchange with name IEX");
-  exch = exchange_new("IEX");
+  iex_exchange = exchange_new("IEX");
 
   if (pcap_loop(desc, 0, packet_handler, NULL) < 0) {
     log_error("%s", pcap_geterr(desc));
@@ -115,7 +101,7 @@ void iex_parse_deep(char* file) {
   }  
 
   // TODO do some sort of finalization to the data here?
-  exchange_free(&exch); 
+  exchange_free(&iex_exchange); 
 
 }
 
@@ -283,10 +269,10 @@ void parse_price_level_update_message(iex_byte_t side, void* payload) {
 
 
  reget_security: 
-  cur_sec = exchange_get(exch, (char*)payload_data->symbol);
+  cur_sec = exchange_get(iex_exchange, (char*)payload_data->symbol);
 
   if (cur_sec == NULL) { 
-    exchange_put(exch, (char*)payload_data->symbol, 
+    exchange_put(iex_exchange, (char*)payload_data->symbol, 
         SECURITY_INTERVAL_MINUTE_NANOSECONDS);
     goto reget_security; 
   }
@@ -311,10 +297,10 @@ void parse_trade_report_message(void* payload) {
   struct security* cur_sec = NULL;
 
  reget_security: 
-  cur_sec = exchange_get(exch, (char*)payload_data->symbol);
+  cur_sec = exchange_get(iex_exchange, (char*)payload_data->symbol);
 
   if (cur_sec == NULL) { 
-    exchange_put(exch, (char*)payload_data->symbol, 
+    exchange_put(iex_exchange, (char*)payload_data->symbol, 
         SECURITY_INTERVAL_MINUTE_NANOSECONDS);
     goto reget_security; 
   }
