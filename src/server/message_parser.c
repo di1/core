@@ -10,8 +10,6 @@ char* init_response(char* security) {
   }
 
   char* cht = security_get_chart(sec);
-  log_debug("%s has chart %s", security, cht); 
-
   return cht;
 
 }
