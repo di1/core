@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 
@@ -37,7 +38,7 @@ cli* cli_parse(int argc, char** argv) {
       } else {
         log_error("%s", "-pcap_feed must be followed "
                         "by a file location");
-        exit(1);
+        EXIT_FAILURE;
       }
     }
   }
@@ -58,7 +59,9 @@ void test() {
   test_exchange();
 }
 
+ 
 int main(int argc, char** argv) {
+
 #if RUN_TESTS
   (void) argc;
   (void) argv;

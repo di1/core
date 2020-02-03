@@ -132,6 +132,7 @@ void packet_handler(u_char *userData,
     inet_ntop(AF_INET, &(ip_header->ip_src), ip_src, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(ip_header->ip_dst), ip_dst, INET_ADDRSTRLEN);
 
+
     // verify udp packet and verify src
     if (ip_header->ip_p == IPPROTO_UDP && is_iex_traffic(ip_src, ip_dst)) {
       
@@ -153,25 +154,25 @@ void packet_handler(u_char *userData,
  */
 void parse_system_event_message(void* payload) {
   switch (((struct iex_system_event_message*)payload)->system_event) {
-        case START_OF_MESSAGES:
-          log_trace("start of messages");
-          break;
-        case START_OF_SYSTEM_HOURS:
-          log_trace("start of system hours");
-          break;
-        case START_OF_REGULAR_MARKET_HOURS:
-          log_trace("start of regular market hours");
-          break;
-        case END_OF_REGULAR_MARKET_HOURS:
-          log_trace("end of regular market hours");
-          break;
-        case END_OF_SYSTEM_HOURS:
-          log_trace("end of system hours");
-          break;
-        case END_OF_MESSAGES:
-          log_trace("end of messages");
-          break;
-      }
+    case START_OF_MESSAGES:
+      log_trace("start of messages");
+      break;
+    case START_OF_SYSTEM_HOURS:
+      log_trace("start of system hours");
+      break;
+    case START_OF_REGULAR_MARKET_HOURS:
+      log_trace("start of regular market hours");
+      break;
+    case END_OF_REGULAR_MARKET_HOURS:
+      log_trace("end of regular market hours");
+      break;
+    case END_OF_SYSTEM_HOURS:
+      log_trace("end of system hours");
+      break;
+    case END_OF_MESSAGES:
+      log_trace("end of messages");
+      break;
+  }
 }
 
 /**

@@ -41,6 +41,7 @@ static const struct lws_http_mount mount = {
 void sigint_handler(int sig) {
   (void) sig;
 	interrupted = 1;
+  exit(1);
 }
 
 static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
