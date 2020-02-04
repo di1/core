@@ -231,5 +231,4 @@ class CandleChart {
 
     this.conn.send('init|' + this.symbol);
   }
-
 }
