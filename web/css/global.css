@@ -8,11 +8,10 @@ body, html {
 #chart {
   position: absolute;
   top: 38px;
-  left: 0px;
+  left: 200px;
 
-  width: 100%;
-  height: calc(100% - 40px);
-  background-color: blue;
+  width: calc(100% - 200px);
+  height: calc(100% - 200px);
 }
 
 #top-bar {
@@ -21,5 +20,20 @@ body, html {
   left: 0;
   height: 38px;
   width: 100%;
-  background-color: blue;
+}
+
+#side-bar {
+  position: absolute;
+  top: 38px;
+  left: 0px;
+  width: 200px;
+  height: calc(100% - 38px);
+}
+
+#bottom-bar {
+  position: absolute;
+  top: calc(100% - 200px);
+  left: 200px;
+  width: calc(100% - 200px);
+  height: 200px;
 }
