@@ -6,6 +6,20 @@ body, html {
 }
 
 #chart {
+  position: absolute;
+  top: 38px;
+  left: 0px;
+
   width: 100%;
-  height: 100%;
+  height: calc(100% - 40px);
+  background-color: blue;
+}
+
+#top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 38px;
+  width: 100%;
+  background-color: blue;
 }
