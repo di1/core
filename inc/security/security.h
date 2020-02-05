@@ -54,6 +54,11 @@ void security_book_update(struct security* sec, bool side, int64_t price,
 char* security_get_chart(struct security* sec);
 
 /**
+ * Returns the latest candle of a given security
+ */
+char* security_get_latest_candle(struct security* sec);
+
+/**
  * Updates the chart given a fixed point number, which must be of the same
  * type given to the order book, and a timestamp in a time unit that is the
  * same as the interval

@@ -37,6 +37,10 @@ char* security_get_chart(struct security* sec) {
   return chart_json(sec->cht);
 }
 
+char* security_get_latest_candle(struct security* sec) {
+  return chart_latest_candle(sec->cht);
+}
+
 bool security_cmp(char* n1, struct security* s) {
   return (strcmp(n1, s->name)) == 0;
 }

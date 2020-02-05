@@ -13,6 +13,9 @@ class CandleChart {
   private CANDLE_WIDTH: number = 15;
 
 
+  private ROOT_CHART: RootChartObject | undefined = undefined;
+  private CANDLE_UPDATES_SENT: number = 0;
+
   constructor(symbol: string) {
     this.chart_canvas = <HTMLCanvasElement> document.getElementById("chart");
 
@@ -33,14 +36,47 @@ class CandleChart {
   }
 
   private onMessage(evt: MessageEvent) {
-    let latestChart: RootChartObject | undefined = JSON.parse(evt.data);
 
-    if (!latestChart) {
-      console.error('onMessage latestChart == undefined');
-      return;
+    var genericMsg = JSON.parse(evt.data);
+
+    if (genericMsg['chart']) {
+
+      let latestChart: RootChartObject | undefined = genericMsg;
+
+      if (!latestChart) {
+        console.error('onMessage latestChart == undefined');
+        return;
+      }
+
+      this.ROOT_CHART = latestChart;
+      this.drawFull(this.ROOT_CHART);
+
+    } else if (genericMsg['latest_candle']) {
+
+      let updateCandle: LatestChartCandle | undefined = genericMsg;
+
+      if (!updateCandle) {
+        console.error('onMessage updateCandle == undefined');
+        return;
+      }
+      if (!this.ROOT_CHART) {
+        console.error('onMessage updateCandle happened before init');
+        return;
+      }
+
+      if (this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle.s ==
+          updateCandle.latest_candle.candle.s) {
+
+        this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle =
+          updateCandle.latest_candle.candle;
+        this.drawFull(this.ROOT_CHART);
+      } else {
+        this.ROOT_CHART.chart.push({candle: updateCandle.latest_candle.candle});
+        this.drawFull(this.ROOT_CHART);
+      }
+    } else {
+      console.error('invalid response from server');
     }
-
-    this.drawFull(latestChart);
   }
 
   private onOpen(evt: Event) {
@@ -133,6 +169,9 @@ class CandleChart {
       return;
     }
 
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
     let drawing_width: number = this.chart_canvas.width;
     let drawing_height: number = 
       this.chart_canvas.height-this.PADDING_BOT;
@@ -178,20 +217,7 @@ class CandleChart {
       ctx.fillText("-" + (i/10000).toFixed(4),
                    drawing_width-this.getPriceWidth(ctx),
                    price_to_pixel.eval(i));
-      //ctx.beginPath();
-      //ctx.moveTo(0, price_to_pixel.eval(i));
-      //ctx.lineTo(drawing_width-this.getPriceWidth(ctx), price_to_pixel.eval(i));
-      //ctx.stroke();
     }
-
-    // DRAW THE GRID LINES
-    //for (let i: number = 0; i < drawing_width-this.getPriceWidth(ctx);
-    //     i += this.CANDLE_WIDTH) {
-    //  ctx.beginPath(); 
-    //  ctx.moveTo(i,0);
-    //  ctx.lineTo(i, this.chart_canvas.height);
-    //  ctx.stroke();
-    //}
 
     // DRAW THE CANDLES
     for (let i: number = start_index; i < candles.length; ++i) {
@@ -214,10 +240,9 @@ class CandleChart {
           this.CANDLE_WIDTH,
           price_to_pixel.eval(candles[i].candle.o)-
             price_to_pixel.eval(candles[i].candle.c));
-        
+
         ctx.fillStyle = 'black';
-      }
-      if (candles[i].candle.o < candles[i].candle.c) {
+      } else if (candles[i].candle.o < candles[i].candle.c) {
         ctx.fillStyle = 'yellow';
         ctx.fillRect(
           width_offset,
@@ -226,9 +251,24 @@ class CandleChart {
           price_to_pixel.eval(candles[i].candle.c)-
             price_to_pixel.eval(candles[i].candle.o));
         ctx.fillStyle = 'black';
+      } else {
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.moveTo(width_offset,
+                   price_to_pixel.eval(candles[i].candle.o));
+        ctx.lineTo(width_offset + this.CANDLE_WIDTH,
+                   price_to_pixel.eval(candles[i].candle.c));
+        ctx.stroke();
       }
     }
+    this.CANDLE_UPDATES_SENT += 1;
 
-    this.conn.send('init|' + this.symbol);
+    // sync chart every 100 updates
+    if (this.CANDLE_UPDATES_SENT % 100 == 0) {
+      this.CANDLE_UPDATES_SENT = 0;
+      this.conn.send('init|' + this.symbol);
+    } else {
+      this.conn.send('latest|' + this.symbol);
+    }
   }
 }

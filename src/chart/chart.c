@@ -1,3 +1,4 @@
+#include "chart/candle.h"
 #include <chart/chart.h>
 
 struct chart {
@@ -91,6 +92,21 @@ char* chart_json(struct chart* cht) {
     tmp_candle_json = NULL;
   }
   strcat(buf, "]}\x0");
+  return buf;
+}
+
+char* chart_latest_candle(struct chart* cht) {
+  // {"latest_candle":}
+  size_t total_json_size = 18 + JSON_CANDLE_MAX_LEN;
+  char* buf = (char*) calloc(total_json_size, sizeof(char));
+  strcat(buf, "{\"latest_candle\":\x0");
+
+  char* tmp_candle_json = NULL;
+  tmp_candle_json = candle_json(cht->candles[cht->cur_candle]);
+  strcat(buf, tmp_candle_json);
+  strcat(buf, "}\x0");
+
+  free(tmp_candle_json);
   return buf;
 }
 

@@ -33,6 +33,11 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts);
 char* chart_json(struct chart* cht);
 
 /**
+ * Gets the latest candle update
+ */
+char* chart_latest_candle(struct chart* cht);
+
+/**
  * Runs tests on the chart class
  */
 void test_chart();

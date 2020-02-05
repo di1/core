@@ -1,16 +1,24 @@
 interface Candle {
-    o: number;
-    h: number;
-    l: number;
-    c: number;
-    s: any;
-    e: any;
+  o: number;
+  h: number;
+  l: number;
+  c: number;
+  s: any;
+  e: any;
 }
 
 interface Chart {
-    candle: Candle;
+  candle: Candle;
 }
 
 interface RootChartObject {
-    chart: Chart[];
+  chart: Chart[];
+}
+
+interface LatestCandle {
+  candle: Candle;
+}
+
+interface LatestChartCandle {
+  latest_candle: LatestCandle;
 }

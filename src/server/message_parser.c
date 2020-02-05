@@ -1,3 +1,4 @@
+#include "security/security.h"
 #include <server/message_parser.h>
 
 char* init_response(char* security) {
@@ -12,6 +13,18 @@ char* init_response(char* security) {
   char* cht = security_get_chart(sec);
   return cht;
 
+}
+
+char* latest_response(char* security) {
+  struct security* sec = exchange_get(iex_exchange, security);
+
+  if (!sec) {
+    log_debug("%s is not a valid security traded on IEX", security);
+    return NULL;
+  }
+
+  char* cht = security_get_latest_candle(sec);
+  return cht;
 }
 
 char* parse_message(char* msg, int len) {
@@ -36,7 +49,16 @@ char* parse_message(char* msg, int len) {
     free(sanitized_msg);
 
     return response;
-  } 
+  }
+  if (strcmp("latest", tokened) == 0) {
+    tokened = strtok(NULL, "|");
+    log_debug("sending latest candle for %s", tokened);
+
+    char* response = latest_response(tokened);
+    free(sanitized_msg);
+
+    return response;
+  }
 
   free(sanitized_msg);
   return NULL;
