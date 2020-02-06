@@ -177,5 +177,6 @@ void* server_start(void* s) {
 
   lws_context_destroy(context);
 
+  exit(1);
   return 0;
 }
