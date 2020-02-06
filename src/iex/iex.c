@@ -102,7 +102,7 @@ void iex_parse_deep(char* file) {
 
   // TODO do some sort of finalization to the data here?
   exchange_free(&iex_exchange); 
-
+  pcap_close(desc);
 }
 
 void packet_handler(u_char *userData,
@@ -227,6 +227,9 @@ void parse_short_sale_price_test_status_message(void* payload) {
 void parse_security_event_message(void* payload) {
   struct iex_security_event_message* payload_data = 
     (struct iex_security_event_message*) (payload);
+
+  
+  symbol_sanitize((char*)payload_data->symbol, 8);
 
   switch (payload_data->security_event) {
     case OPENING_PROCESS_COMPLETE:

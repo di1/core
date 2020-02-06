@@ -3,6 +3,8 @@
 #define LWS_PLUGIN_STATIC
 #include "protocol_lws_minimal.c"
 
+int SERVER_INTERRUPTED = 0;
+
 static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len);
 
@@ -14,8 +16,6 @@ static struct lws_protocols protocols[] = {
 	LWS_PLUGIN_PROTOCOL_MINIMAL,
 	{ NULL, NULL, 0, 0 } /* terminator */
 };
-
-static int interrupted;
 
 static const struct lws_http_mount mount = {
 	/* .mount_next */		NULL,		/* linked-list "next" */
@@ -40,8 +40,7 @@ static const struct lws_http_mount mount = {
 
 void sigint_handler(int sig) {
   (void) sig;
-	interrupted = 1;
-  exit(1);
+  SERVER_INTERRUPTED = 1;
 }
 
 static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
@@ -173,7 +172,7 @@ void* server_start(void* s) {
 	  return NULL;
   }
 
-  while (n >= 0 && !interrupted)
+  while (n >= 0 && !SERVER_INTERRUPTED)
 	  n = lws_service(context, 0);
 
   lws_context_destroy(context);

@@ -82,6 +82,8 @@ int main(int argc, char** argv) {
   }
 
   free(options);
+  
+  SERVER_INTERRUPTED = 1;
 
   pthread_join(id, NULL);
   return 0;
