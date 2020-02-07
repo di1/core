@@ -1,5 +1,5 @@
 /// <reference path="chart/Chart.ts" />
 
 window.onload = () => {
-  let a: CandleChart = new CandleChart("TSLA");
+  let a: CandleChart = new CandleChart("AAPL");
 }

@@ -237,6 +237,15 @@ class CandleChart {
       ctx.fillText("-" + (i/10000).toFixed(4),
                    drawing_width-this.getPriceWidth(ctx),
                    price_to_pixel.eval(i));
+
+      ctx.strokeStyle = 'gray';
+      ctx.setLineDash([2,5]);
+      ctx.beginPath();
+      ctx.moveTo(0, price_to_pixel.eval(i));
+      ctx.lineTo(drawing_width-this.getPriceWidth(ctx),
+                 price_to_pixel.eval(i));
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
 
     // DRAW THE CANDLES
