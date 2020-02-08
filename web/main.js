@@ -4,14 +4,15 @@
 var CandleChart = /** @class */ (function () {
     function CandleChart(symbol) {
         this.NUM_TICKS = 20;
-        this.PADDING_BOT = 15;
-        this.PADDING_TOP = 15;
+        this.PADDING_BOT = 20;
+        this.PADDING_TOP = 20;
         this.CANDLE_WIDTH = 10;
         this.ROOT_CHART = undefined;
         this.CANDLE_UPDATES_SENT = 0;
         this.CANDLE_SPACING = 5;
         this.MOUSE_X = 0;
         this.MOUSE_Y = 0;
+        this.RESET_CHART = false;
         this.chart_canvas = document.getElementById("chart");
         if (!this.chart_canvas) {
             console.error("chart does not exist in html");
@@ -25,7 +26,16 @@ var CandleChart = /** @class */ (function () {
         this.chart_canvas.onwheel = this.onMouseWheelEvent.bind(this);
         this.chart_canvas.onmousemove = this.onMouseMove.bind(this);
     }
+    CandleChart.prototype.setSymbol = function (symbol) {
+        this.symbol = symbol;
+        this.RESET_CHART = true;
+    };
     CandleChart.prototype.onMessage = function (evt) {
+        if (this.RESET_CHART) {
+            this.RESET_CHART = false;
+            this.conn.send('init|' + this.symbol);
+            return;
+        }
         var genericMsg = JSON.parse(evt.data);
         if (genericMsg['chart']) {
             var latestChart = genericMsg;
@@ -121,7 +131,6 @@ var CandleChart = /** @class */ (function () {
         return ctx.measureText(' 0000.0000').width;
     };
     CandleChart.prototype.onMouseWheelEvent = function (evt) {
-        console.log(evt.deltaY);
         if (evt.deltaY > 0)
             this.CANDLE_WIDTH += 1;
         if (evt.deltaY < 0)
@@ -222,6 +231,24 @@ var CandleChart = /** @class */ (function () {
         ctx.lineTo(this.MOUSE_X, drawing_height);
         ctx.stroke();
         ctx.setLineDash([]);
+        ctx.font = this.PADDING_TOP + 'px Monospace';
+        ctx.fillStyle = 'white';
+        ctx.textBaseline = 'top';
+        ctx.fillText(this.symbol.toUpperCase(), 0, 0);
+        // CONERT MOUSE COORDIANTES TO CANDLE INDEX
+        var mouse_candle_index = Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH + this.CANDLE_SPACING));
+        mouse_candle_index += start_index;
+        if (!this.ROOT_CHART) {
+            console.error('this.ROOT_CHART undefined');
+            return;
+        }
+        if (mouse_candle_index >= this.ROOT_CHART.chart.length)
+            mouse_candle_index = this.ROOT_CHART.chart.length - 1;
+        var hovered_candle = this.ROOT_CHART.chart[mouse_candle_index].candle;
+        ctx.fillText(" O:" + (hovered_candle.o / 10000).toFixed(4) +
+            " H:" + (hovered_candle.h / 10000).toFixed(4) +
+            " L:" + (hovered_candle.l / 10000).toFixed(4) +
+            " C:" + (hovered_candle.c / 10000).toFixed(4), ctx.measureText(this.symbol).width + this.PADDING_TOP, 0);
         this.CANDLE_UPDATES_SENT += 1;
         // sync chart every 100 updates
         if (this.CANDLE_UPDATES_SENT % 100 == 0) {
@@ -235,8 +262,28 @@ var CandleChart = /** @class */ (function () {
     return CandleChart;
 }());
 /// <reference path="chart/Chart.ts" />
+var large_display_chart = null;
+function search_input_key_press(evt) {
+    if (evt.keyCode != 13) {
+        return;
+    }
+    var search_input = evt.srcElement;
+    var wanted_stock = search_input.value.toUpperCase();
+    console.log(wanted_stock);
+    if (!large_display_chart) {
+        console.error('display chart is undefined');
+        return;
+    }
+    large_display_chart.setSymbol(wanted_stock);
+}
 window.onload = function () {
-    var a = new CandleChart("AAPL");
+    large_display_chart = new CandleChart("FB");
+    var search_input = document.getElementById('stock-search-input');
+    if (!search_input) {
+        console.error("can't find search input");
+        return;
+    }
+    search_input.onkeypress = search_input_key_press;
 };
 /// <reference path="ILinearEquation.ts" />
 var LinearEquation = /** @class */ (function () {

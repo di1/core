@@ -38,4 +38,4 @@ ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
 TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES} 
-  log book iex chart security exchange server Threads::Threads)
+  log book iex chart security exchange server analysis Threads::Threads)

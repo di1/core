@@ -1,8 +1,16 @@
+* {
+  font-family: monospace;
+}
+
 body, html {
   margin: 0px;
   padding: 0px;
   width: 100%;
   height: 100%;
+
+  background-color: #131722;
+  color: white;
+  font-family: monospace;
 }
 
 #chart {
@@ -10,16 +18,39 @@ body, html {
   top: 38px;
   left: 200px;
 
-  width: calc(100% - 200px);
+  width: calc(100% - 203px);
   height: calc(100% - 200px);
+  border: solid 1px green;
 }
 
 #top-bar {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 200px;
   height: 38px;
-  width: 100%;
+  width: calc(100% - 200px);
+
+  display: flex;
+  align-items: center;
+}
+
+#top-bar span {
+  display: flex;
+  align-items: center;
+  background-color: #363a45;
+  padding-right: 5px;
+  border-radius: 5px;
+  height: 90%;
+}
+
+#stock-search-input {
+  border: none;
+  height: 20px;
+  background-color: #363a45;
+  color: white;
+  padding-left: 10px;
+  width: 300px;
+  text-transform: uppercase;
 }
 
 #side-bar {
@@ -36,4 +67,8 @@ body, html {
   left: 200px;
   width: calc(100% - 200px);
   height: 200px;
+}
+
+#view {
+  
 }

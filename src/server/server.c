@@ -104,6 +104,8 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
     log_debug("received message: %.*s", (int) len, (char*) in);
 
     char* response = parse_message(in, len);
+    if (!response)
+      break;
     size_t response_len = strlen(response);
 
 		vhd->amsg.len = response_len;

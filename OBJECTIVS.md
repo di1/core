@@ -7,8 +7,8 @@
 - [ ] Multithreaded Analysis
 
 ### Frontend
-- [ ] Develop protocol for web socket server
-- [ ] Charting application using canvas
+- [x] Develop protocol for web socket server
+- [x] Charting application using canvas
 - [ ] Canvas draw lines
 - [ ] Canvas display chart patterns
 

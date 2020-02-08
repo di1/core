@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <pthread.h>
 
 #include "candle.h"
 

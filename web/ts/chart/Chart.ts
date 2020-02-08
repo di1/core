@@ -8,8 +8,8 @@ class CandleChart {
   private chart_canvas: HTMLCanvasElement | null;
  
   private NUM_TICKS: number = 20;
-  private PADDING_BOT: number = 15;
-  private PADDING_TOP: number = 15;
+  private PADDING_BOT: number = 20;
+  private PADDING_TOP: number = 20;
   private CANDLE_WIDTH: number = 10;
 
 
@@ -19,6 +19,8 @@ class CandleChart {
 
   private MOUSE_X: number = 0;
   private MOUSE_Y: number = 0;
+
+  private RESET_CHART: boolean = false;
 
   constructor(symbol: string) {
     this.chart_canvas = <HTMLCanvasElement> document.getElementById("chart");
@@ -39,7 +41,18 @@ class CandleChart {
     this.chart_canvas.onmousemove = this.onMouseMove.bind(this);
   }
 
+  public setSymbol(symbol: string) {
+    this.symbol = symbol;
+    this.RESET_CHART = true;
+  }
+
   private onMessage(evt: MessageEvent) {
+
+    if (this.RESET_CHART) {
+      this.RESET_CHART = false;
+      this.conn.send('init|' + this.symbol);
+      return;
+    }
 
     var genericMsg = JSON.parse(evt.data);
 
@@ -165,7 +178,6 @@ class CandleChart {
   }
 
   private onMouseWheelEvent(evt: WheelEvent) {
-    console.log(evt.deltaY);
     if (evt.deltaY > 0)
       this.CANDLE_WIDTH += 1;
     if (evt.deltaY < 0)
@@ -322,6 +334,30 @@ class CandleChart {
     ctx.lineTo(this.MOUSE_X, drawing_height);
     ctx.stroke();
     ctx.setLineDash([]);
+
+    ctx.font = this.PADDING_TOP + 'px Monospace';
+    ctx.fillStyle = 'white';
+    ctx.textBaseline = 'top';
+    ctx.fillText(this.symbol.toUpperCase(), 0, 0);
+
+    // CONERT MOUSE COORDIANTES TO CANDLE INDEX
+    let mouse_candle_index = Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH+this.CANDLE_SPACING));
+    mouse_candle_index += start_index;
+    if (!this.ROOT_CHART) {
+      console.error('this.ROOT_CHART undefined');
+      return;
+    }
+
+    if (mouse_candle_index >= this.ROOT_CHART.chart.length)
+      mouse_candle_index = this.ROOT_CHART.chart.length-1;
+
+    let hovered_candle: Candle = this.ROOT_CHART.chart[mouse_candle_index].candle;
+    ctx.fillText(" O:" + (hovered_candle.o/10000).toFixed(4) + 
+                 " H:" + (hovered_candle.h/10000).toFixed(4) + 
+                 " L:" + (hovered_candle.l/10000).toFixed(4) +
+                 " C:" + (hovered_candle.c/10000).toFixed(4),
+                ctx.measureText(this.symbol).width + this.PADDING_TOP,
+                0);
 
     this.CANDLE_UPDATES_SENT += 1;
     // sync chart every 100 updates

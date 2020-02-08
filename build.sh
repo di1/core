@@ -32,7 +32,7 @@ if [ "$1" = "debug" ]
 then
   cd build
   cmake ../
-  make
+  make -s
   exit 0
 elif [ "$1" = "release" ]
 then
@@ -44,7 +44,7 @@ then
   rm -rf *  
   export RUN_TESTS=0
   cmake ../
-  make
+  make -s
   exit 0
 elif [ "$1" = "clean" ]
 then
@@ -56,7 +56,7 @@ then
   cd build
   export RUN_TESTS=true
   cmake ../
-  make
+  make -s
   ./riski
   exit 0
 else

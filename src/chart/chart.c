@@ -1,5 +1,8 @@
 #include "chart/candle.h"
 #include <chart/chart.h>
+#include <pthread.h>
+
+pthread_mutex_t m_chart_update = PTHREAD_MUTEX_INITIALIZER;
 
 struct chart {
   // the interval between the two candles in nanoseconds
