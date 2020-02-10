@@ -2,7 +2,6 @@
 #include <iex/iex.h>
 
 // iex packet and type data
-#include "security/security.h"
 #include "types.h"
 #include "packet.h"
 
