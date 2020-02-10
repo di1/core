@@ -6,7 +6,7 @@ char* init_response(char* security) {
   struct security* sec = exchange_get(iex_exchange, security);
 
   if (!sec) {
-    log_debug("%s is not a valid security traded on IEX", security);
+    log_error("%s is not a valid security traded on IEX", security);
     return NULL;
   }
 
@@ -19,7 +19,7 @@ char* latest_response(char* security) {
   struct security* sec = exchange_get(iex_exchange, security);
 
   if (!sec) {
-    log_debug("%s is not a valid security traded on IEX", security);
+    log_error("%s is not a valid security traded on IEX", security);
     return NULL;
   }
 
@@ -39,11 +39,11 @@ char* parse_message(char* msg, int len) {
   char* tokened = NULL;
   tokened = strtok(sanitized_msg, "|");
 
-  log_debug("received event type: %s", tokened);
+  //log_debug("received event type: %s", tokened);
 
   if (strcmp("init", tokened) == 0) {
     tokened = strtok(NULL, "|");
-    log_debug("sending full chart for %s", tokened);
+    //log_debug("sending full chart for %s", tokened);
 
     char* response = init_response(tokened);
     free(sanitized_msg);
@@ -52,7 +52,7 @@ char* parse_message(char* msg, int len) {
   }
   if (strcmp("latest", tokened) == 0) {
     tokened = strtok(NULL, "|");
-    log_debug("sending latest candle for %s", tokened);
+    //log_debug("sending latest candle for %s", tokened);
 
     char* response = latest_response(tokened);
     free(sanitized_msg);

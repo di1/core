@@ -7,6 +7,7 @@
 #include <book/book.h>
 #include <chart/chart.h>
 #include <log/log.h>
+#include <pthread.h>
 
 #define SECURITY_INTERVAL_MINUTE_NANOSECONDS 6e+10
 

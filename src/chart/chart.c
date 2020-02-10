@@ -2,8 +2,6 @@
 #include <chart/chart.h>
 #include <pthread.h>
 
-pthread_mutex_t m_chart_update = PTHREAD_MUTEX_INITIALIZER;
-
 struct chart {
   // the interval between the two candles in nanoseconds
   uint64_t interval; 
@@ -57,6 +55,7 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
     // update the current candle
     candle_update(cht->candles[cht->cur_candle], price, ts); 
   }
+
 }
 
 char* chart_json(struct chart* cht) {
@@ -95,11 +94,14 @@ char* chart_json(struct chart* cht) {
     tmp_candle_json = NULL;
   }
   strcat(buf, "]}\x0");
+  
   return buf;
 }
 
 char* chart_latest_candle(struct chart* cht) {
   // {"latest_candle":}
+  
+
   size_t total_json_size = 18 + JSON_CANDLE_MAX_LEN;
   char* buf = (char*) calloc(total_json_size, sizeof(char));
   strcat(buf, "{\"latest_candle\":\x0");

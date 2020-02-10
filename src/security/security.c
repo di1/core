@@ -1,4 +1,7 @@
+#include <pthread.h>
 #include <security/security.h>
+
+pthread_mutex_t m_chart_update = PTHREAD_MUTEX_INITIALIZER;
 
 struct security {
   // the name of the security
@@ -34,11 +37,17 @@ size_t security_hash(char* name) {
 }
 
 char* security_get_chart(struct security* sec) {
-  return chart_json(sec->cht);
+  pthread_mutex_lock(&m_chart_update);
+  char* ret = chart_json(sec->cht);
+  pthread_mutex_unlock(&m_chart_update);
+  return ret;
 }
 
 char* security_get_latest_candle(struct security* sec) {
-  return chart_latest_candle(sec->cht);
+  pthread_mutex_lock(&m_chart_update);
+  char* ret = chart_latest_candle(sec->cht);
+  pthread_mutex_unlock(&m_chart_update);
+  return ret;
 }
 
 bool security_cmp(char* n1, struct security* s) {
@@ -67,7 +76,9 @@ void security_book_update(struct security* sec,
 
 // this is just an abstraction on the chart update function
 void security_chart_update(struct security* sec, int64_t price, uint64_t ts) {
+  pthread_mutex_lock(&m_chart_update);
   chart_update(sec->cht, price, ts);
+  pthread_mutex_unlock(&m_chart_update);
 }
 
 void security_free(struct security** sec) {
