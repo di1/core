@@ -1,3 +1,4 @@
+#include "iex/iex.h"
 #include <server/server.h>
 
 #define LWS_PLUGIN_STATIC
@@ -41,6 +42,8 @@ static const struct lws_http_mount mount = {
 void sigint_handler(int sig) {
   (void) sig;
   SERVER_INTERRUPTED = 1;
+  IEX_SIGNAL_INTER = 1;
+  iex_stop_parse();
 }
 
 static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
@@ -86,19 +89,23 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
 		/* notice we allowed for LWS_PRE in the payload already */
 
+    /*
 		m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
 			      LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
 		if (m < (int)vhd->amsg.len) {
 			lwsl_err("ERROR %d writing to ws\n", m);
 			return -1;
 		}
-
 		pss->last = vhd->current;
+    */
 		break;
 
 	case LWS_CALLBACK_RECEIVE:
 		if (vhd->amsg.payload) {
-			__minimal_destroy_message(&vhd->amsg);
+      struct msg* msg = &vhd->amsg;
+      free(msg->payload);
+      msg->payload = NULL;
+      msg->len = 0;
     }
 
     char* response = parse_message(in, len);
@@ -119,14 +126,16 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     free(response);
 
-		/*
-		 * let everybody know we want to write something on them
-		 * as soon as they are ready
-		 */
-		lws_start_foreach_llp(struct per_session_data__minimal **,
-				      ppss, vhd->pss_list) {
-			lws_callback_on_writable((*ppss)->wsi);
-		} lws_end_foreach_llp(ppss, pss_list);
+    m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
+			      LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
+		if (m < (int)vhd->amsg.len) {
+			lwsl_err("ERROR %d writing to ws\n", m);
+			return -1;
+		}
+		pss->last = vhd->current;
+    free(vhd->amsg.payload);
+    vhd->amsg.payload = NULL;
+    vhd->amsg.len = 0;
 		break;
 
 	default:
@@ -176,6 +185,5 @@ void* server_start(void* s) {
 	  n = lws_service(context, 0);
 
   lws_context_destroy(context);
-
   return 0;
 }

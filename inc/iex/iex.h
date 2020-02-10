@@ -7,6 +7,7 @@
 #include <log/log.h>
 #include <string.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #include <net/ethernet.h>
 #include <arpa/inet.h>
@@ -28,5 +29,16 @@ void iex_parse_deep(char* file);
  * Represents the IEX exchange
  */
 struct exchange* iex_exchange;
+
+/**
+ * Stops processing
+ */
+void iex_stop_parse();
+
+/**
+ * Must be set to 1 on interrup
+ * otherwise will exit 1
+ */
+int IEX_SIGNAL_INTER;
 
 #endif

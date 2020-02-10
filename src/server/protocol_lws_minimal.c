@@ -48,17 +48,6 @@ struct per_vhost_data__minimal {
 };
 
 /* destroys the message when everyone has had a copy of it */
-
-static void
-__minimal_destroy_message(void *_msg)
-{
-	struct msg *msg = _msg;
-
-	free(msg->payload);
-	msg->payload = NULL;
-	msg->len = 0;
-}
-
 #define LWS_PLUGIN_PROTOCOL_MINIMAL \
 	{ \
 		"lws-minimal", \

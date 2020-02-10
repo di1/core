@@ -1,5 +1,6 @@
 // header file that makes iex_parse_deep public
 #include <iex/iex.h>
+#include <pcap/pcap.h>
 
 // iex packet and type data
 #include "types.h"
@@ -14,6 +15,12 @@
   }while (0);
 
 
+int IEX_SIGNAL_INTER = 0;
+pcap_t* desc;
+
+void iex_stop_parse() {
+  pcap_breakloop(desc);
+}
 
 /**
  * Sets or appends a NULL character to the end of
@@ -80,7 +87,6 @@ void iex_parse_deep(char* file) {
   log_trace("offline iex deep");
 
   // create a file descriptor for the pcap file
-  pcap_t* desc;
   char errbuff[PCAP_ERRBUF_SIZE];
   desc = pcap_open_offline(file, errbuff);
 
@@ -95,8 +101,10 @@ void iex_parse_deep(char* file) {
   iex_exchange = exchange_new("IEX");
 
   if (pcap_loop(desc, 0, packet_handler, NULL) < 0) {
-    log_error("%s", pcap_geterr(desc));
-    exit(1);
+    if (IEX_SIGNAL_INTER != 1) {
+      log_error("%s", pcap_geterr(desc));
+      exit(1);
+    }
   }  
 
   // TODO do some sort of finalization to the data here?
