@@ -1,6 +1,10 @@
 #include "chart/candle.h"
+#include "log/log.h"
 #include <chart/chart.h>
 #include <pthread.h>
+
+// The maximum number of candles any given chart has
+size_t g_max_candles = 0;
 
 struct chart {
   // the interval between the two candles in nanoseconds
@@ -41,6 +45,13 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
   // special case where this is the first chart update
   if (cht->last_update == 0) {
     cht->last_update = ts;
+    // check if we need to pre fill the data to make sure
+    // all charts are on the same candle index
+    for (size_t i = 0; i < g_max_candles; ++i) {
+      chart_new_candle(cht, price);
+      cht->cur_candle += 1;
+    }
+    cht->last_update = ts;
     chart_new_candle(cht, price);
     return;
   }
@@ -48,6 +59,23 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
   // check if the interval requires us to make a new candle
   if (ts - cht->last_update > cht->interval) {
     // create a new candle
+    
+    // check if fill-ins are reqired
+    size_t fill_in_candles = (ts - cht->last_update) / cht->interval; 
+
+    if (fill_in_candles != 1) {
+      for (size_t i = 0; i < fill_in_candles-1; ++i) {
+        // fill in the candles in between with dojies of the
+        // current candle before creating the new candle
+        cht->cur_candle += 1;
+        cht->last_update += cht->interval;
+        chart_new_candle(cht, candle_close(cht->candles[cht->cur_candle-1]));
+        candle_update(cht->candles[cht->cur_candle], 
+          candle_close(cht->candles[cht->cur_candle]),
+          cht->last_update + cht->interval); 
+      } 
+    }
+
     cht->last_update = ts;
     cht->cur_candle += 1;
     chart_new_candle(cht, price); 
@@ -56,6 +84,8 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
     candle_update(cht->candles[cht->cur_candle], price, ts); 
   }
 
+  if (cht->cur_candle > g_max_candles)
+    g_max_candles = cht->cur_candle;
 }
 
 char* chart_json(struct chart* cht) {

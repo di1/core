@@ -249,6 +249,9 @@ var CandleChart = /** @class */ (function () {
             " H:" + (hovered_candle.h / 10000).toFixed(4) +
             " L:" + (hovered_candle.l / 10000).toFixed(4) +
             " C:" + (hovered_candle.c / 10000).toFixed(4), ctx.measureText(this.symbol).width + this.PADDING_TOP, 0);
+        ctx.fillText(new Date(hovered_candle.e / 1000000).toDateString(), drawing_width -
+            ctx.measureText(new Date(hovered_candle.e / 1000000).toDateString()).width -
+            this.getPriceWidth(ctx), 0);
         this.CANDLE_UPDATES_SENT += 1;
         // sync chart every 100 updates
         if (this.CANDLE_UPDATES_SENT % 100 == 0) {
@@ -277,7 +280,7 @@ function search_input_key_press(evt) {
     large_display_chart.setSymbol(wanted_stock);
 }
 window.onload = function () {
-    large_display_chart = new CandleChart("FB");
+    large_display_chart = new CandleChart("AAPL");
     var search_input = document.getElementById('stock-search-input');
     if (!search_input) {
         console.error("can't find search input");

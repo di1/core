@@ -8,6 +8,7 @@ command -v tsc >/dev/null 2>&1 || { echo >&2 "I require npm but it's not install
 cd web
 npm update
 tsc
+uglifyjs main.js > main.min.js
 
 cd ..
 

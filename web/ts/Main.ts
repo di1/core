@@ -19,7 +19,7 @@ function search_input_key_press(evt: KeyboardEvent) {
 }
 
 window.onload = () => {
-  large_display_chart = new CandleChart("FB");
+  large_display_chart = new CandleChart("AAPL");
 
   let search_input: HTMLInputElement | null = 
   <HTMLInputElement> document.getElementById('stock-search-input');

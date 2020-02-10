@@ -32,6 +32,30 @@ struct candle* candle_new(int64_t price, uint64_t time) {
   return c;
 }
 
+int64_t candle_open(struct candle* c) {
+  return c->open;
+}
+
+int64_t candle_high(struct candle* c) {
+  return c->high;
+}
+
+int64_t candle_low(struct candle* c) {
+  return c->low;
+}
+
+int64_t candle_close(struct candle* c) {
+  return c->close;
+}
+
+uint64_t candle_start(struct candle* c) {
+  return c->start_time;
+}
+
+uint64_t candle_end(struct candle* c) {
+  return c->end_time;
+}
+
 void candle_update(struct candle* c, int64_t price, uint64_t time) {
 
   // set the close time only if the last price time

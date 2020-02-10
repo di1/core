@@ -1,8 +1,6 @@
 #include <pthread.h>
 #include <security/security.h>
 
-pthread_mutex_t m_chart_update = PTHREAD_MUTEX_INITIALIZER;
-
 struct security {
   // the name of the security
   // always 8 characters long with right space padding
@@ -16,6 +14,9 @@ struct security {
 
   // the current chart of the security
   struct chart* cht;
+
+  pthread_mutex_t m_chart_update;
+
 };
 
 size_t hash(unsigned char* str) {
@@ -37,16 +38,16 @@ size_t security_hash(char* name) {
 }
 
 char* security_get_chart(struct security* sec) {
-  pthread_mutex_lock(&m_chart_update);
+  pthread_mutex_lock(&(sec->m_chart_update));
   char* ret = chart_json(sec->cht);
-  pthread_mutex_unlock(&m_chart_update);
+  pthread_mutex_unlock(&(sec->m_chart_update));
   return ret;
 }
 
 char* security_get_latest_candle(struct security* sec) {
-  pthread_mutex_lock(&m_chart_update);
+  pthread_mutex_lock(&(sec->m_chart_update));
   char* ret = chart_latest_candle(sec->cht);
-  pthread_mutex_unlock(&m_chart_update);
+  pthread_mutex_unlock(&(sec->m_chart_update));
   return ret;
 }
 
@@ -65,6 +66,7 @@ struct security* security_new(char* name, uint64_t interval) {
   sec->b = book_new();
   sec->cht = chart_new(interval);
   sec->hash = hash((unsigned char*)n);
+  pthread_mutex_init(&(sec->m_chart_update), NULL);
   return sec;
 }
 
@@ -76,9 +78,9 @@ void security_book_update(struct security* sec,
 
 // this is just an abstraction on the chart update function
 void security_chart_update(struct security* sec, int64_t price, uint64_t ts) {
-  pthread_mutex_lock(&m_chart_update);
+  pthread_mutex_lock(&(sec->m_chart_update));
   chart_update(sec->cht, price, ts);
-  pthread_mutex_unlock(&m_chart_update);
+  pthread_mutex_unlock(&(sec->m_chart_update));
 }
 
 void security_free(struct security** sec) {

@@ -233,17 +233,16 @@ void parse_security_event_message(void* payload) {
 
   switch (payload_data->security_event) {
     case OPENING_PROCESS_COMPLETE:
-      log_trace("opening process complete %.8s at %lu",
-          payload_data->symbol, payload_data->timestamp);
+      log_trace("opening process complete %.8s",
+          payload_data->symbol);
       break;
     case CLOSING_PROCESS_COMPLETE:
-      log_trace("closing process complete %.8s at %lu",
-          payload_data->symbol, payload_data->timestamp);
+      log_trace("closing process complete %.8s",
+          payload_data->symbol);
       break;
     default:
-      log_error("unknown security event message 0x%x symbol %.8s %lu",
-          payload_data->security_event, payload_data->symbol,
-          payload_data->timestamp);
+      log_error("unknown security event message 0x%x symbol %.8s",
+          payload_data->security_event, payload_data->symbol);
       exit(1);
   } 
 

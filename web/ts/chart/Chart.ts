@@ -359,6 +359,12 @@ class CandleChart {
                 ctx.measureText(this.symbol).width + this.PADDING_TOP,
                 0);
 
+    ctx.fillText(new Date(hovered_candle.e/1000000).toDateString(),
+                 drawing_width - 
+                   ctx.measureText(new Date(hovered_candle.e/1000000).toDateString()).width - 
+                   this.getPriceWidth(ctx),
+                 0);
+
     this.CANDLE_UPDATES_SENT += 1;
     // sync chart every 100 updates
     if (this.CANDLE_UPDATES_SENT % 100 == 0) {
