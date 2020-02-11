@@ -129,6 +129,8 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
   // create the new element
   struct analysis_info* element = analysis_create_info(cht, start, end);
 
+  size_t ne = 0;
+
   // aquire lock to make sure no removing occurs
   pthread_mutex_lock(&(bin->can_remove));
 
@@ -138,6 +140,7 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
     bin->head = element;
     bin->tail = element;
     bin->num_elements = 1;
+    ne = bin->num_elements;
     pthread_mutex_unlock(&(bin->can_remove));
   } else {
     // insert into the end of the dll
@@ -150,11 +153,14 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
     bin->tail->prev = tail;
     bin->tail = element;
     bin->num_elements += 1;
+    ne = bin->num_elements;
     pthread_mutex_unlock(&(bin->can_remove));
   }
 
-  log_debug("%lu elements left in thead bin %lu", bin->num_elements,
-          thread_bin);
+  if (ne > 5) {
+    log_warn("thread id %lu analysis is %lu candles behind",
+        thread_bin, ne);
+  }
 
   current_analysis_index += 1;
 }
