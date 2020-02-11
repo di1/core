@@ -163,7 +163,8 @@ void* server_start(void* s) {
 
 
   lws_set_log_level(logs, NULL);
-  lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use TLS / https)\n");
+  //lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use TLS / https)\n");
+  log_trace("start http & ws server");
 
   memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
   info.port = 7681;

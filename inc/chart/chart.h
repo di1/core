@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-
-#include "candle.h"
+#include <log/log.h>
+#include <pthread.h>
+#include <chart/candle.h>
+#include <analysis/analysis.h>
 
 /**
  *  Private chart struct

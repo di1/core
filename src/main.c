@@ -12,6 +12,7 @@
 #include <security/security.h>
 #include <exchange/exchange.h>
 #include <server/server.h>
+#include <analysis/analysis.h>
 
 /**
  * Defines the command line arguments
@@ -76,6 +77,8 @@ int main(int argc, char** argv) {
 
   pthread_t id;
   pthread_create(&id, NULL, server_start, NULL);
+
+  analysis_init();
 
   if (options->pcap_feed) {
     iex_parse_deep(options->pcap_feed_file);

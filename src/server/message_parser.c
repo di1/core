@@ -9,8 +9,8 @@ char* init_response(char* security) {
     log_error("%s is not a valid security traded on IEX", security);
     return NULL;
   }
-
   char* cht = security_get_chart(sec);
+
   return cht;
 
 }

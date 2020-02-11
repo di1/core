@@ -2,6 +2,8 @@
 
 size_t num_securities = 0;
 
+char** security_names = NULL;
+
 // linked list prototype
 struct ll {
   // current security value
@@ -48,6 +50,12 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
   num_securities += 1;
   if (num_securities%200 == 0)
     log_debug("~%lu securities monitored", num_securities);
+  security_names = (char**) realloc(security_names, num_securities*sizeof(char*));
+
+  char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
+  strcpy(n, name);
+
+  security_names[num_securities-1] = n;
 
 }
 
@@ -87,8 +95,12 @@ void exchange_free(struct exchange** e) {
   } 
   free(*e);
   *e = NULL;
-}
 
+  for (size_t i = 0; i < num_securities; ++i) {
+    free(security_names[i]); 
+  }
+  free(security_names);
+}
 
 void test_exchange() {
   struct exchange* ex = exchange_new("test");

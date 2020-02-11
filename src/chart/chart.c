@@ -1,7 +1,4 @@
-#include "chart/candle.h"
-#include "log/log.h"
 #include <chart/chart.h>
-#include <pthread.h>
 
 // The maximum number of candles any given chart has
 size_t g_max_candles = 0;
@@ -51,6 +48,7 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
       chart_new_candle(cht, price);
       cht->cur_candle += 1;
     }
+
     cht->last_update = ts;
     chart_new_candle(cht, price);
     return;
@@ -75,6 +73,10 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
           cht->last_update + cht->interval); 
       } 
     }
+
+    // before creating the new candle queue up analysis
+    // from candle 0 to cht->cur_candle
+    analysis_push(cht, 0, cht->cur_candle+1);
 
     cht->last_update = ts;
     cht->cur_candle += 1;
