@@ -27,6 +27,20 @@ char* latest_response(char* security) {
   return cht;
 }
 
+char* analysis_response(char* security) {
+
+  struct security* sec = exchange_get(iex_exchange, security);
+
+  if (!sec) {
+    log_error("%s is not a valid secuiryt traded on IEX", security);
+    return NULL;
+  }
+
+  char* analysis_json = security_get_analysis(sec);
+  return analysis_json;
+
+}
+
 char* parse_message(char* msg, int len) {
   
   // there is some garbage after msg from the websocket
@@ -43,7 +57,6 @@ char* parse_message(char* msg, int len) {
 
   if (strcmp("init", tokened) == 0) {
     tokened = strtok(NULL, "|");
-    //log_debug("sending full chart for %s", tokened);
 
     char* response = init_response(tokened);
     free(sanitized_msg);
@@ -52,12 +65,21 @@ char* parse_message(char* msg, int len) {
   }
   if (strcmp("latest", tokened) == 0) {
     tokened = strtok(NULL, "|");
-    //log_debug("sending latest candle for %s", tokened);
 
     char* response = latest_response(tokened);
     free(sanitized_msg);
 
     return response;
+  }
+
+  if (strcmp("analysis", tokened) == 0) {
+    tokened = strtok(NULL, "|");
+
+    char* response = analysis_response(tokened);
+    free(sanitized_msg);
+
+    return response;
+
   }
 
   free(sanitized_msg);

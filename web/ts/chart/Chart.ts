@@ -22,6 +22,8 @@ class CandleChart {
 
   private RESET_CHART: boolean = false;
 
+  private ANALYSIS_RESULTS: RootAnalysisJSON | undefined = undefined;
+
   constructor(symbol: string) {
     this.chart_canvas = <HTMLCanvasElement> document.getElementById("chart");
 
@@ -89,8 +91,11 @@ class CandleChart {
         this.drawFull(this.ROOT_CHART);
       } else {
         this.ROOT_CHART.chart.push({candle: updateCandle.latest_candle.candle});
+        this.conn.send('analysis|' + this.symbol);
         this.drawFull(this.ROOT_CHART);
       }
+    } else if (genericMsg['analysis']) {
+      this.ANALYSIS_RESULTS = <RootAnalysisJSON> genericMsg;
     } else {
       console.error('invalid response from server');
     }

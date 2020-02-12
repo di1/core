@@ -55,6 +55,12 @@ void security_book_update(struct security* sec, bool side, int64_t price,
 char* security_get_chart(struct security* sec);
 
 /**
+ * Returns a json representation of the analysis
+ * done on this securities chart
+ */
+char* security_get_analysis(struct security* sec);
+
+/**
  * Returns the latest candle of a given security
  */
 char* security_get_latest_candle(struct security* sec);

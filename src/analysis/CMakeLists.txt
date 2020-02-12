@@ -1,1 +1,1 @@
-ADD_LIBRARY(analysis analysis.c)
+ADD_LIBRARY(analysis marubozu.c analysis.c)

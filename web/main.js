@@ -13,6 +13,7 @@ var CandleChart = /** @class */ (function () {
         this.MOUSE_X = 0;
         this.MOUSE_Y = 0;
         this.RESET_CHART = false;
+        this.ANALYSIS_RESULTS = undefined;
         this.chart_canvas = document.getElementById("chart");
         if (!this.chart_canvas) {
             console.error("chart does not exist in html");
@@ -64,8 +65,12 @@ var CandleChart = /** @class */ (function () {
             }
             else {
                 this.ROOT_CHART.chart.push({ candle: updateCandle.latest_candle.candle });
+                this.conn.send('analysis|' + this.symbol);
                 this.drawFull(this.ROOT_CHART);
             }
+        }
+        else if (genericMsg['analysis']) {
+            this.ANALYSIS_RESULTS = genericMsg;
         }
         else {
             console.error('invalid response from server');

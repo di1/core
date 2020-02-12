@@ -40,6 +40,42 @@ char* chart_json(struct chart* cht);
 char* chart_latest_candle(struct chart* cht);
 
 /**
+ * enumation for candle patterns
+ */
+enum SINGLE_CANDLE_PATTERNS {
+  SINGLE_CANDLE_PATTERN_NONE,
+  SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU,
+  SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU
+};
+
+/**
+ * Aquires the analysis lock
+ */
+void chart_analysis_lock(struct chart* cht);
+
+/**
+ * Releases the analysis lock
+ */
+void chart_analysis_unlock(struct chart* cht);
+
+/**
+ * Tags a candle with a single candle pattern
+ */
+void chart_put_single_candle_pattern(struct chart* cht, size_t index,
+    enum SINGLE_CANDLE_PATTERNS identifier);
+
+/**
+ * Returns a json that represents the analysis
+ */
+char* chart_analysis_json(struct chart* cht);
+
+/**
+ * Returns a candle, this will only return finalized candles, ie
+ * candles that are not currently being modified
+ */
+struct candle* chart_get_candle(struct chart* cht, size_t index);
+
+/**
  * Runs tests on the chart class
  */
 void test_chart();

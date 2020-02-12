@@ -1,6 +1,8 @@
 #include <analysis/analysis.h>
+#include <analysis/marubozu.h>
+
 #include <chart/chart.h>
-#include <unistd.h>
+#include <chart/candle.h>
 
 struct analysis_info {
 
@@ -40,28 +42,100 @@ struct analysis_list {
 // fwd declaration of analysis_pop
 struct analysis_info* analysis_pop(struct analysis_list* bin);
 
+// Keeps track of which bin the next request will go into
 size_t current_analysis_index = 0;
 size_t num_analysis_threads = 0;
 
 // Holds num_analysis_threads analysis_lists
 struct analysis_list** thread_operations;
 
+// Set to true once all the threads have been created
+bool init_completed = false;
+
+// The list of analysis threads
 pthread_t* threads;
 
-bool init_completed = false;
+#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)        \
+  do {                                                          \
+    ret = ANALYSIS_FUNCTION(last_candle);                       \
+    if (ret != SINGLE_CANDLE_PATTERN_NONE){                     \
+      chart_put_single_candle_pattern(cht, end_candle-1, ret);  \
+    }                                                           \
+  } while(0);
+
+
+/**
+ * Performs simple candle stick analysis on the chart
+ * because this only requires the most recent candle
+ * we only need to perform analysis on the last candle.
+ *
+ * Analysis done in this thread only relies on the end_candle
+ * index, which since is 1 indexed will be end_candle-1 in the 
+ * array.
+ */
+void simple_analysis(struct chart* cht, size_t end_candle) {
+  struct candle* last_candle = chart_get_candle(cht, end_candle-1);
+
+  if (!last_candle) {
+    log_error("%lu end_candle", end_candle);
+    exit(1);
+  }
+
+  // Make sure this is a valid candle, fill in candles will have the same
+  // start and end time
+  if (candle_open(last_candle) == candle_close(last_candle))
+     return; 
+
+  // Now that we have a valid candle perform all single candle
+  // analysis
+
+  // return value of each single analysis
+  enum SINGLE_CANDLE_PATTERNS ret;
+
+  SINGLE_CANDLE_PATTERN_PERFORM(is_white_marubozu);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
+
+}
+
 
 void* analysis_thread_func(void* index) {
 
+  // wait for the sync
+
+  // get the assigned bin id of this analysis thread
   size_t assigned_bin =  *((size_t*)index);
   free(index);
 
+  // this thread will only monitor this bin of analysis requests
   struct analysis_list* bin = thread_operations[assigned_bin];
   log_trace("thread was assigned bin id %lu %p", assigned_bin, bin);
+
+
   while (true) {
+    // get the next analysis in the queue
     pthread_mutex_lock(&(bin->can_remove));
     struct analysis_info* inf = analysis_pop(bin);
     pthread_mutex_unlock(&(bin->can_remove));
+  
+    // analysis_pop returns NULL if there is nothing to do 
+    if (!inf)
+     continue;
+
+    struct chart* cht = inf->cht;
+
+    size_t start_index = inf->start_candle;
+    (void) start_index;
     
+    size_t end_candle = inf->end_candle;
+
+    // aquire the analysis struct first
+    chart_analysis_lock(cht); 
+ 
+    // group the analysis into sections from simplest to hardest 
+    simple_analysis(cht, end_candle);
+
+    // release the analysis struct lock
+    chart_analysis_unlock(cht);
     free(inf);
   }
 
@@ -72,6 +146,7 @@ void analysis_init() {
   int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
   log_info("processor has %d processing threads", numCPU);
   log_trace("creating %d processing units", numCPU);
+
   num_analysis_threads = numCPU;
 
   // create the list container
@@ -158,7 +233,7 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
   }
 
   if (ne > 5) {
-    log_warn("thread id %lu analysis is %lu candles behind",
+    log_warn("thread id %lu analysis is %lu charts behind",
         thread_bin, ne);
   }
 

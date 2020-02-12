@@ -2,12 +2,12 @@
 #define ANALYSIS_
 
 #include <log/log.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
-#include <errno.h>
+#include <unistd.h>
+
+#include <chart/candle.h>
 
 // foward declaration to struct chart in chart/chart.h
 struct chart;

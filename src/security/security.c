@@ -29,6 +29,10 @@ size_t hash(unsigned char* str) {
     return hash;
 }
 
+char* security_get_analysis(struct security* sec) {
+  return chart_analysis_json(sec->cht);
+}
+
 size_t security_get_hash(struct security* s) {
   return s->hash;
 }
