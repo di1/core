@@ -383,57 +383,75 @@ void iex_tp_handler(u_char* data) {
     return;
   }
 
-  // read the message block to figure out what kind of message this is
-  struct iex_tp_message_block_header* message_header =
-    (struct iex_tp_message_block_header*) &data[sizeof(struct iex_tp_header)];
+  data = &data[sizeof(struct iex_tp_header)];
 
-  void* payload_body = &data[sizeof(struct iex_tp_header) + 
-                             sizeof(struct iex_tp_message_block_header)];
+  // to do bug, this only reads the first message of the message block
+  // add loop to read all messages
 
-  // switch through the different message types
-  switch (message_header->message_type) {
+  for (iex_short_t i = 0; i < header->message_count; ++i) {  
+    // read the message block to figure out what kind of message this is
+    struct iex_tp_message_block_header* message_header =
+      (struct iex_tp_message_block_header*) &data[0];
 
-    // administrative messages to tell us where in the trading day
-    // we are
-    case SYSTEM_EVENT_MESSAGE: 
-      parse_system_event_message(payload_body);
-      break;
-    case SECURITY_DIRECTORY_MESSAGE:
-      parse_security_directory_message(payload_body);
-      break;
-    case TRADING_STATUS_MESSAGE:
-      parse_trading_status_message(payload_body);
-      break;
-    case OPERATIONAL_HAULT_STATUS_MESSAGE:
-      parse_operational_hault_status_message(payload_body);
-      break;
-    case SHORT_SALE_PRICE_TEST_STATUS_MESSAGE:
-      parse_short_sale_price_test_status_message(payload_body);
-      break;
-    case SECURITY_EVENT_MESSAGE:
-      parse_security_event_message(payload_body);
-      break;
-    case PRICE_LEVEL_UPDATE_BUY_MESSAGE:
-    case PRICE_LEVEL_UPDATE_SELL_MESSAGE:
-      parse_price_level_update_message(message_header->message_type,
-          payload_body);
-      break;
-    case TRADE_REPORT_MESSAGE:
-      parse_trade_report_message(payload_body);
-      break;
-    case OFFICIAL_PRICE_MESSAGE:
-      parse_official_price_message(payload_body);
-      break;
-    case TRADE_BREAK_MESSAGE:
-      parse_trade_break_message(payload_body);
-      break;
-    case AUCTION_INFORMATION_MESSAGE:
-      parse_auction_information_message(payload_body);
-      break;
-    default:
-      print_iex_tp_header(header);
-      exit(1);
-      break;
+    data = &data[sizeof(struct iex_tp_message_block_header)];
+
+    void* payload_body = &data[0];
+
+    // switch through the different message types
+    switch (message_header->message_type) {
+      // administrative messages to tell us where in the trading day
+      // we are
+      case SYSTEM_EVENT_MESSAGE: 
+        parse_system_event_message(payload_body);
+        data = &data[sizeof(struct iex_system_event_message)];
+        break;
+      case SECURITY_DIRECTORY_MESSAGE:
+        parse_security_directory_message(payload_body);
+        data = &data[sizeof(struct iex_security_directory_message)];
+        break;
+      case TRADING_STATUS_MESSAGE:
+        parse_trading_status_message(payload_body);
+        data = &data[sizeof(struct iex_trading_status_message)];
+        break;
+      case OPERATIONAL_HAULT_STATUS_MESSAGE:
+        parse_operational_hault_status_message(payload_body);
+        data = &data[sizeof(struct iex_operational_halt_status_message)];
+        break;
+      case SHORT_SALE_PRICE_TEST_STATUS_MESSAGE:
+        parse_short_sale_price_test_status_message(payload_body);
+        data = &data[sizeof(struct iex_short_sale_price_test_message)];
+        break;
+      case SECURITY_EVENT_MESSAGE:
+        parse_security_event_message(payload_body);
+        data = &data[sizeof(struct iex_security_event_message)];
+        break;
+      case PRICE_LEVEL_UPDATE_BUY_MESSAGE:
+      case PRICE_LEVEL_UPDATE_SELL_MESSAGE:
+        parse_price_level_update_message(message_header->message_type,
+            payload_body);
+        data = &data[sizeof(struct iex_price_level_update_message)];
+        break;
+      case TRADE_REPORT_MESSAGE:
+        parse_trade_report_message(payload_body);
+        data = &data[sizeof(struct iex_trade_report_message)];
+        break;
+      case OFFICIAL_PRICE_MESSAGE:
+        parse_official_price_message(payload_body);
+        data = &data[sizeof(struct iex_official_price_message)];
+        break;
+      case TRADE_BREAK_MESSAGE:
+        parse_trade_break_message(payload_body);
+        data = &data[sizeof(struct iex_trade_break_message)];
+        break;
+      case AUCTION_INFORMATION_MESSAGE:
+        parse_auction_information_message(payload_body);
+        data = &data[sizeof(struct iex_auction_information_message)];
+        break;
+      default:
+        print_iex_tp_header(header);
+        exit(1);
+        break;
+    }
   }
 
 }

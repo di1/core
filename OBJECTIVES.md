@@ -3,8 +3,8 @@
 - [ ] Parse multiple IEX files
 - [x] Generate json chart for security
 - [x] Websocket/HTML server
-- [ ] Analysis
-- [ ] Multithreaded Analysis
+- [x] Analysis
+- [x] Multithreaded Analysis
 
 ### Frontend
 - [x] Develop protocol for web socket server
@@ -27,7 +27,7 @@
 - [ ] Inverted Hammer
 - [ ] Long Lower Shadow
 - [ ] Long Upper Shadow
-- [ ] Marubozu
+- [x] Marubozu
 - [ ] Shooting Star
 - [ ] Spinning Top
 - [ ] Shaven Bottom
