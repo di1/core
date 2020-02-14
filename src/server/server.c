@@ -87,9 +87,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 		if (pss->last == vhd->current)
 			break;
 
-		/* notice we allowed for LWS_PRE in the payload already */
-
-    /*
+		/* notice we allowed for LWS_PRE in the payload already */ 
 		m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
 			      LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
 		if (m < (int)vhd->amsg.len) {
@@ -97,7 +95,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 			return -1;
 		}
 		pss->last = vhd->current;
-    */
+    
 		break;
 
 	case LWS_CALLBACK_RECEIVE:
@@ -115,7 +113,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
 		vhd->amsg.len = response_len;
 		/* notice we over-allocate by LWS_PRE */
-    vhd->amsg.payload = malloc(LWS_PRE + response_len);
+    vhd->amsg.payload = malloc((LWS_PRE*2) + response_len);
 		if (!vhd->amsg.payload) {
 			lwsl_user("OOM: dropping\n");
 			break;
@@ -125,18 +123,9 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 		vhd->current++;
 
     free(response);
-
-    m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
-			      LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
-		if (m < (int)vhd->amsg.len) {
-			lwsl_err("ERROR %d writing to ws\n", m);
-			return -1;
-		}
-		pss->last = vhd->current;
-    free(vhd->amsg.payload);
-    vhd->amsg.payload = NULL;
-    vhd->amsg.len = 0;
-		break;
+ 
+		lws_callback_on_writable(wsi);
+    break;
 
 	default:
 		break;

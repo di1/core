@@ -34,6 +34,8 @@ var CandleChart = /** @class */ (function () {
     CandleChart.prototype.onMessage = function (evt) {
         if (this.RESET_CHART) {
             this.RESET_CHART = false;
+            this.ANALYSIS_RESULTS = undefined;
+            this.ROOT_CHART = undefined;
             this.conn.send('init|' + this.symbol);
             return;
         }
@@ -136,10 +138,12 @@ var CandleChart = /** @class */ (function () {
         return ctx.measureText(' 0000.0000').width;
     };
     CandleChart.prototype.onMouseWheelEvent = function (evt) {
-        if (evt.deltaY > 0)
+        if (evt.deltaY > 0) {
             this.CANDLE_WIDTH += 1;
-        if (evt.deltaY < 0)
+        }
+        if (evt.deltaY < 0) {
             this.CANDLE_WIDTH -= 1;
+        }
     };
     CandleChart.prototype.drawFull = function (chart) {
         if (!this.chart_canvas) {
@@ -191,23 +195,50 @@ var CandleChart = /** @class */ (function () {
         var last_color = '';
         for (var i = start_index; i < candles.length; ++i) {
             var width_offset = ((i - start_index) * (this.CANDLE_WIDTH + this.CANDLE_SPACING));
-            ctx.fillStyle = 'blue';
-            ctx.beginPath();
-            ctx.moveTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.h));
-            ctx.lineTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.l));
-            ctx.stroke();
+            var has_analysis = false;
+            if (this.ANALYSIS_RESULTS &&
+                i < this.ANALYSIS_RESULTS.analysis.single_candle.length &&
+                this.ANALYSIS_RESULTS.analysis.single_candle[i] != 0) {
+                has_analysis = true;
+            }
             if (candles[i].candle.o > candles[i].candle.c) {
                 ctx.fillStyle = '#EF5350';
+                ctx.strokeStyle = ctx.fillStyle;
                 last_color = ctx.fillStyle;
-                ctx.fillRect(width_offset, price_to_pixel.eval(candles[i].candle.c), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.o) -
-                    price_to_pixel.eval(candles[i].candle.c));
+                if (has_analysis) {
+                    ctx.strokeRect(width_offset, price_to_pixel.eval(candles[i].candle.c), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.o) -
+                        price_to_pixel.eval(candles[i].candle.c));
+                }
+                else {
+                    ctx.fillRect(width_offset, price_to_pixel.eval(candles[i].candle.c), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.o) -
+                        price_to_pixel.eval(candles[i].candle.c));
+                }
+                ctx.beginPath();
+                ctx.moveTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.h));
+                ctx.lineTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.o));
+                ctx.moveTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.l));
+                ctx.lineTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.c));
+                ctx.stroke();
                 ctx.fillStyle = 'black';
             }
             else if (candles[i].candle.o < candles[i].candle.c) {
                 ctx.fillStyle = '#26A69A';
+                ctx.strokeStyle = ctx.fillStyle;
                 last_color = ctx.fillStyle;
-                ctx.fillRect(width_offset, price_to_pixel.eval(candles[i].candle.o), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.c) -
-                    price_to_pixel.eval(candles[i].candle.o));
+                if (has_analysis) {
+                    ctx.strokeRect(width_offset, price_to_pixel.eval(candles[i].candle.o), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.c) -
+                        price_to_pixel.eval(candles[i].candle.o));
+                }
+                else {
+                    ctx.fillRect(width_offset, price_to_pixel.eval(candles[i].candle.o), this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.c) -
+                        price_to_pixel.eval(candles[i].candle.o));
+                }
+                ctx.beginPath();
+                ctx.moveTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.h));
+                ctx.lineTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.c));
+                ctx.moveTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.l));
+                ctx.lineTo(width_offset + this.CANDLE_WIDTH / 2.0, price_to_pixel.eval(candles[i].candle.o));
+                ctx.stroke();
                 ctx.fillStyle = 'black';
             }
             else {

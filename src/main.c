@@ -73,6 +73,8 @@ int main(int argc, char** argv) {
   if (argc == 1)
     usage(argv[0]);
 
+  log_info("hello");
+
   cli* options = cli_parse(argc, argv);
 
   pthread_t id;
