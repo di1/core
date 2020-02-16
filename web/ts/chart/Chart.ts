@@ -6,7 +6,7 @@ class CandleChart {
   private symbol: string;
   private conn: WebSocket;
   private chart_canvas: HTMLCanvasElement | null;
- 
+
   private NUM_TICKS: number = 20;
   private PADDING_BOT: number = 20;
   private PADDING_TOP: number = 20;
@@ -36,7 +36,7 @@ class CandleChart {
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);
-  
+
     //this.rescaleCanvas(this.chart_canvas);
 
     this.chart_canvas.onwheel = this.onMouseWheelEvent.bind(this);
@@ -199,7 +199,7 @@ class CandleChart {
       return;
     }
 
-    let ctx: CanvasRenderingContext2D | null = 
+    let ctx: CanvasRenderingContext2D | null =
       this.chart_canvas.getContext('2d');
 
     if (!ctx) {
@@ -213,19 +213,19 @@ class CandleChart {
     ctx.font = "normal 1.4em Monospace";
 
     let drawing_width: number = this.chart_canvas.width;
-    let drawing_height: number = 
+    let drawing_height: number =
       this.chart_canvas.height-this.PADDING_BOT;
 
     ctx.strokeStyle = 'white';
     ctx.textBaseline = 'middle';
 
-    ctx.fillStyle = '#131722'; 
+    ctx.fillStyle = '#131722';
     ctx.fillRect(0,0,this.chart_canvas.width, this.chart_canvas.height);
     ctx.fillStyle = 'white';
 
     let candles: Chart[] = chart.chart;
 
-    let num_displayable_candles: number = 
+    let num_displayable_candles: number =
       (this.chart_canvas.width-this.getPriceWidth(ctx))/(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
     num_displayable_candles -= 1;
@@ -244,12 +244,12 @@ class CandleChart {
     ctx.lineTo(drawing_width-this.getPriceWidth(ctx), this.chart_canvas.height);
     ctx.stroke();
 
-    let pixel_to_price: LinearEquation = 
+    let pixel_to_price: LinearEquation =
       new LinearEquation(this.PADDING_TOP, priceRange.max, drawing_height-this.PADDING_BOT, priceRange.min);
 
-    let price_to_pixel: LinearEquation = 
-      new LinearEquation(priceRange.min, drawing_height, priceRange.max,
-                        this.PADDING_TOP);
+    let price_to_pixel: LinearEquation =
+      new LinearEquation(priceRange.max, this.PADDING_TOP, priceRange.min,
+                        drawing_height-this.PADDING_BOT);
 
 
     // DRAW THE PRICE TICKS
@@ -272,7 +272,7 @@ class CandleChart {
     // DRAW THE CANDLES
     let last_color: string = '';
     for (let i: number = start_index; i < candles.length; ++i) {
-      let width_offset: number = 
+      let width_offset: number =
         ((i-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING));
 
       let has_analysis: boolean = false;
@@ -313,7 +313,7 @@ class CandleChart {
         ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
                  price_to_pixel.eval(candles[i].candle.c));
         ctx.stroke();
-   
+
 
         ctx.fillStyle = 'black';
       } else if (candles[i].candle.o < candles[i].candle.c) {
@@ -336,7 +336,7 @@ class CandleChart {
             price_to_pixel.eval(candles[i].candle.c)-
               price_to_pixel.eval(candles[i].candle.o));
         }
-        
+
         ctx.beginPath();
         ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
                  price_to_pixel.eval(candles[i].candle.h));
@@ -360,10 +360,44 @@ class CandleChart {
         ctx.stroke();
       }
 
+      if (this.ANALYSIS_RESULTS != undefined &&
+          i < this.ANALYSIS_RESULTS.analysis.single_candle.length &&
+          this.ANALYSIS_RESULTS.analysis.single_candle[i] != 0) {
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = 'white';
+
+        let candle_code: number = this.ANALYSIS_RESULTS.analysis.single_candle[i];
+        let candle_id: string;
+
+        switch (candle_code) {
+          case 0:
+            candle_id = "";
+            break;
+          case 1:
+          case 2:
+            candle_id = "M";
+            break;
+          case 3:
+          case 4:
+            candle_id = "S";
+            break;
+          default:
+            console.error("i don't know this candle pattern");
+            candle_id = "X";
+            break;
+        }
+
+        ctx.font = 'normal ' + (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
+        ctx.fillText(candle_id,
+                     (width_offset + (this.CANDLE_WIDTH/2.0)) - ctx.measureText(candle_id).width/2.0,
+                     price_to_pixel.eval(candles[i].candle.l) + 5);
+        ctx.textBaseline = 'middle';
+        ctx.font = "normal 1.4em Monospace";
+      }
+
     }
 
-    
-    ctx.fillStyle = last_color; 
+    ctx.fillStyle = last_color;
     ctx.fillRect(drawing_width-this.getPriceWidth(ctx),
                  price_to_pixel.eval(candles[candles.length-1].candle.c) - (20.0/2.0),
                  this.getPriceWidth(ctx), 20);
@@ -372,7 +406,7 @@ class CandleChart {
                  price_to_pixel.eval(candles[candles.length-1].candle.c));
 
     // draw the mouse cross
-    ctx.fillStyle = 'white'; 
+    ctx.fillStyle = 'white';
     ctx.fillRect(drawing_width-this.getPriceWidth(ctx),
                  this.MOUSE_Y - (20.0/2.0),
                  this.getPriceWidth(ctx), 20);
@@ -385,7 +419,7 @@ class CandleChart {
     ctx.beginPath();
     ctx.moveTo(0, this.MOUSE_Y);
     ctx.lineTo(drawing_width-this.getPriceWidth(ctx), this.MOUSE_Y);
-    ctx.moveTo(this.MOUSE_X, 0);
+    ctx.moveTo(this.MOUSE_X, this.PADDING_TOP);
     ctx.lineTo(this.MOUSE_X, drawing_height);
     ctx.stroke();
     ctx.setLineDash([]);
@@ -407,16 +441,16 @@ class CandleChart {
       mouse_candle_index = this.ROOT_CHART.chart.length-1;
 
     let hovered_candle: Candle = this.ROOT_CHART.chart[mouse_candle_index].candle;
-    ctx.fillText(" O:" + (hovered_candle.o/10000).toFixed(4) + 
-                 " H:" + (hovered_candle.h/10000).toFixed(4) + 
+    ctx.fillText(" O:" + (hovered_candle.o/10000).toFixed(4) +
+                 " H:" + (hovered_candle.h/10000).toFixed(4) +
                  " L:" + (hovered_candle.l/10000).toFixed(4) +
                  " C:" + (hovered_candle.c/10000).toFixed(4),
                 ctx.measureText(this.symbol).width + this.PADDING_TOP,
                 0);
 
     ctx.fillText(new Date(hovered_candle.e/1000000).toDateString(),
-                 drawing_width - 
-                   ctx.measureText(new Date(hovered_candle.e/1000000).toDateString()).width - 
+                 drawing_width -
+                   ctx.measureText(new Date(hovered_candle.e/1000000).toDateString()).width -
                    this.getPriceWidth(ctx),
                  0);
 

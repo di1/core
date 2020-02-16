@@ -178,7 +178,7 @@ var CandleChart = /** @class */ (function () {
         ctx.lineTo(drawing_width - this.getPriceWidth(ctx), this.chart_canvas.height);
         ctx.stroke();
         var pixel_to_price = new LinearEquation(this.PADDING_TOP, priceRange.max, drawing_height - this.PADDING_BOT, priceRange.min);
-        var price_to_pixel = new LinearEquation(priceRange.min, drawing_height, priceRange.max, this.PADDING_TOP);
+        var price_to_pixel = new LinearEquation(priceRange.max, this.PADDING_TOP, priceRange.min, drawing_height - this.PADDING_BOT);
         // DRAW THE PRICE TICKS
         var inc = (priceRange.max - priceRange.min) / this.NUM_TICKS;
         for (var i = priceRange.min; i <= priceRange.max; i += inc) {
@@ -248,6 +248,35 @@ var CandleChart = /** @class */ (function () {
                 ctx.lineTo(width_offset + this.CANDLE_WIDTH, price_to_pixel.eval(candles[i].candle.c));
                 ctx.stroke();
             }
+            if (this.ANALYSIS_RESULTS != undefined &&
+                i < this.ANALYSIS_RESULTS.analysis.single_candle.length &&
+                this.ANALYSIS_RESULTS.analysis.single_candle[i] != 0) {
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = 'white';
+                var candle_code = this.ANALYSIS_RESULTS.analysis.single_candle[i];
+                var candle_id = void 0;
+                switch (candle_code) {
+                    case 0:
+                        candle_id = "";
+                        break;
+                    case 1:
+                    case 2:
+                        candle_id = "M";
+                        break;
+                    case 3:
+                    case 4:
+                        candle_id = "S";
+                        break;
+                    default:
+                        console.error("i don't know this candle pattern");
+                        candle_id = "X";
+                        break;
+                }
+                ctx.font = 'normal ' + (this.CANDLE_WIDTH * 2.0).toString() + 'px monospace';
+                ctx.fillText(candle_id, (width_offset + (this.CANDLE_WIDTH / 2.0)) - ctx.measureText(candle_id).width / 2.0, price_to_pixel.eval(candles[i].candle.l) + 5);
+                ctx.textBaseline = 'middle';
+                ctx.font = "normal 1.4em Monospace";
+            }
         }
         ctx.fillStyle = last_color;
         ctx.fillRect(drawing_width - this.getPriceWidth(ctx), price_to_pixel.eval(candles[candles.length - 1].candle.c) - (20.0 / 2.0), this.getPriceWidth(ctx), 20);
@@ -263,7 +292,7 @@ var CandleChart = /** @class */ (function () {
         ctx.beginPath();
         ctx.moveTo(0, this.MOUSE_Y);
         ctx.lineTo(drawing_width - this.getPriceWidth(ctx), this.MOUSE_Y);
-        ctx.moveTo(this.MOUSE_X, 0);
+        ctx.moveTo(this.MOUSE_X, this.PADDING_TOP);
         ctx.lineTo(this.MOUSE_X, drawing_height);
         ctx.stroke();
         ctx.setLineDash([]);

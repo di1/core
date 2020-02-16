@@ -1,6 +1,7 @@
 #include <analysis/analysis.h>
 #include <analysis/marubozu.h>
 #include <analysis/spinning_top.h>
+#include <analysis/doji.h>
 
 #include <chart/chart.h>
 #include <chart/candle.h>
@@ -66,6 +67,7 @@ pthread_t* threads;
       log_info("%s in %s", #ANALYSIS_FUNCTION, chart_get_name(cht));  \
       }                                                               \
       chart_put_single_candle_pattern(cht, end_candle-1, ret);        \
+      return;                                                         \
     }                                                                 \
   } while(0);
 
@@ -102,6 +104,9 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
   SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_bot);
 }
 
 

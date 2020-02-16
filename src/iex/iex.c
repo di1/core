@@ -183,16 +183,17 @@ void parse_system_event_message(void* payload) {
 }
 
 /**
- * Tells us that there is something special for this 
+ * Tells us that there is something special for this
  * security
  */
 void parse_security_directory_message(void* payload) {
   struct iex_security_directory_message* payload_data =
     (struct iex_security_directory_message*) (payload);
 
-  log_trace("security directory message for %s\n", payload_data->symbol);
+  symbol_sanitize((char*) payload_data->symbol, 8);
+  log_trace("security directory message for %s", payload_data->symbol);
 
-  // TODO do something with this information 
+  // TODO do something with this information
   // TODO https://iextrading.com/docs/IEX%20DEEP%20Specification.pdf
   // TODO page 8
 }
@@ -202,11 +203,13 @@ void parse_security_directory_message(void* payload) {
  * weather it is paused/haulted/released etc...
  */
 void parse_trading_status_message(void* payload) {
-  struct iex_trading_status_message* payload_data = 
+  struct iex_trading_status_message* payload_data =
     (struct iex_trading_status_message*) (payload);
+  (void) payload_data;
 
+  /*
   log_trace("trading status message for %.8s", payload_data->symbol);
-
+  */
   // TODO do something with this information
 }
 
@@ -216,42 +219,48 @@ void parse_trading_status_message(void* payload) {
 void parse_operational_hault_status_message(void* payload) {
   struct iex_operational_halt_status_message* payload_data =
     (struct iex_operational_halt_status_message*) (payload);
-
+  (void) payload_data;
+  /*
   log_trace("operation hault message for %.8s", payload_data->symbol);
-
+  */
   // TODO do something with this information
 }
 
 void parse_short_sale_price_test_status_message(void* payload) {
-  struct iex_short_sale_price_test_message* payload_data = 
+  struct iex_short_sale_price_test_message* payload_data =
     (struct iex_short_sale_price_test_message*) (payload);
-
+  (void) payload_data;
+  /*
   log_trace("short sale price test message for %.8s", payload_data->symbol);
+  */
 
   // TODO do something with this information
 }
 
 void parse_security_event_message(void* payload) {
-  struct iex_security_event_message* payload_data = 
+  struct iex_security_event_message* payload_data =
     (struct iex_security_event_message*) (payload);
 
-  
   symbol_sanitize((char*)payload_data->symbol, 8);
 
   switch (payload_data->security_event) {
     case OPENING_PROCESS_COMPLETE:
+      /*
       log_trace("opening process complete %.8s",
           payload_data->symbol);
+      */
       break;
     case CLOSING_PROCESS_COMPLETE:
+      /*
       log_trace("closing process complete %.8s",
           payload_data->symbol);
+      */
       break;
     default:
       log_error("unknown security event message 0x%x symbol %.8s",
           payload_data->security_event, payload_data->symbol);
       exit(1);
-  } 
+  }
 
   // TODO might want to do more with this
 
