@@ -1,4 +1,0 @@
-01:24:07 [94mTRACE[0m [90m/home/wsh/Documents/riski/src/server/server.c:167:[0m start http & ws server
-01:24:07 [32mINFO [0m [90m/home/wsh/Documents/riski/src/analysis/analysis.c:145:[0m processor has 16 processing threads
-01:24:07 [94mTRACE[0m [90m/home/wsh/Documents/riski/src/analysis/analysis.c:146:[0m creating 16 processing units
-01:24:07 [94mTRACE[0m [90m/home/wsh/Documents/riski/src/analysis/analysis.c:109:[0m thread was assigned bin id 0 0x555555560440

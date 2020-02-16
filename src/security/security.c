@@ -68,7 +68,7 @@ struct security* security_new(char* name, uint64_t interval) {
   
   sec->name = n;
   sec->b = book_new();
-  sec->cht = chart_new(interval);
+  sec->cht = chart_new(interval, n);
   sec->hash = hash((unsigned char*)n);
   pthread_mutex_init(&(sec->m_chart_update), NULL);
   return sec;

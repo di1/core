@@ -16,7 +16,7 @@ struct chart;
 /**
  * Creates a new chart given the interval of data
  */
-struct chart* chart_new(uint64_t interval);
+struct chart* chart_new(uint64_t interval, char* name);
 
 /**
  * Frees the chart
@@ -28,6 +28,11 @@ void chart_free(struct chart** cht);
  * of the price data
  */
 void chart_update(struct chart* cht, int64_t price, uint64_t ts);
+
+/**
+ * Gets the name of the chart
+ */
+char* chart_get_name(struct chart* cht);
 
 /**
  * Converst the chart to a json object
@@ -45,7 +50,9 @@ char* chart_latest_candle(struct chart* cht);
 enum SINGLE_CANDLE_PATTERNS {
   SINGLE_CANDLE_PATTERN_NONE,
   SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU,
-  SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU
+  SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU,
+  SINGLE_CANDLE_PATTERN_WHITE_SPINNING_TOP,
+  SINGLE_CANDLE_PATTERN_BLACK_SPINNING_TOP
 };
 
 /**

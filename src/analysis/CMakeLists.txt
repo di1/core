@@ -1,1 +1,2 @@
-ADD_LIBRARY(analysis marubozu.c analysis.c)
+ADD_LIBRARY(analysis marubozu.c
+  spinning_top.c analysis.c)

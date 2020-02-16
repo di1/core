@@ -6,3 +6,5 @@ vgcore.*
 *.js
 3rdparty/
 web/node_modules/
+*.log
+*.aux

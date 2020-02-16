@@ -15,7 +15,7 @@ struct chart_analysis {
 
 struct chart {
   // the interval between the two candles in nanoseconds
-  uint64_t interval; 
+  uint64_t interval;
 
   // the number of candles _slots_ that are pre allocated
   size_t num_candles_allocated;
@@ -26,24 +26,32 @@ struct chart {
   // the start of the last candle
   uint64_t last_update;
 
-  // the list of candles 
+  // the list of candles
   struct candle** candles;
 
   // contains the chart patterns
   struct chart_analysis* analysis;
+
+  // the name of the chart
+  char* name;
 };
 
-struct chart* chart_new(uint64_t interval) {
+char* chart_get_name(struct chart* cht) {
+  return cht->name;
+}
+
+struct chart* chart_new(uint64_t interval, char* name) {
 
   struct chart* cht = (struct chart*) malloc(1*sizeof(struct chart));
   cht->interval = interval;
+  cht->name = name;
   cht->num_candles_allocated = 1440;
   cht->cur_candle = 0;
   cht->last_update = 0;
   cht->candles = (struct candle**)
     malloc((cht->num_candles_allocated)*sizeof(struct chart*));
 
-  cht->analysis = (struct chart_analysis*) 
+  cht->analysis = (struct chart_analysis*)
     malloc(1 * sizeof(struct chart_analysis));
   cht->analysis->scp = (enum SINGLE_CANDLE_PATTERNS*)
     malloc((cht->num_candles_allocated)*sizeof(enum SINGLE_CANDLE_PATTERNS));
@@ -88,8 +96,8 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
     cht->last_update = ts;
     // check if we need to pre fill the data to make sure
     // all charts are on the same candle index
-   
-    // removed for now, this may or may not be needed I am unsure 
+    // removed for now, this may or may not be needed I am unsure
+    //
     /*
     for (size_t i = 0; i < g_max_candles; ++i) {
       chart_new_candle(cht, price);
@@ -105,11 +113,9 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
   // check if the interval requires us to make a new candle
   if (ts - cht->last_update > cht->interval) {
     // create a new candle
-    
     // check if fill-ins are reqired
-    size_t fill_in_candles = (ts - cht->last_update) / cht->interval; 
+    size_t fill_in_candles = (ts - cht->last_update) / cht->interval;
 
-    
     if (fill_in_candles != 1) {
       for (size_t i = 0; i < fill_in_candles-1; ++i) {
         // fill in the candles in between with dojies of the
@@ -117,7 +123,7 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
         cht->cur_candle += 1;
         cht->last_update += cht->interval;
         chart_new_candle(cht, candle_close(cht->candles[cht->cur_candle-1]));
-      } 
+      }
     }
 
     cht->last_update = ts;
@@ -130,7 +136,7 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
 
   } else {
     // update the current candle
-    candle_update(cht->candles[cht->cur_candle], price, ts); 
+    candle_update(cht->candles[cht->cur_candle], price, ts);
   }
 
   if (cht->cur_candle > g_max_candles)
@@ -146,9 +152,9 @@ char* chart_json(struct chart* cht) {
 
   size_t num_candles = cht->cur_candle + 1;
   // chart proto = {"chart":[c1,c2,c3,c4...]}
- 
-  // allocate enough space to hold each candle 
-  size_t total_json_size = JSON_CANDLE_MAX_LEN * num_candles; 
+
+  // allocate enough space to hold each candle
+  size_t total_json_size = JSON_CANDLE_MAX_LEN * num_candles;
 
   // add (num_candles-1) commas
   total_json_size += (num_candles-1);
@@ -161,7 +167,7 @@ char* chart_json(struct chart* cht) {
 
   char* buf = (char*) calloc(total_json_size, sizeof(char));
   strcat(buf, "{\"chart\":[\x0");
-  
+
   char* tmp_candle_json = NULL;
   for (size_t i = 0; i < num_candles; ++i) {
     tmp_candle_json = candle_json(cht->candles[i]);
@@ -173,7 +179,6 @@ char* chart_json(struct chart* cht) {
     tmp_candle_json = NULL;
   }
   strcat(buf, "]}\x0");
-  
   return buf;
 }
 
@@ -183,11 +188,10 @@ char* chart_analysis_json(struct chart* cht) {
   pthread_mutex_lock(&(chta->lock));
 
   size_t num_candles = cht->cur_candle + 1;
-  
-  // analysis proto {"analysis": 
+  // analysis proto {"analysis":
   //                {"single_candle":[000000000,000000000,000000000,...]}}
- 
-  // begining prototype length {"analy...[ 
+
+  // begining prototype length {"analy...[
   size_t total_json_size = 30;
   // commas
   total_json_size += (num_candles-1);
@@ -200,7 +204,6 @@ char* chart_analysis_json(struct chart* cht) {
 
   char* buf = (char*) calloc(total_json_size, sizeof(char));
   strcat(buf, "{\"analysis\":{\"single_candle\":[\x0");
-  
   for (size_t i = 0; i < num_candles; ++i) {
     char resbuf[10] = {0};
     sprintf(resbuf, "%u", chta->scp[i]);
@@ -219,7 +222,6 @@ char* chart_analysis_json(struct chart* cht) {
 
 char* chart_latest_candle(struct chart* cht) {
   // {"latest_candle":}
-  
 
   size_t total_json_size = 18 + JSON_CANDLE_MAX_LEN;
   char* buf = (char*) calloc(total_json_size, sizeof(char));
@@ -248,7 +250,7 @@ void chart_free(struct chart** cht) {
 
 void test_chart() {
 
-  struct chart* cht = chart_new(10);
+  struct chart* cht = chart_new(10, "abc");
   ASSERT_TEST(cht != NULL);
   ASSERT_TEST(cht->interval == 10);
   ASSERT_TEST(cht->num_candles_allocated == 1440);
@@ -256,7 +258,7 @@ void test_chart() {
   ASSERT_TEST(cht->candles != NULL);
   ASSERT_TEST(cht->last_update == 0);
 
-  // make sure chart json returns null since there is no information 
+  // make sure chart json returns null since there is no information
   ASSERT_TEST(chart_json(cht) == NULL);
 
   // send an update to the chart

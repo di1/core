@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Exit on first error 
+#Exit on first error
 set -e
 
 command -v tsc >/dev/null 2>&1 || { echo >&2 "I require npm but it's not installed.  Aborting."; exit 1; }

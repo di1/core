@@ -42,7 +42,7 @@ char* analysis_response(char* security) {
 }
 
 char* parse_message(char* msg, int len) {
-  
+
   // there is some garbage after msg from the websocket
   // so we cut it off in a new array
   char* sanitized_msg = (char*) malloc((len+1)*sizeof(char));

@@ -60,7 +60,6 @@ void test() {
   test_exchange();
 }
 
- 
 int main(int argc, char** argv) {
 
 #if RUN_TESTS
@@ -87,10 +86,8 @@ int main(int argc, char** argv) {
   }
 
   free(options);
-  
   SERVER_INTERRUPTED = 1;
 
   pthread_join(id, NULL);
-  
   return 0;
 }

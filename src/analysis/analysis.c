@@ -1,12 +1,14 @@
 #include <analysis/analysis.h>
 #include <analysis/marubozu.h>
+#include <analysis/spinning_top.h>
 
 #include <chart/chart.h>
 #include <chart/candle.h>
+#include <openssl/pkcs7.h>
 
 struct analysis_info {
 
-  // chart to analyize 
+  // chart to analyize
   struct chart* cht;
 
   // where to start in the chart
@@ -30,7 +32,7 @@ struct analysis_list {
   struct analysis_info* tail;
 
   // Need two mutexes to stop race conditions
-  // where 1 thread tries to append and 1 thread 
+  // where 1 thread tries to append and 1 thread
   // tries to remove
   pthread_mutex_t can_append;
   pthread_mutex_t can_remove;
@@ -55,12 +57,16 @@ bool init_completed = false;
 // The list of analysis threads
 pthread_t* threads;
 
-#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)        \
-  do {                                                          \
-    ret = ANALYSIS_FUNCTION(last_candle);                       \
-    if (ret != SINGLE_CANDLE_PATTERN_NONE){                     \
-      chart_put_single_candle_pattern(cht, end_candle-1, ret);  \
-    }                                                           \
+#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)              \
+  do {                                                                \
+    ret = ANALYSIS_FUNCTION(last_candle);                             \
+    if (ret != SINGLE_CANDLE_PATTERN_NONE){                           \
+      if (ret != SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU &&              \
+          ret != SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU){               \
+      log_info("%s in %s", #ANALYSIS_FUNCTION, chart_get_name(cht));  \
+      }                                                               \
+      chart_put_single_candle_pattern(cht, end_candle-1, ret);        \
+    }                                                                 \
   } while(0);
 
 
@@ -70,7 +76,7 @@ pthread_t* threads;
  * we only need to perform analysis on the last candle.
  *
  * Analysis done in this thread only relies on the end_candle
- * index, which since is 1 indexed will be end_candle-1 in the 
+ * index, which since is 1 indexed will be end_candle-1 in the
  * array.
  */
 void simple_analysis(struct chart* cht, size_t end_candle) {
@@ -84,7 +90,7 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
   if (candle_open(last_candle) == candle_close(last_candle))
-     return; 
+     return;
 
   // Now that we have a valid candle perform all single candle
   // analysis
@@ -94,7 +100,8 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
 
   SINGLE_CANDLE_PATTERN_PERFORM(is_white_marubozu);
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
-
+  SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
 }
 
 
@@ -116,8 +123,8 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_lock(&(bin->can_remove));
     struct analysis_info* inf = analysis_pop(bin);
     pthread_mutex_unlock(&(bin->can_remove));
-  
-    // analysis_pop returns NULL if there is nothing to do 
+
+    // analysis_pop returns NULL if there is nothing to do
     if (!inf)
      continue;
 
@@ -125,13 +132,13 @@ void* analysis_thread_func(void* index) {
 
     size_t start_index = inf->start_candle;
     (void) start_index;
-    
+
     size_t end_candle = inf->end_candle;
 
     // aquire the analysis struct first
-    chart_analysis_lock(cht); 
- 
-    // group the analysis into sections from simplest to hardest 
+    chart_analysis_lock(cht);
+
+    // group the analysis into sections from simplest to hardest
     simple_analysis(cht, end_candle);
 
     // release the analysis struct lock
@@ -141,7 +148,6 @@ void* analysis_thread_func(void* index) {
 
 }
 
-
 void analysis_init() {
   int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
   log_info("processor has %d processing threads", numCPU);
@@ -150,10 +156,10 @@ void analysis_init() {
   num_analysis_threads = numCPU;
 
   // create the list container
-  thread_operations = (struct analysis_list**) 
+  thread_operations = (struct analysis_list**)
     malloc(num_analysis_threads * sizeof(struct analysis_list*));
 
-  // create the lists 
+  // create the lists
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     thread_operations[i] = (struct analysis_list*)
       malloc(1 * sizeof(struct analysis_list));
@@ -193,7 +199,7 @@ struct analysis_info* analysis_create_info(struct chart* cht, size_t start,
 }
 
 void analysis_push(struct chart* cht, size_t start, size_t end) {
- 
+
   while (!init_completed);
 
   // what bin the analysis will go into
@@ -209,9 +215,9 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
   // aquire lock to make sure no removing occurs
   pthread_mutex_lock(&(bin->can_remove));
 
-  // we will always push to the end of the bin 
+  // we will always push to the end of the bin
   if (bin->tail == NULL && bin->head == NULL) {
-    // no elements in the list (easy case) 
+    // no elements in the list (easy case)
     bin->head = element;
     bin->tail = element;
     bin->num_elements = 1;
@@ -219,7 +225,6 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
     pthread_mutex_unlock(&(bin->can_remove));
   } else {
     // insert into the end of the dll
-    
     // get tail
     struct analysis_info* tail = bin->tail;
 
@@ -248,15 +253,15 @@ struct analysis_info* analysis_pop(struct analysis_list* bin) {
   struct analysis_info* element = bin->head;
 
   //log_trace("%p", bin->head);
-  
+
   // remove the head
   if (bin->head) {
     bin->head = bin->head->next;
     bin->num_elements -= 1;
   }
- 
+
   // if the next element was not null
-  // set the previous element to NULL 
+  // set the previous element to NULL
   if (bin->head) {
     bin->head->prev = NULL;
   } else {
