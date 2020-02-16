@@ -17,10 +17,10 @@
 - [ ] Big White Candle
 - [ ] Black Body
 - [ ] White Body
-- [ ] Doji
-- [ ] Dragon Fly Doji
-- [ ] Graveston Doji
-- [ ] Long Legged Doji
+- [x] Doji
+- [x] Dragon Fly Doji
+- [x] Graveston Doji
+- [x] Long Legged Doji
 - [ ] Hanging Man
 - [ ] Hammer
 - [ ] Inverted Black Hammer
