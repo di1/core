@@ -58,17 +58,17 @@ bool init_completed = false;
 // The list of analysis threads
 pthread_t* threads;
 
-#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)              \
-  do {                                                                \
-    ret = ANALYSIS_FUNCTION(last_candle);                             \
-    if (ret != SINGLE_CANDLE_PATTERN_NONE){                           \
-      if (ret != SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU &&              \
-          ret != SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU){               \
-      log_info("%s in %s", #ANALYSIS_FUNCTION, chart_get_name(cht));  \
-      }                                                               \
-      chart_put_single_candle_pattern(cht, end_candle-1, ret);        \
-      return;                                                         \
-    }                                                                 \
+#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)                      \
+  do {                                                                        \
+    ret = ANALYSIS_FUNCTION(last_candle);                                     \
+    if (ret != SINGLE_CANDLE_PATTERN_NONE) {                                  \
+      if (ret != SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU &&                      \
+          ret != SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU) {                      \
+          log_info("%s in %s", #ANALYSIS_FUNCTION, chart_get_name(cht));      \
+      }                                                                       \
+      chart_put_single_candle_pattern(cht, end_candle-1, ret);                \
+      return;                                                                 \
+    }                                                                         \
   } while(0);
 
 
@@ -159,6 +159,11 @@ void analysis_init() {
   log_trace("creating %d processing units", numCPU);
 
   num_analysis_threads = numCPU;
+
+  if (numCPU - 3 > 0) {
+    num_analysis_threads = numCPU - 3;
+  }
+
 
   // create the list container
   thread_operations = (struct analysis_list**)

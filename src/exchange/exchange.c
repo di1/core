@@ -22,7 +22,7 @@ struct exchange* exchange_new(char* name) {
   char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
   strcpy(n, name);
 
-  struct exchange* e = (struct exchange*) calloc(1, sizeof(struct exchange)); 
+  struct exchange* e = (struct exchange*) calloc(1, sizeof(struct exchange));
   e->name = n;
 
   return e;
@@ -60,7 +60,7 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
 }
 
 struct security* exchange_get(struct exchange* e, char* name) {
-  
+
   size_t hash = security_hash(name);
   struct ll* bin_list = &e->entries[hash];
 
@@ -89,15 +89,15 @@ void exchange_free(struct exchange** e) {
           cur = cur->next;
           security_free(&tmp->val);
           free(tmp);
-        } 
+        }
       }
     }
-  } 
+  }
   free(*e);
   *e = NULL;
 
   for (size_t i = 0; i < num_securities; ++i) {
-    free(security_names[i]); 
+    free(security_names[i]);
   }
   free(security_names);
 }
@@ -109,15 +109,12 @@ void test_exchange() {
   exchange_put(ex, "test    ", 1000);
 
   struct security* sec = exchange_get(ex, "test    ");
-  ASSERT_TEST(security_get_hash(sec) == security_hash("test    ")); 
+  ASSERT_TEST(security_get_hash(sec) == security_hash("test    "));
 
   exchange_put(ex, "test1234", 10000);
 
   sec = exchange_get(ex, "test1234");
-  ASSERT_TEST(security_get_hash(sec) == security_hash("test1234")); 
-
-
-  
+  ASSERT_TEST(security_get_hash(sec) == security_hash("test1234"));
 
   exchange_free(&ex);
   ASSERT_TEST(ex == NULL);

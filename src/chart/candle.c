@@ -18,6 +18,9 @@ struct candle {
 
   // the end time
   uint64_t end_time;
+
+  // the volume (number of trades that happened in this candle
+  uint64_t volume;
 };
 
 struct candle* candle_new(int64_t price, uint64_t time) {
@@ -28,7 +31,7 @@ struct candle* candle_new(int64_t price, uint64_t time) {
   c->close = price;
   c->start_time = time;
   c->end_time = time;
-
+  c->volume = 1;
   return c;
 }
 
@@ -58,6 +61,7 @@ uint64_t candle_end(struct candle* c) {
 
 void candle_update(struct candle* c, int64_t price, uint64_t time) {
 
+  c->volume += 1;
   // set the close time only if the last price time
   // is greater than the most recent price
   if (time > c->end_time) {
@@ -76,7 +80,7 @@ void candle_update(struct candle* c, int64_t price, uint64_t time) {
 void candle_free(struct candle** c) {
   if (*c == NULL)
     return;
-  
+
   free(*c);
   *c = NULL;
 }
@@ -91,16 +95,18 @@ char* candle_json(struct candle* c) {
    *    "l": 00000000000000000000,
    *    "c": 00000000000000000000,
    *    "s": 00000000000000000000,
-   *    "e": 00000000000000000000
+   *    "e": 00000000000000000000,
+   *    "v": 00000000000000000000
    *  }
    * }
    */
-  
+
   // max 170 characters (no whitespace or new lines
   char* buf = (char*) malloc(JSON_CANDLE_MAX_LEN*sizeof(char));
   int ret = sprintf(buf, "{\"candle\":{"
-      "\"o\":%ld,\"h\":%ld,\"l\":%ld,\"c\":%ld,\"s\":%lu,\"e\":%lu}}",
-      c->open, c->high, c->low, c->close, c->start_time, c->end_time);
+      "\"o\":%ld,\"h\":%ld,\"l\":%ld,\"c\":%ld,\"s\":%lu,\"e\":%lu,\"v\":%lu}}",
+      c->open, c->high, c->low, c->close, c->start_time, c->end_time,
+      c->volume);
 
   if (ret == -1) {
     log_error("sprintf on candle ran out of space in buf of 170 allocated"
@@ -112,7 +118,7 @@ char* candle_json(struct candle* c) {
 }
 
 void test_candle() {
-  
+
   // make sure candle creation is good
   struct candle* c = candle_new(0, 0);
   ASSERT_TEST(c != NULL);
@@ -171,8 +177,8 @@ void test_candle() {
 
   // make sure freeing works
   candle_free(&c);
-  ASSERT_TEST(c == NULL);  
-  
+  ASSERT_TEST(c == NULL);
+
   // free the candle json
   free(json);
 }

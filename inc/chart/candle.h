@@ -8,7 +8,7 @@
 
 #include <log/log.h>
 
-#define JSON_CANDLE_MAX_LEN 170
+#define JSON_CANDLE_MAX_LEN 200
 
 /**
  * Private candle struct
