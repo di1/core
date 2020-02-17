@@ -39,6 +39,11 @@ void candle_free(struct candle** c);
 char* candle_json(struct candle* c);
 
 /**
+ * Gets the volume of the candle, 0 if the candle is a fill in candle
+ */
+uint64_t candle_volume(struct candle* c);
+
+/**
  * Gets the open price of the candle
  */
 int64_t candle_open(struct candle* c);

@@ -3,6 +3,7 @@ interface Candle {
   h: number;
   l: number;
   c: number;
+  v: number;
   s: any;
   e: any;
 }

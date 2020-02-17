@@ -5,9 +5,8 @@
 #include <chart/candle.h>
 #include <stdlib.h>
 
-enum SINGLE_CANDLE_PATTERNS is_doji_top(struct candle* cnd);
-enum SINGLE_CANDLE_PATTERNS is_doji_middle(struct candle* cnd);
-enum SINGLE_CANDLE_PATTERNS is_doji_bot(struct candle* cnd);
+enum SINGLE_CANDLE_PATTERNS is_doji_dragonfly(struct candle* cnd);
+enum SINGLE_CANDLE_PATTERNS is_doji_gravestone(struct candle* cnd);
 enum SINGLE_CANDLE_PATTERNS is_doji_generic(struct candle* cnd);
 
 #endif

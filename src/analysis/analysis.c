@@ -91,7 +91,7 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
 
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
-  if (candle_open(last_candle) == candle_close(last_candle))
+  if (candle_volume(last_candle) == 0)
      return;
 
   // Now that we have a valid candle perform all single candle
@@ -104,9 +104,9 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
   SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_dragonfly);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_gravestone);
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_top);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_bot);
 }
 
 

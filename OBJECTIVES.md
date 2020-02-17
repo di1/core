@@ -10,7 +10,8 @@
 - [x] Develop protocol for web socket server
 - [x] Charting application using canvas
 - [ ] Canvas draw lines
-- [ ] Canvas display chart patterns
+- [x] Canvas display single chart patterns
+- [ ] Canvas display multiple chart patterns
 
 ### Simple Candle Stick Patterns
 - [ ] Big Black Candle
@@ -20,7 +21,6 @@
 - [x] Doji
 - [x] Dragon Fly Doji
 - [x] Graveston Doji
-- [x] Long Legged Doji
 - [ ] Hanging Man
 - [ ] Hammer
 - [ ] Inverted Black Hammer
@@ -29,7 +29,7 @@
 - [ ] Long Upper Shadow
 - [x] Marubozu
 - [ ] Shooting Star
-- [ ] Spinning Top
+- [x] Spinning Top
 - [ ] Shaven Bottom
 - [ ] Shaven Head
 

@@ -21,7 +21,7 @@ function search_input_key_press(evt: KeyboardEvent) {
 window.onload = () => {
   large_display_chart = new CandleChart("AAPL");
 
-  let search_input: HTMLInputElement | null = 
+  let search_input: HTMLInputElement | null =
   <HTMLInputElement> document.getElementById('stock-search-input');
 
   if (!search_input) {

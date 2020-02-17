@@ -31,8 +31,12 @@ struct candle* candle_new(int64_t price, uint64_t time) {
   c->close = price;
   c->start_time = time;
   c->end_time = time;
-  c->volume = 1;
+  c->volume = 0;
   return c;
+}
+
+uint64_t candle_volume(struct candle* c) {
+  return c->volume;
 }
 
 int64_t candle_open(struct candle* c) {
