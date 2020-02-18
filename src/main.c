@@ -52,14 +52,6 @@ void usage(char* path) {
   exit(1);
 }
 
-void test() {
-  test_book();
-  test_candle();
-  test_chart();
-  test_security();
-  test_exchange();
-}
-
 int main(int argc, char** argv) {
 
   if (argc == 1)
