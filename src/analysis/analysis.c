@@ -5,7 +5,6 @@
 
 #include <chart/chart.h>
 #include <chart/candle.h>
-#include <openssl/pkcs7.h>
 
 struct analysis_info {
 

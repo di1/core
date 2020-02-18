@@ -62,13 +62,6 @@ void test() {
 
 int main(int argc, char** argv) {
 
-#if RUN_TESTS
-  (void) argc;
-  (void) argv;
-  test();
-  return 0;
-#endif
-
   if (argc == 1)
     usage(argv[0]);
 

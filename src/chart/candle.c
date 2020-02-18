@@ -108,9 +108,10 @@ char* candle_json(struct candle* c) {
   // max 170 characters (no whitespace or new lines
   char* buf = (char*) malloc(JSON_CANDLE_MAX_LEN*sizeof(char));
   int ret = sprintf(buf, "{\"candle\":{"
-      "\"o\":%ld,\"h\":%ld,\"l\":%ld,\"c\":%ld,\"s\":%lu,\"e\":%lu,\"v\":%lu}}",
-      c->open, c->high, c->low, c->close, c->start_time, c->end_time,
-      c->volume);
+      "\"o\":%lld,\"h\":%lld,\"l\":%lld,\"c\":%lld,\"s\":%llu,\"e\":%llu,\"v\":%llu}}",
+      (long long)c->open, (long long)c->high, (long long)c->low,
+      (long long)c->close, (unsigned long long)c->start_time, (unsigned long long)c->end_time,
+      (long long)c->volume);
 
   if (ret == -1) {
     log_error("sprintf on candle ran out of space in buf of 170 allocated"
