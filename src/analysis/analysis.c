@@ -34,7 +34,6 @@ struct analysis_list {
   // Need two mutexes to stop race conditions
   // where 1 thread tries to append and 1 thread
   // tries to remove
-  pthread_mutex_t can_append;
   pthread_mutex_t can_remove;
 
   size_t num_elements;
@@ -163,6 +162,9 @@ void analysis_init() {
     num_analysis_threads = numCPU - 3;
   }
 
+  log_trace("creating %d processing units", numCPU);
+
+
 
   // create the list container
   thread_operations = (struct analysis_list**)
@@ -174,7 +176,6 @@ void analysis_init() {
       malloc(1 * sizeof(struct analysis_list));
 
     pthread_mutex_init(&(thread_operations[i]->can_remove), NULL);
-    pthread_mutex_init(&(thread_operations[i]->can_append), NULL);
 
     thread_operations[i]->head = NULL;
     thread_operations[i]->tail = NULL;
