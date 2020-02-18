@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <iex/iex.h>
 #include <log/log.h>
@@ -47,6 +48,16 @@ cli* cli_parse(int argc, char** argv) {
   return options;
 }
 
+void valid_working_directory() {
+  if (0 != access("./web/", F_OK)) {
+    if (ENOENT == errno || ENOTDIR == errno) {
+       // does not exist
+       log_error("can not find directory ./web/");
+       exit(1);
+    }
+  }
+}
+
 void usage(char* path) {
   printf("%s [-pcap_feed FILE][-pcap_list FILE1 FILE2 ...]\n", path);
   exit(1);
@@ -57,7 +68,7 @@ int main(int argc, char** argv) {
   if (argc == 1)
     usage(argv[0]);
 
-  log_info("hello");
+  valid_working_directory();
 
   cli* options = cli_parse(argc, argv);
 
