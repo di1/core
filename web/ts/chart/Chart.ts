@@ -1,6 +1,3 @@
-/// <reference path="IChart.ts" />
-/// <reference path="ILinearEquation.ts" />
-
 class CandleChart {
 
   private symbol: string;

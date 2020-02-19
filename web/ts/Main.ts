@@ -1,33 +1,38 @@
-/// <reference path="chart/Chart.ts" />
+let largeDisplayChart: CandleChart | null = null;
 
-let large_display_chart: CandleChart | null = null;
+/**
+  Callback for key press on stock search input.
+  On enter will switch the largeDisplayChart with
+  the stock symbol entered.
 
-function search_input_key_press(evt: KeyboardEvent) {
+  @param {KeyboardEvent} evt The keyboard event
+ */
+function searchInputKeyPress(evt: KeyboardEvent) {
   if (evt.keyCode != 13) {
     return;
   }
 
-  let search_input: EventTarget | null = evt.srcElement;
-  let wanted_stock = (<HTMLInputElement> search_input).value.toUpperCase();
-  console.log(wanted_stock);
+  const searchInput: EventTarget | null = evt.srcElement;
+  const wantedStock = (<HTMLInputElement> searchInput).value.toUpperCase();
+  console.log(wantedStock);
 
-  if (!large_display_chart) {
+  if (!largeDisplayChart) {
     console.error('display chart is undefined');
     return;
   }
-  large_display_chart.setSymbol(wanted_stock);
+  largeDisplayChart.setSymbol(wantedStock);
 }
 
 window.onload = () => {
-  large_display_chart = new CandleChart("AAPL");
+  largeDisplayChart = new CandleChart('AAPL');
 
-  let search_input: HTMLInputElement | null =
+  const searchInput: HTMLInputElement | null =
   <HTMLInputElement> document.getElementById('stock-search-input');
 
-  if (!search_input) {
-    console.error("can't find search input");
+  if (!searchInput) {
+    console.error('can\'t find search input');
     return;
   }
-  search_input.onkeypress = search_input_key_press;
-}
+  searchInput.onkeypress = searchInputKeyPress;
+};
 
