@@ -1,10 +1,23 @@
 interface Candle {
+  // open
   o: number;
+
+  // high
   h: number;
+
+  // low
   l: number;
+
+  // close
   c: number;
+
+  // volume
   v: number;
+
+  // start timestamp
   s: any;
+
+  // end timestamp
   e: any;
 }
 
@@ -21,5 +34,5 @@ interface LatestCandle {
 }
 
 interface LatestChartCandle {
-  latest_candle: LatestCandle;
+  latestCandle: LatestCandle;
 }

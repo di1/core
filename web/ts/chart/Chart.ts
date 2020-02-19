@@ -1,8 +1,10 @@
-class CandleChart {
-
+/**
+  Represents a CandleChart
+ */
+class CandleChart { // eslint-disable-line no-unused-vars
   private symbol: string;
   private conn: WebSocket;
-  private chart_canvas: HTMLCanvasElement | null;
+  private chartCanvas: HTMLCanvasElement | null;
 
   private NUM_TICKS: number = 20;
   private PADDING_BOT: number = 50;
@@ -21,36 +23,44 @@ class CandleChart {
 
   private ANALYSIS_RESULTS: RootAnalysisJSON | undefined = undefined;
 
-  constructor(symbol: string) {
-    this.chart_canvas = <HTMLCanvasElement> document.getElementById("chart");
+  /**
+    Creates a candle chart bound to the largeCandleChart.
 
-    if (!this.chart_canvas) {
-      console.error("chart does not exist in html");
+    @param {string} symbol The security ticker; e.g AAPL
+   */
+  constructor(symbol: string) {
+    this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
+
+    if (!this.chartCanvas) {
+      console.error('chart does not exist in html');
     }
 
     this.symbol = symbol;
-    this.conn = new WebSocket("ws://localhost:7681", "lws-minimal");
+    this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);
 
-    //this.rescaleCanvas(this.chart_canvas);
-
-    this.chart_canvas.onwheel = this.onMouseWheelEvent.bind(this);
-    this.chart_canvas.onmousemove = this.onMouseMove.bind(this);
-    this.chart_canvas.onkeypress = this.onKeyPress.bind(this);
+    this.chartCanvas.onwheel = this.onMouseWheelEvent.bind(this);
+    this.chartCanvas.onmousemove = this.onMouseMove.bind(this);
   }
 
-  private onKeyPress(evt: KeyboardEvent) {
-  }
+  /**
+    Sets the symbol this chart is currently displaying
 
+    @param {string} symbol The security ticker; e.g AAPL
+   */
   public setSymbol(symbol: string) {
     this.symbol = symbol;
     this.RESET_CHART = true;
   }
 
-  private onMessage(evt: MessageEvent) {
+  /**
+    Callback when a message from the websocket server is sent.
 
+    @param {MessageEvent} evt The message event
+   */
+  private onMessage(evt: MessageEvent) {
     if (this.RESET_CHART) {
       this.RESET_CHART = false;
       this.ANALYSIS_RESULTS = undefined;
@@ -59,11 +69,10 @@ class CandleChart {
       return;
     }
 
-    var genericMsg = JSON.parse(evt.data);
+    const genericMsg = JSON.parse(evt.data);
 
     if (genericMsg['chart']) {
-
-      let latestChart: RootChartObject | undefined = genericMsg;
+      const latestChart: RootChartObject | undefined = genericMsg;
 
       if (!latestChart) {
         console.error('onMessage latestChart == undefined');
@@ -72,10 +81,8 @@ class CandleChart {
 
       this.ROOT_CHART = latestChart;
       this.drawFull(this.ROOT_CHART);
-
-    } else if (genericMsg['latest_candle']) {
-
-      let updateCandle: LatestChartCandle | undefined = genericMsg;
+    } else if (genericMsg['latestCandle']) {
+      const updateCandle: LatestChartCandle | undefined = genericMsg;
 
       if (!updateCandle) {
         console.error('onMessage updateCandle == undefined');
@@ -87,13 +94,12 @@ class CandleChart {
       }
 
       if (this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle.s ==
-          updateCandle.latest_candle.candle.s) {
-
+          updateCandle.latestCandle.candle.s) {
         this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle =
-          updateCandle.latest_candle.candle;
+          updateCandle.latestCandle.candle;
         this.drawFull(this.ROOT_CHART);
       } else {
-        this.ROOT_CHART.chart.push({candle: updateCandle.latest_candle.candle});
+        this.ROOT_CHART.chart.push({candle: updateCandle.latestCandle.candle});
         this.conn.send('analysis|' + this.symbol);
         this.drawFull(this.ROOT_CHART);
       }
@@ -104,93 +110,102 @@ class CandleChart {
     }
   }
 
+  /**
+    The callback when the web socket connection has
+    successfully opened
+
+    @param {Event} evt A generic event
+   */
   private onOpen(evt: Event) {
     this.conn.send('init|' + this.symbol);
   }
 
-  private onClose() {
+  /**
+    The callback when the web socket connection
+    closed.
+
+    @param {CloseEvent} evt The close event
+   */
+  private onClose(evt: CloseEvent) {
     console.log('websocket connection closed');
   }
 
-  public rescaleCanvas(canvas: any): void {
-    // finally query the various pixel ratios
-    let ctx = canvas.getContext('2d');
+  /**
+    Callback when a mouse moves, updates a class specific mouse variables
+    to keep track of where the mouse is.
 
-    let devicePixelRatio = window.devicePixelRatio || 1;
-
-    let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
-                        ctx.mozBackingStorePixelRatio ||
-                        ctx.msBackingStorePixelRatio ||
-                        ctx.oBackingStorePixelRatio ||
-                        ctx.backingStorePixelRatio || 1;
-    let ratio = devicePixelRatio / backingStoreRatio;
-
-    console.log(devicePixelRatio);
-
-    // upscale the canvas if the two ratios don't match
-    if (devicePixelRatio !== backingStoreRatio) {
-
-      let oldWidth = canvas.width;
-      let oldHeight = canvas.height;
-
-      canvas.width = oldWidth * ratio;
-      canvas.height = oldHeight * ratio;
-
-      canvas.style.width = oldWidth + 'px';
-      canvas.style.height = oldHeight + 'px';
-
-      // now scale the context to counter
-      // the fact that we've manually scaled
-      // our canvas element
-      ctx.scale(ratio, ratio);
-    }
-  }
-
+    @param {MouseEvent} evt A mouse event
+   */
   private onMouseMove(evt: MouseEvent) {
-    if (!this.chart_canvas)
+    if (!this.chartCanvas) {
       return;
-    const rect = this.chart_canvas.getBoundingClientRect();
+    }
+    const rect = this.chartCanvas.getBoundingClientRect();
     const x = evt.clientX;
     const y = evt.clientY;
 
-    let scaleX: number = this.chart_canvas.width / rect.width;    // relationship bitmap vs. element for X
-    let scaleY: number = this.chart_canvas.height / rect.height;  // relationship bitmap vs. element for Y
+    // relationship bitmap vs. element for X
+    const scaleX: number = this.chartCanvas.width / rect.width;
+
+    // relationship bitmap vs. element for Y
+    const scaleY: number = this.chartCanvas.height / rect.height;
 
     this.MOUSE_X = (x - rect.left) * scaleX;
     this.MOUSE_Y = (y - rect.top) * scaleY;
   }
 
-  private getChartRange(candles: Chart[], start_index: number): ChartRange {
+  /**
+    Obtains the min, and max for the price and volume of the given data.
+
+    @param {Chart[]} candles The full list of candles in the chart
+    @param {number} startIndex A candle index to start finding the ranges
+    @return {ChartRange} Returns a chartrange interface
+   */
+  private getChartRange(candles: Chart[], startIndex: number): ChartRange {
     let gmax: number = Number.MIN_VALUE;
     let gmin: number = Number.MAX_VALUE;
-    let vgmax_: number = Number.MIN_VALUE;
+    let vgmax: number = Number.MIN_VALUE;
 
-    for (let i: number = start_index; i < candles.length; ++i) {
-      let lmax: number = Math.max(candles[i].candle.o,candles[i].candle.h,
-                    candles[i].candle.l, candles[i].candle.c);
-      let lmin: number = Math.min(candles[i].candle.o,candles[i].candle.h,
-                    candles[i].candle.l, candles[i].candle.c);
+    for (let i: number = startIndex; i < candles.length; ++i) {
+      const lmax: number = Math.max(candles[i].candle.o, candles[i].candle.h,
+          candles[i].candle.l, candles[i].candle.c);
+      const lmin: number = Math.min(candles[i].candle.o, candles[i].candle.h,
+          candles[i].candle.l, candles[i].candle.c);
 
-      let vlmax: number = candles[i].candle.v;
+      const vlmax: number = candles[i].candle.v;
 
-      if (lmax > gmax)
+      if (lmax > gmax) {
         gmax = lmax;
-      if (lmin < gmin)
+      }
+      if (lmin < gmin) {
         gmin = lmin;
-      if (vlmax > vgmax_)
-        vgmax_ = vlmax;
-
+      }
+      if (vlmax > vgmax) {
+        vgmax = vlmax;
+      }
     }
 
-    let r: ChartRange = {max: gmax, min: gmin, vmin: 0, vmax: vgmax_};
+    const r: ChartRange = {max: gmax, min: gmin, vmin: 0, vmax: vgmax};
     return r;
   }
 
+  /**
+    Calculates the width of the text ' 0000.0000' drawn on the canvas
 
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @return {number} The width of the text in pixels
+   */
   private getPriceWidth(ctx: CanvasRenderingContext2D): number {
     return ctx.measureText(' 0000.0000').width;
   }
 
+  /**
+    Callback when the mouse wheel gets spun/moved. Will increase the candle
+    width and zoom in to the right on forward spin, and decrease and zoom out
+    while spun backwards.
+
+    @param {WheelEvent} evt Thte mouse wheel event
+   */
   private onMouseWheelEvent(evt: WheelEvent) {
     if (evt.deltaY > 0) {
       this.CANDLE_WIDTH += 1;
@@ -200,14 +215,19 @@ class CandleChart {
     }
   }
 
+  /**
+    Draws the chart on the html canvas
+
+    @param {RootChartObject} chart The interface representing the candles
+   */
   private drawFull(chart: RootChartObject) {
-    if (!this.chart_canvas) {
+    if (!this.chartCanvas) {
       console.error('unable to get canvas element');
       return;
     }
 
-    let ctx: CanvasRenderingContext2D | null =
-      this.chart_canvas.getContext('2d');
+    const ctx: CanvasRenderingContext2D | null =
+      this.chartCanvas.getContext('2d');
 
     if (!ctx) {
       console.error('contex == undefined');
@@ -216,118 +236,121 @@ class CandleChart {
 
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
-    ctx.translate(0.5,0.5);
-    ctx.font = "normal 1.4em Monospace";
+    ctx.translate(0.5, 0.5);
+    ctx.font = 'normal 1.4em Monospace';
 
-    let drawing_width: number = this.chart_canvas.width;
-    let drawing_height: number =
-      this.chart_canvas.height-this.PADDING_BOT;
+    const drawingWidth: number = this.chartCanvas.width;
+    const drawingHeight: number =
+      this.chartCanvas.height-this.PADDING_BOT;
 
     ctx.strokeStyle = 'white';
     ctx.textBaseline = 'middle';
 
     ctx.fillStyle = '#131722';
-    ctx.fillRect(0,0,this.chart_canvas.width, this.chart_canvas.height);
+    ctx.fillRect(0, 0, this.chartCanvas.width, this.chartCanvas.height);
     ctx.fillStyle = 'white';
 
-    let candles: Chart[] = chart.chart;
+    const candles: Chart[] = chart.chart;
 
-    let num_displayable_candles: number =
-      (this.chart_canvas.width-this.getPriceWidth(ctx))/(this.CANDLE_WIDTH+this.CANDLE_SPACING);
+    let numDisplayableCandles: number =
+      (this.chartCanvas.width-this.getPriceWidth(ctx)) /
+      (this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
-    num_displayable_candles -= 1;
+    numDisplayableCandles -= 1;
 
-    let start_index: number;
-    if (num_displayable_candles < candles.length)
-      start_index = Math.floor(candles.length-num_displayable_candles);
-    else
-      start_index = 0;
+    let startIndex: number;
+    if (numDisplayableCandles < candles.length) {
+      startIndex = Math.floor(candles.length-numDisplayableCandles);
+    } else {
+      startIndex = 0;
+    }
 
-    let priceRange: ChartRange = this.getChartRange(candles, start_index);
+    const priceRange: ChartRange = this.getChartRange(candles, startIndex);
 
 
-    ctx.moveTo(drawing_width-this.getPriceWidth(ctx), 0);
-    ctx.lineTo(drawing_width-this.getPriceWidth(ctx), this.chart_canvas.height);
+    ctx.moveTo(drawingWidth-this.getPriceWidth(ctx), 0);
+    ctx.lineTo(drawingWidth-this.getPriceWidth(ctx), this.chartCanvas.height);
     ctx.stroke();
 
-    let pixel_to_price: LinearEquation =
+    const pixelToPrice: LinearEquation =
       new LinearEquation(this.PADDING_TOP, priceRange.max,
-                         drawing_height-this.PADDING_BOT, priceRange.min);
+          drawingHeight-this.PADDING_BOT, priceRange.min);
 
-    let price_to_pixel: LinearEquation =
+    const priceToPixel: LinearEquation =
       new LinearEquation(priceRange.max, this.PADDING_TOP, priceRange.min,
-                        drawing_height);
-    let volume_to_pixel: LinearEquation =
-      new LinearEquation(priceRange.vmin, this.chart_canvas.height, priceRange.vmax,
-                         drawing_height);
+          drawingHeight);
+
+    const volumeToPixel: LinearEquation =
+      new LinearEquation(priceRange.vmin, this.chartCanvas.height,
+          priceRange.vmax, drawingHeight);
 
     // DRAW THE PRICE TICKS
-    let inc: number = (priceRange.max-priceRange.min)/this.NUM_TICKS;
+    const inc: number = (priceRange.max-priceRange.min)/this.NUM_TICKS;
     for (let i: number = priceRange.min; i <= priceRange.max; i += inc) {
-      ctx.fillText("-" + (i/10000).toFixed(4),
-                   drawing_width-this.getPriceWidth(ctx),
-                   price_to_pixel.eval(i));
+      ctx.fillText('-' + (i/10000).toFixed(4),
+          drawingWidth-this.getPriceWidth(ctx),
+          priceToPixel.eval(i));
 
       ctx.strokeStyle = 'gray';
-      ctx.setLineDash([2,5]);
+      ctx.setLineDash([2, 5]);
       ctx.beginPath();
-      ctx.moveTo(0, price_to_pixel.eval(i));
-      ctx.lineTo(drawing_width-this.getPriceWidth(ctx),
-                 price_to_pixel.eval(i));
+      ctx.moveTo(0, priceToPixel.eval(i));
+      ctx.lineTo(drawingWidth-this.getPriceWidth(ctx),
+          priceToPixel.eval(i));
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
     // DRAW THE CANDLES
-    let last_color: string = '';
-    for (let i: number = start_index; i < candles.length; ++i) {
-      let width_offset: number =
-        ((i-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING));
+    let lastColor: string = '';
+    for (let i: number = startIndex; i < candles.length; ++i) {
+      const widthOffset: number =
+        ((i-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING));
 
-      let has_analysis: boolean = false;
+      let hasAnalysis: boolean = false;
       if (this.ANALYSIS_RESULTS &&
-          i < this.ANALYSIS_RESULTS.analysis.single_candle.length &&
-          this.ANALYSIS_RESULTS.analysis.single_candle[i] != 0) {
-        has_analysis = true;
+          i < this.ANALYSIS_RESULTS.analysis.singleCandle.length &&
+          this.ANALYSIS_RESULTS.analysis.singleCandle[i] != 0) {
+        hasAnalysis = true;
       }
 
       if (candles[i].candle.o > candles[i].candle.c) {
         ctx.fillStyle = '#EF5350';
         ctx.strokeStyle = ctx.fillStyle;
-        last_color = ctx.fillStyle;
+        lastColor = ctx.fillStyle;
 
-        if (has_analysis) {
+        if (hasAnalysis) {
           ctx.strokeRect(
-            width_offset,
-            price_to_pixel.eval(candles[i].candle.c),
-            this.CANDLE_WIDTH,
-            price_to_pixel.eval(candles[i].candle.o)-
-              price_to_pixel.eval(candles[i].candle.c));
+              widthOffset,
+              priceToPixel.eval(candles[i].candle.c),
+              this.CANDLE_WIDTH,
+              priceToPixel.eval(candles[i].candle.o)-
+              priceToPixel.eval(candles[i].candle.c));
         } else {
           ctx.fillRect(
-            width_offset,
-            price_to_pixel.eval(candles[i].candle.c),
-            this.CANDLE_WIDTH,
-            price_to_pixel.eval(candles[i].candle.o)-
-              price_to_pixel.eval(candles[i].candle.c));
+              widthOffset,
+              priceToPixel.eval(candles[i].candle.c),
+              this.CANDLE_WIDTH,
+              priceToPixel.eval(candles[i].candle.o)-
+              priceToPixel.eval(candles[i].candle.c));
         }
 
         ctx.beginPath();
-        ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.h));
-        ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.o));
-        ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.l));
-        ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.c));
+        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.h));
+        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.o));
+        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.l));
+        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.c));
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.fillRect(width_offset,
-                     volume_to_pixel.eval(candles[i].candle.v),
-                     this.CANDLE_WIDTH,
-                     this.chart_canvas.height-volume_to_pixel.eval(candles[i].candle.v));
+        ctx.fillRect(widthOffset,
+            volumeToPixel.eval(candles[i].candle.v),
+            this.CANDLE_WIDTH,
+            this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
         ctx.stroke();
 
 
@@ -335,40 +358,40 @@ class CandleChart {
       } else if (candles[i].candle.o < candles[i].candle.c) {
         ctx.fillStyle = '#26A69A';
         ctx.strokeStyle = ctx.fillStyle;
-        last_color = ctx.fillStyle;
+        lastColor = ctx.fillStyle;
 
-        if (has_analysis) {
+        if (hasAnalysis) {
           ctx.strokeRect(
-            width_offset,
-            price_to_pixel.eval(candles[i].candle.o),
-            this.CANDLE_WIDTH,
-            price_to_pixel.eval(candles[i].candle.c)-
-              price_to_pixel.eval(candles[i].candle.o));
+              widthOffset,
+              priceToPixel.eval(candles[i].candle.o),
+              this.CANDLE_WIDTH,
+              priceToPixel.eval(candles[i].candle.c)-
+              priceToPixel.eval(candles[i].candle.o));
         } else {
           ctx.fillRect(
-            width_offset,
-            price_to_pixel.eval(candles[i].candle.o),
-            this.CANDLE_WIDTH,
-            price_to_pixel.eval(candles[i].candle.c)-
-              price_to_pixel.eval(candles[i].candle.o));
+              widthOffset,
+              priceToPixel.eval(candles[i].candle.o),
+              this.CANDLE_WIDTH,
+              priceToPixel.eval(candles[i].candle.c)-
+              priceToPixel.eval(candles[i].candle.o));
         }
 
         ctx.beginPath();
-        ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.h));
-        ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.c));
-        ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.l));
-        ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                 price_to_pixel.eval(candles[i].candle.o));
+        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.h));
+        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.c));
+        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.l));
+        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+            priceToPixel.eval(candles[i].candle.o));
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.fillRect(width_offset,
-                     volume_to_pixel.eval(candles[i].candle.v),
-                     this.CANDLE_WIDTH,
-                     this.chart_canvas.height-volume_to_pixel.eval(candles[i].candle.v));
+        ctx.fillRect(widthOffset,
+            volumeToPixel.eval(candles[i].candle.v),
+            this.CANDLE_WIDTH,
+            this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
         ctx.stroke();
 
         ctx.fillStyle = 'black';
@@ -377,81 +400,86 @@ class CandleChart {
           ctx.fillStyle = 'white';
           ctx.strokeStyle = 'white';
           ctx.beginPath();
-          ctx.moveTo(width_offset,
-                     price_to_pixel.eval(candles[i].candle.o));
-          ctx.lineTo(width_offset + this.CANDLE_WIDTH,
-                     price_to_pixel.eval(candles[i].candle.c));
+          ctx.moveTo(widthOffset,
+              priceToPixel.eval(candles[i].candle.o));
+          ctx.lineTo(widthOffset + this.CANDLE_WIDTH,
+              priceToPixel.eval(candles[i].candle.c));
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                   price_to_pixel.eval(candles[i].candle.h));
-          ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                   price_to_pixel.eval(candles[i].candle.c));
-          ctx.moveTo(width_offset + this.CANDLE_WIDTH/2.0,
-                   price_to_pixel.eval(candles[i].candle.l));
-          ctx.lineTo(width_offset + this.CANDLE_WIDTH/2.0,
-                   price_to_pixel.eval(candles[i].candle.o));
+          ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+              priceToPixel.eval(candles[i].candle.h));
+          ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+              priceToPixel.eval(candles[i].candle.c));
+          ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
+              priceToPixel.eval(candles[i].candle.l));
+          ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
+              priceToPixel.eval(candles[i].candle.o));
           ctx.stroke();
 
 
           ctx.beginPath();
-          ctx.fillRect(width_offset,
-                       volume_to_pixel.eval(candles[i].candle.v),
-                       this.CANDLE_WIDTH,
-                       this.chart_canvas.height-volume_to_pixel.eval(candles[i].candle.v));
+          ctx.fillRect(widthOffset,
+              volumeToPixel.eval(candles[i].candle.v),
+              this.CANDLE_WIDTH,
+              this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
           ctx.stroke();
         }
       }
 
       if (this.ANALYSIS_RESULTS != undefined &&
-          i < this.ANALYSIS_RESULTS.analysis.single_candle.length &&
-          this.ANALYSIS_RESULTS.analysis.single_candle[i] != 0) {
+          i < this.ANALYSIS_RESULTS.analysis.singleCandle.length &&
+          this.ANALYSIS_RESULTS.analysis.singleCandle[i] != 0) {
         ctx.textBaseline = 'top';
         ctx.fillStyle = 'white';
 
-        let candle_code: number = this.ANALYSIS_RESULTS.analysis.single_candle[i];
-        let candle_id: string;
+        const candleCode: number =
+          this.ANALYSIS_RESULTS.analysis.singleCandle[i];
+        let candleId: string;
 
-        switch (candle_code) {
+        switch (candleCode) {
           case 0:
-            candle_id = "";
+            candleId = '';
             break;
           case 1:
           case 2:
-            candle_id = "M";
+            candleId = 'M';
             break;
           case 3:
           case 4:
-            candle_id = "S";
+            candleId = 'S';
             break;
           case 5:
           case 6:
           case 7:
-            candle_id = "D";
+            candleId = 'D';
             break;
           default:
-            console.error("i don't know this candle pattern");
-            candle_id = "X";
+            console.error('i don\'t know this candle pattern');
+            candleId = 'X';
             break;
         }
 
-        ctx.font = 'normal ' + (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
-        ctx.fillText(candle_id,
-                     (width_offset + (this.CANDLE_WIDTH/2.0)) - ctx.measureText(candle_id).width/2.0,
-                     price_to_pixel.eval(candles[i].candle.l) + 5);
-        ctx.textBaseline = 'middle';
-        ctx.font = "normal 1.4em Monospace";
-      }
+        ctx.font = 'normal ' +
+          (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
 
+        ctx.fillText(candleId,
+            (widthOffset + (this.CANDLE_WIDTH/2.0)) -
+              ctx.measureText(candleId).width/2.0,
+            priceToPixel.eval(candles[i].candle.l) + 5);
+
+        ctx.textBaseline = 'middle';
+        ctx.font = 'normal 1.4em Monospace';
+      }
     }
 
     // Draw the trend lines
     if (this.ANALYSIS_RESULTS != undefined &&
-        this.ANALYSIS_RESULTS.analysis.trend_lines.length != 0) {
-      for (let i: number = 0; i < this.ANALYSIS_RESULTS.analysis.trend_lines.length; ++i) {
-        let trend: TrendLine = this.ANALYSIS_RESULTS.analysis.trend_lines[i];
-        if (trend.s >= start_index) {
+        this.ANALYSIS_RESULTS.analysis.trendLines.length != 0) {
+      for (let i: number = 0;
+        i < this.ANALYSIS_RESULTS.analysis.trendLines.length; ++i) {
+        const trend: TrendLine = this.ANALYSIS_RESULTS.analysis.trendLines[i];
+        if (trend.s >= startIndex) {
           ctx.beginPath();
           ctx.save();
           ctx.lineWidth = 0.5;
@@ -459,34 +487,38 @@ class CandleChart {
           ctx.fillStyle = 'yellow';
           if (trend.d) {
             ctx.moveTo(
-              ((trend.s-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
-                price_to_pixel.eval(candles[trend.e].candle.h));
-            ctx.lineTo(((trend.e-start_index+1)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
-                price_to_pixel.eval(candles[trend.e].candle.h));
+                (trend.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING),
+                priceToPixel.eval(candles[trend.e].candle.h));
+            ctx.lineTo(
+                (trend.e-startIndex+1)*(this.CANDLE_WIDTH+this.CANDLE_SPACING),
+                priceToPixel.eval(candles[trend.e].candle.h));
           }
           ctx.stroke();
           ctx.restore();
           ctx.strokeStyle = 'black';
-
         }
       }
     }
 
-    ctx.fillStyle = last_color;
-    ctx.fillRect(drawing_width-this.getPriceWidth(ctx),
-                 price_to_pixel.eval(candles[candles.length-1].candle.c) - (20.0/2.0),
-                 this.getPriceWidth(ctx), 20);
+    ctx.fillStyle = lastColor;
+    ctx.fillRect(drawingWidth-this.getPriceWidth(ctx),
+        priceToPixel.eval(candles[candles.length-1].candle.c) - (20.0/2.0),
+        this.getPriceWidth(ctx), 20);
     ctx.fillStyle = 'white';
-    ctx.fillText("-" + ((candles[candles.length-1].candle.c)/10000.0).toFixed(4),drawing_width-this.getPriceWidth(ctx),
-                 price_to_pixel.eval(candles[candles.length-1].candle.c));
+    ctx.fillText(
+        '-' + ((candles[candles.length-1].candle.c)/10000.0).toFixed(4),
+        drawingWidth-this.getPriceWidth(ctx),
+        priceToPixel.eval(candles[candles.length-1].candle.c));
 
     ctx.fillStyle = 'white';
-    ctx.fillRect(drawing_width-this.getPriceWidth(ctx),
-                 this.MOUSE_Y - (20.0/2.0),
-                 this.getPriceWidth(ctx), 20);
+    ctx.fillRect(drawingWidth-this.getPriceWidth(ctx),
+        this.MOUSE_Y - (20.0/2.0),
+        this.getPriceWidth(ctx), 20);
     ctx.fillStyle = 'black';
-    ctx.fillText("-" + ((pixel_to_price.eval(this.MOUSE_Y))/10000).toFixed(4),drawing_width-this.getPriceWidth(ctx),
-                 this.MOUSE_Y);
+    ctx.fillText(
+        '-' + ((pixelToPrice.eval(this.MOUSE_Y))/10000).toFixed(4),
+        drawingWidth-this.getPriceWidth(ctx),
+        this.MOUSE_Y);
 
     ctx.font = (this.PADDING_TOP+1).toString() + 'px Monospace';
     ctx.fillStyle = 'white';
@@ -494,29 +526,34 @@ class CandleChart {
     ctx.fillText(this.symbol.toUpperCase(), 0, 0);
 
     // CONERT MOUSE COORDIANTES TO CANDLE INDEX
-    let mouse_candle_index = Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH+this.CANDLE_SPACING));
-    mouse_candle_index += start_index;
+    let mouseCandleIndex =
+      Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH+this.CANDLE_SPACING));
+
+    mouseCandleIndex += startIndex;
     if (!this.ROOT_CHART) {
       console.error('this.ROOT_CHART undefined');
       return;
     }
 
-    if (mouse_candle_index >= this.ROOT_CHART.chart.length)
-      mouse_candle_index = this.ROOT_CHART.chart.length-1;
+    if (mouseCandleIndex >= this.ROOT_CHART.chart.length) {
+      mouseCandleIndex = this.ROOT_CHART.chart.length-1;
+    }
 
-    let hovered_candle: Candle = this.ROOT_CHART.chart[mouse_candle_index].candle;
-    ctx.fillText(" O:" + (hovered_candle.o/10000).toFixed(4) +
-                 " H:" + (hovered_candle.h/10000).toFixed(4) +
-                 " L:" + (hovered_candle.l/10000).toFixed(4) +
-                 " C:" + (hovered_candle.c/10000).toFixed(4),
-                ctx.measureText(this.symbol).width + this.PADDING_TOP,
-                0);
+    const hoveredCandle: Candle =
+      this.ROOT_CHART.chart[mouseCandleIndex].candle;
+    ctx.fillText(' O:' + (hoveredCandle.o/10000).toFixed(4) +
+                 ' H:' + (hoveredCandle.h/10000).toFixed(4) +
+                 ' L:' + (hoveredCandle.l/10000).toFixed(4) +
+                 ' C:' + (hoveredCandle.c/10000).toFixed(4),
+    ctx.measureText(this.symbol).width + this.PADDING_TOP,
+    0);
 
-    ctx.fillText(new Date(hovered_candle.e/1000000).toDateString(),
-                 drawing_width -
-                   ctx.measureText(new Date(hovered_candle.e/1000000).toDateString()).width -
-                   this.getPriceWidth(ctx),
-                 0);
+    ctx.fillText(
+        new Date(hoveredCandle.e/1000000).toDateString(),
+        drawingWidth -
+        ctx.measureText(new Date(hoveredCandle.e/1000000).toDateString())
+            .width - this.getPriceWidth(ctx),
+        0);
 
     this.CANDLE_UPDATES_SENT += 1;
     // sync chart every 100 updates

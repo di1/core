@@ -246,8 +246,8 @@ char* chart_analysis_json(struct chart* cht) {
 
   size_t num_candles = cht->cur_candle + 1;
   // analysis proto {"analysis":
-  //                {"single_candle":[000000000,000000000,000000000,...]},
-  //                {"trend_lines":[{s:000000000,e:00000000,d:aaaaa}...]}}
+  //                {"singleCandle":[000000000,000000000,000000000,...]},
+  //                {"trendLines":[{s:000000000,e:00000000,d:aaaaa}...]}}
 
   // begining prototype length {"analy...[
   size_t total_json_size = 30;
@@ -275,7 +275,7 @@ char* chart_analysis_json(struct chart* cht) {
 
   // build the single candle analysis json
   char* buf = (char*) calloc(total_json_size, sizeof(char));
-  strcat(buf, "{\"analysis\":{\"single_candle\":[\x0");
+  strcat(buf, "{\"analysis\":{\"singleCandle\":[\x0");
   for (size_t i = 0; i < num_candles; ++i) {
     char resbuf[10] = {0};
     sprintf(resbuf, "%u", chta->scp[i]);
@@ -287,7 +287,7 @@ char* chart_analysis_json(struct chart* cht) {
   strcat(buf, "],\x0");
 
   // build the trend_lines json
-  strcat(buf, "\"trend_lines\":[\x0");
+  strcat(buf, "\"trendLines\":[\x0");
   for (size_t i = 0; i < chta->num_trend_lines; ++i) {
     char trend_line_json_buf[34];
     sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%s}",
@@ -305,11 +305,11 @@ char* chart_analysis_json(struct chart* cht) {
 }
 
 char* chart_latest_candle(struct chart* cht) {
-  // {"latest_candle":}
+  // {"latestCandle":}
 
   size_t total_json_size = 18 + JSON_CANDLE_MAX_LEN;
   char* buf = (char*) calloc(total_json_size, sizeof(char));
-  strcat(buf, "{\"latest_candle\":\x0");
+  strcat(buf, "{\"latestCandle\":\x0");
 
   char* tmp_candle_json = NULL;
   tmp_candle_json = candle_json(cht->candles[cht->cur_candle]);
