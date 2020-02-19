@@ -1,12 +1,11 @@
 #ifndef MESSAGE_PARSER_
 #define MESSAGE_PARSER_
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <log/log.h>
 #include <exchange/exchange.h>
 #include <iex/iex.h>
+#include <log/log.h>
+#include <stdlib.h>
+#include <string.h>
 
 /**
  * Takes in a message

@@ -8,6 +8,16 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v clang >/dev/null 2>&1 || {
+  echo >&2 "[ERROR] clang is not installed."
+  exit 1
+}
+
+command -v clang-format >/dev/null 2>&1 || {
+  echo >&2 "[ERROR] clang-format is not installed."
+  exit 1
+}
+
 cd web
 
 echo "[WEB   ] Updating NPM"
@@ -30,18 +40,24 @@ echo "[WEB   ] Minimizing javascript"
 ./node_modules/.bin/uglifyjs main.js -o main.min.js
 cd ..
 
-cd src
-for chFile in `find . -name "*.h" -o -name "*.c"`
+for chFile in `find ./inc/ -name "*.h" -o -name "*.c"`
 do
   echo "[FORMAT] ${chFile}"
   clang-format -i -style=Google ${chFile}
 done
-cd ..
+
+for chFile in `find ./src/ -name "*.h" -o -name "*.c"`
+do
+  echo "[FORMAT] ${chFile}"
+  clang-format -i -style=Google ${chFile}
+done
+
 
 echo
 
 mkdir -p build/
 cd build/
+export CC=/usr/bin/clang
 cmake ..
 make -s
 cd ..

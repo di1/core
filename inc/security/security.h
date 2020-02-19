@@ -1,15 +1,15 @@
 #ifndef SECURITY_
 #define SECURITY_
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
 #include <book/book.h>
 #include <chart/chart.h>
 #include <log/log.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define SECURITY_INTERVAL_MINUTE_NANOSECONDS  6e+10
+#define SECURITY_INTERVAL_MINUTE_NANOSECONDS 6e+10
 #define SECURITY_INTERVAL_5SECOND_NANOSECONDS 5000000000
 #define SECURITY_INTERVAL_5MINUTE_NANOSECONDS 300000000000
 
@@ -48,7 +48,7 @@ struct security* security_new(char* name, uint64_t interval);
  * of shares
  */
 void security_book_update(struct security* sec, bool side, int64_t price,
-    int64_t quantity);
+                          int64_t quantity);
 
 /**
  * Returns a json representation of the chart, the user of this function

@@ -4,9 +4,9 @@
 #ifndef BOOK_
 #define BOOK_
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define BUY_SIDE true
 #define SELL_SIDE false

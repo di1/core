@@ -1,13 +1,12 @@
 #ifndef ANALYSIS_
 #define ANALYSIS_
 
+#include <chart/candle.h>
 #include <log/log.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <chart/candle.h>
 
 // foward declaration to struct chart in chart/chart.h
 struct chart;

@@ -2,8 +2,8 @@
 #define SERVER_
 
 #include <libwebsockets.h>
-#include <string.h>
 #include <signal.h>
+#include <string.h>
 
 #include "message_parser.h"
 
