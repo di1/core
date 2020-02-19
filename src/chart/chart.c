@@ -3,14 +3,25 @@
 // The maximum number of candles any given chart has
 size_t g_max_candles = 0;
 
+struct trend_line {
+  size_t start_index;
+  size_t end_index;
+  bool direction;
+};
+
 struct chart_analysis {
 
-  // locks the analysis from being read or modified
+  // Locks the analysis from being read or modified
   // from a different thread not holding the lock
   pthread_mutex_t lock;
 
-  // a list the size of num_candles_allocated
+  // A list the size of num_candles_allocated
   enum SINGLE_CANDLE_PATTERNS* scp;
+
+  // A list of trend lines (not preallocted)
+  size_t num_trend_lines;
+  struct trend_line* trend_lines;
+
 };
 
 struct chart {
@@ -42,6 +53,7 @@ char* chart_get_name(struct chart* cht) {
 
 struct chart* chart_new(uint64_t interval, char* name) {
 
+  // Initialize the chart
   struct chart* cht = (struct chart*) malloc(1*sizeof(struct chart));
   cht->interval = interval;
   cht->name = name;
@@ -51,10 +63,13 @@ struct chart* chart_new(uint64_t interval, char* name) {
   cht->candles = (struct candle**)
     malloc((cht->num_candles_allocated)*sizeof(struct chart*));
 
+  // Initialize inner analysis struct
   cht->analysis = (struct chart_analysis*)
     malloc(1 * sizeof(struct chart_analysis));
   cht->analysis->scp = (enum SINGLE_CANDLE_PATTERNS*)
     malloc((cht->num_candles_allocated)*sizeof(enum SINGLE_CANDLE_PATTERNS));
+  cht->analysis->trend_lines = NULL;
+  cht->analysis->num_trend_lines = 0;
 
   // initalize all the analysis to NONE
   for (size_t i = 0; i < cht->num_candles_allocated; ++i) {
@@ -77,6 +92,23 @@ void chart_analysis_unlock(struct chart* cht) {
 void chart_put_single_candle_pattern(struct chart* cht, size_t index,
     enum SINGLE_CANDLE_PATTERNS identifier) {
   cht->analysis->scp[index] = identifier;
+}
+
+void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
+    bool direction) {
+
+  struct chart_analysis* cur_analysis = cht->analysis;
+
+  // Add 1 new element to the analysis
+  cur_analysis->num_trend_lines += 1;
+  cur_analysis->trend_lines =
+    (struct trend_line*) realloc(cur_analysis->trend_lines,
+        cur_analysis->num_trend_lines * sizeof(struct trend_line));
+
+  size_t num_trend_lines = cur_analysis->num_trend_lines;
+  cur_analysis->trend_lines[num_trend_lines - 1].direction = direction;
+  cur_analysis->trend_lines[num_trend_lines - 1].start_index = start;
+  cur_analysis->trend_lines[num_trend_lines - 1].end_index = end;
 }
 
 inline void chart_new_candle(struct chart* cht, int64_t price) {
@@ -189,7 +221,8 @@ char* chart_analysis_json(struct chart* cht) {
 
   size_t num_candles = cht->cur_candle + 1;
   // analysis proto {"analysis":
-  //                {"single_candle":[000000000,000000000,000000000,...]}}
+  //                {"single_candle":[000000000,000000000,000000000,...]},
+  //                {"trend_lines":[{s:000000000,e:00000000,d:aaaaa}...]}}
 
   // begining prototype length {"analy...[
   size_t total_json_size = 30;
@@ -199,9 +232,23 @@ char* chart_analysis_json(struct chart* cht) {
   // integer for each candle
   total_json_size += (num_candles*8);
 
+  // ending ]},
+  total_json_size += 3;
+
+  // {"trend_lines":[
+  total_json_size += 16;
+
+  // each trend line {s:...}
+  total_json_size += (chta->num_trend_lines*32);
+
+  // commas between each trend json
+  total_json_size += (chta->num_trend_lines-1);
+
   // ending ]}}
   total_json_size += 3;
 
+
+  // build the single candle analysis json
   char* buf = (char*) calloc(total_json_size, sizeof(char));
   strcat(buf, "{\"analysis\":{\"single_candle\":[\x0");
   for (size_t i = 0; i < num_candles; ++i) {
@@ -212,12 +259,24 @@ char* chart_analysis_json(struct chart* cht) {
     strcat(buf, resbuf);
   }
 
-  strcat(buf, "]}}\x0");
+  strcat(buf, "],\x0");
 
+  // build the trend_lines json
+  strcat(buf, "\"trend_lines\":[\x0");
+  for (size_t i = 0; i < chta->num_trend_lines; ++i) {
+    char trend_line_json_buf[34];
+    sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%s}",
+       chta->trend_lines[i].start_index, chta->trend_lines[i].end_index,
+      (chta->trend_lines[i].direction) ? "true" : "false");
+    if (i != chta->num_trend_lines-1)
+      strcat(trend_line_json_buf, ",\x0");
+    strcat(buf, trend_line_json_buf);
+  }
+
+  strcat(buf, "]}}\x0");
   pthread_mutex_unlock(&(chta->lock));
 
   return buf;
-
 }
 
 char* chart_latest_candle(struct chart* cht) {

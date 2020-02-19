@@ -274,14 +274,6 @@ void parse_price_level_update_message(iex_byte_t side, void* payload) {
   struct iex_price_level_update_message* payload_data =
     (struct iex_price_level_update_message*) (payload);
 
-  // TODO send the information to the market book
-  // to update the order book
-
-  // seems like the order book gets updated before the trade
-  // report message gets sent so we will create new listing in
-  // the exchange here
-  //
-
   symbol_sanitize((char*)payload_data->symbol, 8);
   struct security* cur_sec = NULL;
 
@@ -305,11 +297,6 @@ void parse_price_level_update_message(iex_byte_t side, void* payload) {
 void parse_trade_report_message(void* payload) {
   struct iex_trade_report_message* payload_data =
    (struct iex_trade_report_message*) (payload);
-
-
-  // TODO send the information to the market to update
-  // the latest price
-  //log_trace("trade report message for %.8s", payload_data->symbol);
 
   symbol_sanitize((char*)payload_data->symbol, 8);
   struct security* cur_sec = NULL;
@@ -360,7 +347,7 @@ void parse_auction_information_message(void* payload) {
   struct iex_auction_information_message* payload_data =
     (struct iex_auction_information_message*) (payload);
 
-  // TODO this is a best to taccle and understand but
+  // TODO this is a beast to taccle and understand but
   // TODO is should not affect the order book or last
   // TODO traded prices and I think can be left alone for now
 

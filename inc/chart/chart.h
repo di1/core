@@ -75,6 +75,13 @@ void chart_put_single_candle_pattern(struct chart* cht, size_t index,
     enum SINGLE_CANDLE_PATTERNS identifier);
 
 /**
+ * Markes a line on a chart given two candles, and a boolean "direction"
+ * which indicates weather this line should be draw from the lows or the highs
+ */
+void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
+    bool direction);
+
+/**
  * Returns a json that represents the analysis
  */
 char* chart_analysis_json(struct chart* cht);

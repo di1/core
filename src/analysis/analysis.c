@@ -2,6 +2,7 @@
 #include <analysis/marubozu.h>
 #include <analysis/spinning_top.h>
 #include <analysis/doji.h>
+#include <analysis/horizontal_line.h>
 
 #include <chart/chart.h>
 #include <chart/candle.h>
@@ -60,10 +61,6 @@ pthread_t* threads;
   do {                                                                        \
     ret = ANALYSIS_FUNCTION(last_candle);                                     \
     if (ret != SINGLE_CANDLE_PATTERN_NONE) {                                  \
-      if (ret != SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU &&                      \
-          ret != SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU) {                      \
-          log_info("%s in %s", #ANALYSIS_FUNCTION, chart_get_name(cht));      \
-      }                                                                       \
       chart_put_single_candle_pattern(cht, end_candle-1, ret);                \
       return;                                                                 \
     }                                                                         \
@@ -143,6 +140,7 @@ void* analysis_thread_func(void* index) {
 
     // group the analysis into sections from simplest to hardest
     simple_analysis(cht, end_candle);
+    find_horizontal_line(cht, end_candle);
 
     // release the analysis struct lock
     chart_analysis_unlock(cht);

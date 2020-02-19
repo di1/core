@@ -262,7 +262,8 @@ class CandleChart {
     ctx.stroke();
 
     let pixel_to_price: LinearEquation =
-      new LinearEquation(this.PADDING_TOP, priceRange.max, drawing_height-this.PADDING_BOT, priceRange.min);
+      new LinearEquation(this.PADDING_TOP, priceRange.max,
+                         drawing_height-this.PADDING_BOT, priceRange.min);
 
     let price_to_pixel: LinearEquation =
       new LinearEquation(priceRange.max, this.PADDING_TOP, priceRange.min,
@@ -454,6 +455,30 @@ class CandleChart {
         ctx.font = "normal 1.4em Monospace";
       }
 
+    }
+
+    // Draw the trend lines
+    if (this.ANALYSIS_RESULTS != undefined &&
+        this.ANALYSIS_RESULTS.analysis.trend_lines.length != 0) {
+      for (let i: number = 0; i < this.ANALYSIS_RESULTS.analysis.trend_lines.length; ++i) {
+        let trend: TrendLine = this.ANALYSIS_RESULTS.analysis.trend_lines[i];
+        if (trend.s >= start_index) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'yellow';
+          ctx.fillStyle = 'yellow';
+          if (trend.d) {
+            ctx.moveTo(
+              ((trend.s-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
+                price_to_pixel.eval(candles[trend.e].candle.h));
+            ctx.lineTo(((trend.e-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
+                price_to_pixel.eval(candles[trend.e].candle.h));
+          }
+          ctx.stroke();
+          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = 'black';
+
+        }
+      }
     }
 
     ctx.fillStyle = last_color;
