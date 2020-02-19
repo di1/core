@@ -24,7 +24,7 @@ struct candle {
 };
 
 struct candle* candle_new(int64_t price, uint64_t time) {
-  struct candle* c = (struct candle*) malloc (1*sizeof(struct candle));
+  struct candle* c = (struct candle*)malloc(1 * sizeof(struct candle));
   c->open = price;
   c->high = price;
   c->low = price;
@@ -35,36 +35,21 @@ struct candle* candle_new(int64_t price, uint64_t time) {
   return c;
 }
 
-uint64_t candle_volume(struct candle* c) {
-  return c->volume;
-}
+uint64_t candle_volume(struct candle* c) { return c->volume; }
 
-int64_t candle_open(struct candle* c) {
-  return c->open;
-}
+int64_t candle_open(struct candle* c) { return c->open; }
 
-int64_t candle_high(struct candle* c) {
-  return c->high;
-}
+int64_t candle_high(struct candle* c) { return c->high; }
 
-int64_t candle_low(struct candle* c) {
-  return c->low;
-}
+int64_t candle_low(struct candle* c) { return c->low; }
 
-int64_t candle_close(struct candle* c) {
-  return c->close;
-}
+int64_t candle_close(struct candle* c) { return c->close; }
 
-uint64_t candle_start(struct candle* c) {
-  return c->start_time;
-}
+uint64_t candle_start(struct candle* c) { return c->start_time; }
 
-uint64_t candle_end(struct candle* c) {
-  return c->end_time;
-}
+uint64_t candle_end(struct candle* c) { return c->end_time; }
 
 void candle_update(struct candle* c, int64_t price, uint64_t time) {
-
   c->volume += 1;
   // set the close time only if the last price time
   // is greater than the most recent price
@@ -75,15 +60,12 @@ void candle_update(struct candle* c, int64_t price, uint64_t time) {
 
   // update the high and low
   // the time doesn't matter in this case
-  if (price > c->high)
-    c->high = price;
-  if (price < c->low)
-    c->low = price;
+  if (price > c->high) c->high = price;
+  if (price < c->low) c->low = price;
 }
 
 void candle_free(struct candle** c) {
-  if (*c == NULL)
-    return;
+  if (*c == NULL) return;
 
   free(*c);
   *c = NULL;
@@ -106,24 +88,25 @@ char* candle_json(struct candle* c) {
    */
 
   // max 170 characters (no whitespace or new lines
-  char* buf = (char*) malloc(JSON_CANDLE_MAX_LEN*sizeof(char));
-  int ret = sprintf(buf, "{\"candle\":{"
-      "\"o\":%lld,\"h\":%lld,\"l\":%lld,\"c\":%lld,\"s\":%llu,\"e\":%llu,\"v\":%llu}}",
-      (long long)c->open, (long long)c->high, (long long)c->low,
-      (long long)c->close, (unsigned long long)c->start_time, (unsigned long long)c->end_time,
-      (long long)c->volume);
+  char* buf = (char*)malloc(JSON_CANDLE_MAX_LEN * sizeof(char));
+  int ret = sprintf(buf,
+                    "{\"candle\":{"
+                    "\"o\":%lld,\"h\":%lld,\"l\":%lld,\"c\":%lld,\"s\":%llu,"
+                    "\"e\":%llu,\"v\":%llu}}",
+                    (long long)c->open, (long long)c->high, (long long)c->low,
+                    (long long)c->close, (unsigned long long)c->start_time,
+                    (unsigned long long)c->end_time, (long long)c->volume);
 
   if (ret == -1) {
-    log_error("sprintf on candle ran out of space in buf of 170 allocated"
+    log_error(
+        "sprintf on candle ran out of space in buf of 170 allocated"
         " characters");
   }
 
   return buf;
-
 }
 
 void test_candle() {
-
   // make sure candle creation is good
   struct candle* c = candle_new(0, 0);
   ASSERT_TEST(c != NULL);
@@ -177,8 +160,10 @@ void test_candle() {
   // make sure the json is correct
   char* json = candle_json(c);
   ASSERT_TEST(
-    strcmp(json,
-      "{\"candle\":{\"o\":0,\"h\":5,\"l\":-5,\"c\":3,\"s\":0,\"e\":6}}") == 0);
+      strcmp(
+          json,
+          "{\"candle\":{\"o\":0,\"h\":5,\"l\":-5,\"c\":3,\"s\":0,\"e\":6}}") ==
+      0);
 
   // make sure freeing works
   candle_free(&c);

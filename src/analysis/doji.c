@@ -12,7 +12,6 @@ enum SINGLE_CANDLE_PATTERNS is_doji_dragonfly(struct candle* cnd) {
   return SINGLE_CANDLE_PATTERN_NONE;
 }
 
-
 enum SINGLE_CANDLE_PATTERNS is_doji_gravestone(struct candle* cnd) {
   int64_t o = candle_open(cnd);
   int64_t h = candle_high(cnd);

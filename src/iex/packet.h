@@ -20,7 +20,7 @@ struct iex_tp_header {
 // decifer the message block
 struct iex_tp_message_block_header {
   iex_short_t message_length;
-  iex_byte_t message_type; 
+  iex_byte_t message_type;
 } __attribute__((packed));
 
 struct iex_system_event_message {
@@ -68,7 +68,7 @@ struct iex_price_level_update_message {
   iex_timestamp_t timestamp;
   iex_byte_t symbol[8];
   iex_int_t size;
-  iex_price_t price; 
+  iex_price_t price;
 } __attribute__((packed));
 
 struct iex_trade_report_message {
@@ -77,7 +77,7 @@ struct iex_trade_report_message {
   iex_byte_t symbol[8];
   iex_int_t size;
   iex_price_t price;
-  iex_long_t trade_id;  
+  iex_long_t trade_id;
 } __attribute__((packed));
 
 struct iex_official_price_message {

@@ -19,10 +19,10 @@ struct exchange {
 };
 
 struct exchange* exchange_new(char* name) {
-  char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
+  char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
   strcpy(n, name);
 
-  struct exchange* e = (struct exchange*) calloc(1, sizeof(struct exchange));
+  struct exchange* e = (struct exchange*)calloc(1, sizeof(struct exchange));
   e->name = n;
 
   return e;
@@ -40,7 +40,7 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
       val = val->next;
     }
 
-    struct ll* next_entry = (struct ll*) malloc(1*sizeof(struct ll));
+    struct ll* next_entry = (struct ll*)malloc(1 * sizeof(struct ll));
     next_entry->next = NULL;
     next_entry->val = s;
 
@@ -48,25 +48,23 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
   }
 
   num_securities += 1;
-  if (num_securities%200 == 0)
+  if (num_securities % 200 == 0)
     log_debug("~%lu securities monitored", num_securities);
-  security_names = (char**) realloc(security_names, num_securities*sizeof(char*));
+  security_names =
+      (char**)realloc(security_names, num_securities * sizeof(char*));
 
-  char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
+  char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
   strcpy(n, name);
 
-  security_names[num_securities-1] = n;
-
+  security_names[num_securities - 1] = n;
 }
 
 struct security* exchange_get(struct exchange* e, char* name) {
-
   size_t hash = security_hash(name);
   struct ll* bin_list = &e->entries[hash];
 
   while (bin_list != NULL) {
-    if (bin_list->val == NULL)
-      return NULL;
+    if (bin_list->val == NULL) return NULL;
     if (security_cmp(name, bin_list->val)) {
       return bin_list->val;
     }
@@ -118,5 +116,4 @@ void test_exchange() {
 
   exchange_free(&ex);
   ASSERT_TEST(ex == NULL);
-
 }

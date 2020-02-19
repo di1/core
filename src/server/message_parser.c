@@ -1,8 +1,8 @@
-#include "security/security.h"
 #include <server/message_parser.h>
 
-char* init_response(char* security) {
+#include "security/security.h"
 
+char* init_response(char* security) {
   struct security* sec = exchange_get(iex_exchange, security);
 
   if (!sec) {
@@ -12,7 +12,6 @@ char* init_response(char* security) {
   char* cht = security_get_chart(sec);
 
   return cht;
-
 }
 
 char* latest_response(char* security) {
@@ -28,7 +27,6 @@ char* latest_response(char* security) {
 }
 
 char* analysis_response(char* security) {
-
   struct security* sec = exchange_get(iex_exchange, security);
 
   if (!sec) {
@@ -38,14 +36,12 @@ char* analysis_response(char* security) {
 
   char* analysis_json = security_get_analysis(sec);
   return analysis_json;
-
 }
 
 char* parse_message(char* msg, int len) {
-
   // there is some garbage after msg from the websocket
   // so we cut it off in a new array
-  char* sanitized_msg = (char*) malloc((len+1)*sizeof(char));
+  char* sanitized_msg = (char*)malloc((len + 1) * sizeof(char));
   strncpy(sanitized_msg, msg, len);
   sanitized_msg[len] = '\x0';
 
@@ -53,7 +49,7 @@ char* parse_message(char* msg, int len) {
   char* tokened = NULL;
   tokened = strtok(sanitized_msg, "|");
 
-  //log_debug("received event type: %s", tokened);
+  // log_debug("received event type: %s", tokened);
 
   if (strcmp("init", tokened) == 0) {
     tokened = strtok(NULL, "|");
@@ -79,7 +75,6 @@ char* parse_message(char* msg, int len) {
     free(sanitized_msg);
 
     return response;
-
   }
 
   free(sanitized_msg);

@@ -1,14 +1,12 @@
 #include <analysis/analysis.h>
-#include <analysis/marubozu.h>
-#include <analysis/spinning_top.h>
 #include <analysis/doji.h>
 #include <analysis/horizontal_line.h>
-
-#include <chart/chart.h>
+#include <analysis/marubozu.h>
+#include <analysis/spinning_top.h>
 #include <chart/candle.h>
+#include <chart/chart.h>
 
 struct analysis_info {
-
   // chart to analyize
   struct chart* cht;
 
@@ -38,7 +36,6 @@ struct analysis_list {
   pthread_mutex_t can_remove;
 
   size_t num_elements;
-
 };
 
 // fwd declaration of analysis_pop
@@ -57,15 +54,14 @@ bool init_completed = false;
 // The list of analysis threads
 pthread_t* threads;
 
-#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)                      \
-  do {                                                                        \
-    ret = ANALYSIS_FUNCTION(last_candle);                                     \
-    if (ret != SINGLE_CANDLE_PATTERN_NONE) {                                  \
-      chart_put_single_candle_pattern(cht, end_candle-1, ret);                \
-      return;                                                                 \
-    }                                                                         \
-  } while(0);
-
+#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)         \
+  do {                                                           \
+    ret = ANALYSIS_FUNCTION(last_candle);                        \
+    if (ret != SINGLE_CANDLE_PATTERN_NONE) {                     \
+      chart_put_single_candle_pattern(cht, end_candle - 1, ret); \
+      return;                                                    \
+    }                                                            \
+  } while (0);
 
 /**
  * Performs simple candle stick analysis on the chart
@@ -77,7 +73,7 @@ pthread_t* threads;
  * array.
  */
 void simple_analysis(struct chart* cht, size_t end_candle) {
-  struct candle* last_candle = chart_get_candle(cht, end_candle-1);
+  struct candle* last_candle = chart_get_candle(cht, end_candle - 1);
 
   if (!last_candle) {
     log_error("%lu end_candle", end_candle);
@@ -86,8 +82,7 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
 
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
-  if (candle_volume(last_candle) == 0)
-     return;
+  if (candle_volume(last_candle) == 0) return;
 
   // Now that we have a valid candle perform all single candle
   // analysis
@@ -104,19 +99,16 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
 }
 
-
 void* analysis_thread_func(void* index) {
-
   // wait for the sync
 
   // get the assigned bin id of this analysis thread
-  size_t assigned_bin =  *((size_t*)index);
+  size_t assigned_bin = *((size_t*)index);
   free(index);
 
   // this thread will only monitor this bin of analysis requests
   struct analysis_list* bin = thread_operations[assigned_bin];
   log_trace("thread was assigned bin id %lu %p", assigned_bin, bin);
-
 
   while (true) {
     // get the next analysis in the queue
@@ -125,13 +117,12 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
-    if (!inf)
-     continue;
+    if (!inf) continue;
 
     struct chart* cht = inf->cht;
 
     size_t start_index = inf->start_candle;
-    (void) start_index;
+    (void)start_index;
 
     size_t end_candle = inf->end_candle;
 
@@ -146,7 +137,6 @@ void* analysis_thread_func(void* index) {
     chart_analysis_unlock(cht);
     free(inf);
   }
-
 }
 
 void analysis_init() {
@@ -162,16 +152,14 @@ void analysis_init() {
 
   log_trace("creating %d processing units", numCPU);
 
-
-
   // create the list container
-  thread_operations = (struct analysis_list**)
-    malloc(num_analysis_threads * sizeof(struct analysis_list*));
+  thread_operations = (struct analysis_list**)malloc(
+      num_analysis_threads * sizeof(struct analysis_list*));
 
   // create the lists
   for (size_t i = 0; i < num_analysis_threads; ++i) {
-    thread_operations[i] = (struct analysis_list*)
-      malloc(1 * sizeof(struct analysis_list));
+    thread_operations[i] =
+        (struct analysis_list*)malloc(1 * sizeof(struct analysis_list));
 
     pthread_mutex_init(&(thread_operations[i]->can_remove), NULL);
 
@@ -181,19 +169,19 @@ void analysis_init() {
     thread_operations[i]->num_elements = 0;
   }
 
-  threads = (pthread_t*) calloc(num_analysis_threads, sizeof(pthread_t));
+  threads = (pthread_t*)calloc(num_analysis_threads, sizeof(pthread_t));
   for (size_t i = 0; i < num_analysis_threads; ++i) {
-    size_t* id = (size_t*) malloc(1 * sizeof(size_t));
+    size_t* id = (size_t*)malloc(1 * sizeof(size_t));
     *id = i;
-    pthread_create(&(threads[i]), NULL, analysis_thread_func, (void*) id);
+    pthread_create(&(threads[i]), NULL, analysis_thread_func, (void*)id);
   }
   init_completed = true;
 }
 
 struct analysis_info* analysis_create_info(struct chart* cht, size_t start,
-    size_t end) {
+                                           size_t end) {
   struct analysis_info* element =
-   (struct analysis_info*) malloc(1 * sizeof(struct analysis_info));
+      (struct analysis_info*)malloc(1 * sizeof(struct analysis_info));
 
   element->cht = cht;
   element->start_candle = start;
@@ -203,12 +191,11 @@ struct analysis_info* analysis_create_info(struct chart* cht, size_t start,
   element->prev = NULL;
 
   return element;
-
 }
 
 void analysis_push(struct chart* cht, size_t start, size_t end) {
-
-  while (!init_completed);
+  while (!init_completed)
+    ;
 
   // what bin the analysis will go into
   size_t thread_bin = current_analysis_index % num_analysis_threads;
@@ -246,8 +233,7 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
   }
 
   if (ne > 5) {
-    log_warn("thread id %lu analysis is %lu charts behind",
-        thread_bin, ne);
+    log_warn("thread id %lu analysis is %lu charts behind", thread_bin, ne);
   }
 
   current_analysis_index += 1;
@@ -260,7 +246,7 @@ struct analysis_info* analysis_pop(struct analysis_list* bin) {
 
   struct analysis_info* element = bin->head;
 
-  //log_trace("%p", bin->head);
+  // log_trace("%p", bin->head);
 
   // remove the head
   if (bin->head) {
@@ -277,7 +263,5 @@ struct analysis_info* analysis_pop(struct analysis_list* bin) {
     bin->tail = NULL;
   }
 
-
   return element;
-
 }

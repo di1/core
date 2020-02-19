@@ -16,30 +16,24 @@ struct security {
   struct chart* cht;
 
   pthread_mutex_t m_chart_update;
-
 };
 
 size_t hash(unsigned char* str) {
-    size_t hash = 5381;
-    int c;
-    while ((c = *str++))
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  size_t hash = 5381;
+  int c;
+  while ((c = *str++)) hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
-    hash = hash % SECURITY_HASH_MODULE_VAL;
-    return hash;
+  hash = hash % SECURITY_HASH_MODULE_VAL;
+  return hash;
 }
 
 char* security_get_analysis(struct security* sec) {
   return chart_analysis_json(sec->cht);
 }
 
-size_t security_get_hash(struct security* s) {
-  return s->hash;
-}
+size_t security_get_hash(struct security* s) { return s->hash; }
 
-size_t security_hash(char* name) {
-  return hash((unsigned char*)name);
-}
+size_t security_hash(char* name) { return hash((unsigned char*)name); }
 
 char* security_get_chart(struct security* sec) {
   pthread_mutex_lock(&(sec->m_chart_update));
@@ -61,11 +55,11 @@ bool security_cmp(char* n1, struct security* s) {
 
 // creates a new security
 struct security* security_new(char* name, uint64_t interval) {
-  struct security* sec = (struct security*) malloc(1*sizeof(struct security));
-  
-  char* n = (char*) malloc((strlen(name)+1)*sizeof(char));
+  struct security* sec = (struct security*)malloc(1 * sizeof(struct security));
+
+  char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
   strcpy(n, name);
-  
+
   sec->name = n;
   sec->b = book_new();
   sec->cht = chart_new(interval, n);
@@ -75,8 +69,8 @@ struct security* security_new(char* name, uint64_t interval) {
 }
 
 // this is just an abstraction on the book update function
-void security_book_update(struct security* sec,
-    bool side, int64_t price, int64_t quantity) {
+void security_book_update(struct security* sec, bool side, int64_t price,
+                          int64_t quantity) {
   book_update(side, sec->b, price, quantity);
 }
 
@@ -103,8 +97,7 @@ void test_security() {
   ASSERT_TEST(sec->cht != NULL);
   ASSERT_TEST(strcmp(sec->name, "ABC     ") == 0);
   ASSERT_TEST(security_hash("ABC     ") == sec->hash);
-  
+
   security_free(&sec);
   ASSERT_TEST(sec == NULL);
-
 }

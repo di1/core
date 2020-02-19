@@ -2,24 +2,21 @@
 #include <iex/iex.h>
 
 // iex packet and type data
-#include "types.h"
 #include "packet.h"
+#include "types.h"
 
-#define TIME(CODE, MESSAGE) do {\
-    clock_t begin = clock();\
-    CODE\
-    clock_t end = clock();\
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;\
-    log_trace("%s %lf", MESSAGE, time_spent);\
-  }while (0);
-
+#define TIME(CODE, MESSAGE)                                     \
+  do {                                                          \
+    clock_t begin = clock();                                    \
+    CODE clock_t end = clock();                                 \
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC; \
+    log_trace("%s %lf", MESSAGE, time_spent);                   \
+  } while (0);
 
 int IEX_SIGNAL_INTER = 0;
 pcap_t* desc;
 
-void iex_stop_parse() {
-  pcap_breakloop(desc);
-}
+void iex_stop_parse() { pcap_breakloop(desc); }
 
 /**
  * Sets or appends a NULL character to the end of
@@ -40,8 +37,8 @@ void symbol_sanitize(char* s, size_t n) {
  * packets, the incoming packets from a file are indisquinshible
  * from an interface
  */
-void packet_handler(u_char *userData,
-    const struct pcap_pkthdr* pkthdr, const u_char* packet);
+void packet_handler(u_char* userData, const struct pcap_pkthdr* pkthdr,
+                    const u_char* packet);
 
 /**
  * Processes the data inside the udp packet
@@ -62,7 +59,7 @@ void print_iex_tp_header(struct iex_tp_header* header) {
   log_debug("message_count: %u", header->message_count);
   log_debug("stream_offset: %ld", header->stream_offset);
   log_debug("first_message_sequence_number: %ld",
-      header->first_message_sequence_number);
+            header->first_message_sequence_number);
   log_debug("send_time: %lu", header->send_time);
   log_debug(" === iex_tp_header ===");
 }
@@ -74,14 +71,12 @@ bool is_iex_traffic(char* ip_src, char* ip_dst) {
          strcmp(ip_dst, IEX_PRIMARY) == 0 ||
          strcmp(ip_dst, IEX_SECONDARY) == 0 ||
          strcmp(ip_dst, IEX_TERTIARY) == 0;
-
 }
 
 /**
  * Entry point to parsing an iex historical deep pcap file
  */
 void iex_parse_deep(char* file) {
-
   log_trace("given pcap file: %s", file);
   log_trace("offline iex deep");
 
@@ -111,26 +106,24 @@ void iex_parse_deep(char* file) {
   pcap_close(desc);
 }
 
-void packet_handler(u_char *userData,
-    const struct pcap_pkthdr* pkthdr, const u_char* packet) {
-
+void packet_handler(u_char* userData, const struct pcap_pkthdr* pkthdr,
+                    const u_char* packet) {
   // we won't be passing any user defined information
-  (void) userData;
-  (void) pkthdr;
+  (void)userData;
+  (void)pkthdr;
 
   // we only care about ethernet traffic so validate this packet
   // is an ethernet packet
   const struct ether_header* ethernet_header;
-  ethernet_header = (struct ether_header*) packet;
+  ethernet_header = (struct ether_header*)packet;
 
   // validate type ethernet packet
   if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
-
     // iex traffic comes from tcp traffic so make sure this is
     // a udp and not tcp traffic, also it comes from a set IP
     // we will filter out all the other traffic
     const struct ip* ip_header;
-    ip_header = (struct ip*) (packet + sizeof(struct ether_header));
+    ip_header = (struct ip*)(packet + sizeof(struct ether_header));
 
     // convert src and dst ip addresses into text form
     char ip_src[INET_ADDRSTRLEN];
@@ -138,15 +131,11 @@ void packet_handler(u_char *userData,
     inet_ntop(AF_INET, &(ip_header->ip_src), ip_src, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(ip_header->ip_dst), ip_dst, INET_ADDRSTRLEN);
 
-
     // verify udp packet and verify src
     if (ip_header->ip_p == IPPROTO_UDP && is_iex_traffic(ip_src, ip_dst)) {
-
       // extract the packet data
-      u_char* data = (u_char*) (packet +
-                     sizeof(struct ether_header) +
-                     sizeof(struct ip) +
-                     sizeof(struct udphdr));
+      u_char* data = (u_char*)(packet + sizeof(struct ether_header) +
+                               sizeof(struct ip) + sizeof(struct udphdr));
 
       // offload the udp data processing out of this function
       iex_tp_handler(data);
@@ -187,9 +176,9 @@ void parse_system_event_message(void* payload) {
  */
 void parse_security_directory_message(void* payload) {
   struct iex_security_directory_message* payload_data =
-    (struct iex_security_directory_message*) (payload);
+      (struct iex_security_directory_message*)(payload);
 
-  symbol_sanitize((char*) payload_data->symbol, 8);
+  symbol_sanitize((char*)payload_data->symbol, 8);
   log_trace("security directory message for %s", payload_data->symbol);
 
   // TODO do something with this information
@@ -203,8 +192,8 @@ void parse_security_directory_message(void* payload) {
  */
 void parse_trading_status_message(void* payload) {
   struct iex_trading_status_message* payload_data =
-    (struct iex_trading_status_message*) (payload);
-  (void) payload_data;
+      (struct iex_trading_status_message*)(payload);
+  (void)payload_data;
 
   /*
   log_trace("trading status message for %.8s", payload_data->symbol);
@@ -217,8 +206,8 @@ void parse_trading_status_message(void* payload) {
  */
 void parse_operational_hault_status_message(void* payload) {
   struct iex_operational_halt_status_message* payload_data =
-    (struct iex_operational_halt_status_message*) (payload);
-  (void) payload_data;
+      (struct iex_operational_halt_status_message*)(payload);
+  (void)payload_data;
   /*
   log_trace("operation hault message for %.8s", payload_data->symbol);
   */
@@ -227,8 +216,8 @@ void parse_operational_hault_status_message(void* payload) {
 
 void parse_short_sale_price_test_status_message(void* payload) {
   struct iex_short_sale_price_test_message* payload_data =
-    (struct iex_short_sale_price_test_message*) (payload);
-  (void) payload_data;
+      (struct iex_short_sale_price_test_message*)(payload);
+  (void)payload_data;
   /*
   log_trace("short sale price test message for %.8s", payload_data->symbol);
   */
@@ -238,7 +227,7 @@ void parse_short_sale_price_test_status_message(void* payload) {
 
 void parse_security_event_message(void* payload) {
   struct iex_security_event_message* payload_data =
-    (struct iex_security_event_message*) (payload);
+      (struct iex_security_event_message*)(payload);
 
   symbol_sanitize((char*)payload_data->symbol, 8);
 
@@ -257,12 +246,11 @@ void parse_security_event_message(void* payload) {
       break;
     default:
       log_error("unknown security event message 0x%x symbol %.8s",
-          payload_data->security_event, payload_data->symbol);
+                payload_data->security_event, payload_data->symbol);
       exit(1);
   }
 
   // TODO might want to do more with this
-
 }
 
 /**
@@ -272,18 +260,17 @@ void parse_security_event_message(void* payload) {
  */
 void parse_price_level_update_message(iex_byte_t side, void* payload) {
   struct iex_price_level_update_message* payload_data =
-    (struct iex_price_level_update_message*) (payload);
+      (struct iex_price_level_update_message*)(payload);
 
   symbol_sanitize((char*)payload_data->symbol, 8);
   struct security* cur_sec = NULL;
 
-
- reget_security:
+reget_security:
   cur_sec = exchange_get(iex_exchange, (char*)payload_data->symbol);
 
   if (cur_sec == NULL) {
     exchange_put(iex_exchange, (char*)payload_data->symbol,
-        SECURITY_INTERVAL_MINUTE_NANOSECONDS);
+                 SECURITY_INTERVAL_MINUTE_NANOSECONDS);
     goto reget_security;
   }
 
@@ -296,22 +283,21 @@ void parse_price_level_update_message(iex_byte_t side, void* payload) {
  */
 void parse_trade_report_message(void* payload) {
   struct iex_trade_report_message* payload_data =
-   (struct iex_trade_report_message*) (payload);
+      (struct iex_trade_report_message*)(payload);
 
   symbol_sanitize((char*)payload_data->symbol, 8);
   struct security* cur_sec = NULL;
 
- reget_security:
+reget_security:
   cur_sec = exchange_get(iex_exchange, (char*)payload_data->symbol);
 
   if (cur_sec == NULL) {
     exchange_put(iex_exchange, (char*)payload_data->symbol,
-        SECURITY_INTERVAL_MINUTE_NANOSECONDS);
+                 SECURITY_INTERVAL_MINUTE_NANOSECONDS);
     goto reget_security;
   }
 
   security_chart_update(cur_sec, payload_data->price, payload_data->timestamp);
-
 }
 
 /**
@@ -321,7 +307,7 @@ void parse_trade_report_message(void* payload) {
  */
 void parse_official_price_message(void* payload) {
   struct iex_official_price_message* payload_data =
-    (struct iex_official_price_message*) (payload);
+      (struct iex_official_price_message*)(payload);
 
   // TODO pass the information to the market about
   // the official opening and closing prices
@@ -335,7 +321,7 @@ void parse_official_price_message(void* payload) {
  */
 void parse_trade_break_message(void* payload) {
   struct iex_trade_break_message* payload_data =
-    (struct iex_trade_break_message*) (payload);
+      (struct iex_trade_break_message*)(payload);
 
   // TODO this is IEX specific and is considered "rare"
   // TODO I'm unsure what to do with this
@@ -345,15 +331,14 @@ void parse_trade_break_message(void* payload) {
 
 void parse_auction_information_message(void* payload) {
   struct iex_auction_information_message* payload_data =
-    (struct iex_auction_information_message*) (payload);
+      (struct iex_auction_information_message*)(payload);
 
   // TODO this is a beast to taccle and understand but
   // TODO is should not affect the order book or last
   // TODO traded prices and I think can be left alone for now
 
-  //log_trace("auction information for %.8s", payload_data->symbol);
-  (void) payload_data;
-
+  // log_trace("auction information for %.8s", payload_data->symbol);
+  (void)payload_data;
 }
 
 /**
@@ -362,18 +347,15 @@ void parse_auction_information_message(void* payload) {
  * function to do a task
  */
 void iex_tp_handler(u_char* data) {
-
   // the header starts at position 0 of the data
-  struct iex_tp_header* header = (struct iex_tp_header*) &data[0];
+  struct iex_tp_header* header = (struct iex_tp_header*)&data[0];
 
-  if (!(header->message_protocol_id == 0x8004 &&
-      header->channel_id == 1)) {
+  if (!(header->message_protocol_id == 0x8004 && header->channel_id == 1)) {
     log_trace("unknown protocol\n");
     return;
   }
 
-  if (header->payload_length == 0 &&
-      header->message_count == 0) {
+  if (header->payload_length == 0 && header->message_count == 0) {
     // this is a heartbeat message
     return;
   }
@@ -386,7 +368,7 @@ void iex_tp_handler(u_char* data) {
   for (iex_short_t i = 0; i < header->message_count; ++i) {
     // read the message block to figure out what kind of message this is
     struct iex_tp_message_block_header* message_header =
-      (struct iex_tp_message_block_header*) &data[0];
+        (struct iex_tp_message_block_header*)&data[0];
 
     data = &data[sizeof(struct iex_tp_message_block_header)];
 
@@ -423,7 +405,7 @@ void iex_tp_handler(u_char* data) {
       case PRICE_LEVEL_UPDATE_BUY_MESSAGE:
       case PRICE_LEVEL_UPDATE_SELL_MESSAGE:
         parse_price_level_update_message(message_header->message_type,
-            payload_body);
+                                         payload_body);
         data = &data[sizeof(struct iex_price_level_update_message)];
         break;
       case TRADE_REPORT_MESSAGE:
@@ -448,5 +430,4 @@ void iex_tp_handler(u_char* data) {
         break;
     }
   }
-
 }
