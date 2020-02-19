@@ -41,6 +41,10 @@ class CandleChart {
 
     this.chart_canvas.onwheel = this.onMouseWheelEvent.bind(this);
     this.chart_canvas.onmousemove = this.onMouseMove.bind(this);
+    this.chart_canvas.onkeypress = this.onKeyPress.bind(this);
+  }
+
+  private onKeyPress(evt: KeyboardEvent) {
   }
 
   public setSymbol(symbol: string) {
@@ -195,7 +199,7 @@ class CandleChart {
       this.CANDLE_WIDTH += 1;
     }
     if (evt.deltaY < 0) {
-      this.CANDLE_WIDTH -= 1;
+      this.CANDLE_WIDTH -= 0.5;
     }
   }
 
@@ -215,7 +219,7 @@ class CandleChart {
 
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
-
+    ctx.translate(0.5,0.5);
     ctx.font = "normal 1.4em Monospace";
 
     let drawing_width: number = this.chart_canvas.width;
@@ -241,18 +245,6 @@ class CandleChart {
       start_index = Math.floor(candles.length-num_displayable_candles);
     else
       start_index = 0;
-
-
-    ctx.strokeStyle = 'white';
-    ctx.beginPath();
-    ctx.moveTo(0, this.MOUSE_Y);
-    ctx.lineTo(drawing_width-this.getPriceWidth(ctx), this.MOUSE_Y);
-    ctx.moveTo(this.MOUSE_X, this.PADDING_TOP);
-    ctx.lineTo(this.MOUSE_X, drawing_height+this.PADDING_BOT);
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-    ctx.lineWidth = 1;
-
 
     let priceRange: ChartRange = this.getChartRange(candles, start_index);
 
@@ -464,17 +456,19 @@ class CandleChart {
         let trend: TrendLine = this.ANALYSIS_RESULTS.analysis.trend_lines[i];
         if (trend.s >= start_index) {
           ctx.beginPath();
+          ctx.save();
+          ctx.lineWidth = 0.5;
           ctx.strokeStyle = 'yellow';
           ctx.fillStyle = 'yellow';
           if (trend.d) {
             ctx.moveTo(
               ((trend.s-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
                 price_to_pixel.eval(candles[trend.e].candle.h));
-            ctx.lineTo(((trend.e-start_index)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
+            ctx.lineTo(((trend.e-start_index+1)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)),
                 price_to_pixel.eval(candles[trend.e].candle.h));
           }
           ctx.stroke();
-          ctx.lineWidth = 0.5;
+          ctx.restore();
           ctx.strokeStyle = 'black';
 
         }

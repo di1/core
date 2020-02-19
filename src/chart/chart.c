@@ -99,6 +99,33 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
 
   struct chart_analysis* cur_analysis = cht->analysis;
 
+  // Compute the "trend union"
+  // If two seperate trend lines are created where both have the same
+  // start index, then simply extend the trend line to the most recent
+  // end index. By induction this will be the first trend line found with the
+  // same start index. We will also combine trends whos "end" candle
+  // both lie on the same y axis
+
+  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
+    if (cur_analysis->trend_lines[i].start_index == start) {
+      cur_analysis->trend_lines[i].end_index = end;
+      return;
+    }
+
+    // TODO this will need to be abstracted as end points won't always
+    // begin from the high
+    int64_t t1_end =
+      candle_high(cht->candles[cur_analysis->trend_lines[i].end_index]);
+    int64_t t2_end =
+      candle_high(cht->candles[end]);
+
+    if (t1_end == t2_end) {
+      cur_analysis->trend_lines[i].end_index = end;
+      return;
+    }
+
+  }
+
   // Add 1 new element to the analysis
   cur_analysis->num_trend_lines += 1;
   cur_analysis->trend_lines =
@@ -164,8 +191,6 @@ void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
 
     // queue up analysis on the newly finalized chart
     analysis_push(cht, 0, cht->cur_candle);
-
-
   } else {
     // update the current candle
     candle_update(cht->candles[cht->cur_candle], price, ts);
