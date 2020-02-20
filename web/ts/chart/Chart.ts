@@ -4,7 +4,7 @@
 class CandleChart { // eslint-disable-line no-unused-vars
   private symbol: string;
   private conn: WebSocket;
-  private chartCanvas: HTMLCanvasElement | null;
+  private chartCanvas: HTMLCanvasElement;
 
   private NUM_TICKS: number = 20;
   private PADDING_BOT: number = 50;
@@ -12,7 +12,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private CANDLE_WIDTH: number = 10;
 
 
-  private ROOT_CHART: RootChartObject | undefined = undefined;
+  private ROOT_CHART: RootChartObject;
   private CANDLE_UPDATES_SENT: number = 0;
   private CANDLE_SPACING: number = 5;
 
@@ -21,7 +21,9 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
   private RESET_CHART: boolean = false;
 
-  private ANALYSIS_RESULTS: RootAnalysisJSON | undefined = undefined;
+  private ANALYSIS_RESULTS: RootAnalysisJSON;
+
+  private CHART_STYLE_BACKGROUND_COLOR = '#131722';
 
   /**
     Creates a candle chart bound to the largeCandleChart.
@@ -31,10 +33,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
   constructor(symbol: string) {
     this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
 
-    if (!this.chartCanvas) {
-      console.error('chart does not exist in html');
-    }
-
     this.symbol = symbol;
     this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
@@ -43,6 +41,14 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     this.chartCanvas.onwheel = this.onMouseWheelEvent.bind(this);
     this.chartCanvas.onmousemove = this.onMouseMove.bind(this);
+
+    this.ROOT_CHART = <RootChartObject> {
+      chart: [],
+    };
+
+    this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
+      analysis: <AnalysisJSON> {singleCandle: [], trendLines: []},
+    };
   }
 
   /**
@@ -63,8 +69,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private onMessage(evt: MessageEvent) {
     if (this.RESET_CHART) {
       this.RESET_CHART = false;
-      this.ANALYSIS_RESULTS = undefined;
-      this.ROOT_CHART = undefined;
       this.conn.send('init|' + this.symbol);
       return;
     }
@@ -129,6 +133,23 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private onClose(evt: CloseEvent) {
     console.log('websocket connection closed');
   }
+
+  /**
+    Callback when the mouse wheel gets spun/moved. Will increase the candle
+    width and zoom in to the right on forward spin, and decrease and zoom out
+    while spun backwards.
+
+    @param {WheelEvent} evt Thte mouse wheel event
+   */
+  private onMouseWheelEvent(evt: WheelEvent) {
+    if (evt.deltaY > 0) {
+      this.CANDLE_WIDTH += 1;
+    }
+    if (evt.deltaY < 0) {
+      this.CANDLE_WIDTH -= 0.5;
+    }
+  }
+
 
   /**
     Callback when a mouse moves, updates a class specific mouse variables
@@ -200,19 +221,104 @@ class CandleChart { // eslint-disable-line no-unused-vars
   }
 
   /**
-    Callback when the mouse wheel gets spun/moved. Will increase the candle
-    width and zoom in to the right on forward spin, and decrease and zoom out
-    while spun backwards.
+    Sets up context variables before rendering, these are the default
+    values and may be changed throught the rendering.
 
-    @param {WheelEvent} evt Thte mouse wheel event
+    @param {CanvasRenderingContext2D} ctx The rendering context
    */
-  private onMouseWheelEvent(evt: WheelEvent) {
-    if (evt.deltaY > 0) {
-      this.CANDLE_WIDTH += 1;
+  private canvasRenderContex2DSetup(ctx: CanvasRenderingContext2D) {
+    // Set the canvas width and height to the screens width and height
+    // and translate the entire screen by a half a pixel to get cripser lines
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+    ctx.translate(0.5, 0.5);
+
+    // Set font
+    ctx.font = 'normal 1.4em Monospace';
+
+    // Most drawing of text has a baseline of middle and drawing text is
+    // mainly of white text
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = 'white';
+
+    // Clear the drawing area
+    ctx.save();
+    ctx.fillStyle = this.CHART_STYLE_BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, this.chartCanvas.width, this.chartCanvas.height);
+    ctx.restore();
+  }
+
+  /**
+    Computes the maximum number of allowed candles to be displayed
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {number} rightBarPriceWidth Number of pixels the price bar takes.
+    @return {number} The maximum number of candles allowed on the screen
+   */
+  private computeNumDisplayableCandles(ctx: CanvasRenderingContext2D,
+      rightBarPriceWidth: number): number {
+    // Divide the chart width not include the leftBarPriceBarWidth
+    // by the amount of space one candle occupies to get the maximum
+    // number of candles displayable on the screen
+    let numDisplayableCandles: number =
+      (this.chartCanvas.width-rightBarPriceWidth) /
+      (this.CANDLE_WIDTH + this.CANDLE_SPACING);
+
+    // Subtract one candle for spacing given to the right most bar
+    numDisplayableCandles -= 1;
+
+    return numDisplayableCandles;
+  }
+
+  /**
+    Calculates what the start index of the left most candle is. This number
+    changes based on zoom, and chart position.
+
+    @param {Chart[]} candles The array of candles that can be drawn.
+    @param {number} maxDrawableCandles The maximum number of candles that can
+                                        be drawn on the screen.
+    @return {number} The start index of the left most candle
+   */
+  private computeCandleStartIndex(candles: Chart[],
+      maxDrawableCandles: number): number {
+    let startIndex: number;
+    if (maxDrawableCandles < candles.length) {
+      startIndex = Math.floor(candles.length-maxDrawableCandles);
+    } else {
+      startIndex = 0;
     }
-    if (evt.deltaY < 0) {
-      this.CANDLE_WIDTH -= 0.5;
+    return startIndex;
+  }
+
+  /**
+    Draws the right price bar.
+
+    @param {CanvasRenderingContext2D} ctx
+    @param {number} drawingWidth The width of the entire canvas.
+    @param {number} rightBarPriceWidth The alloted space for the price bar.
+    @param {ChartRange} priceRange The price range of the chart
+    @param {LinearEquation} priceToPixel An equation that converts a price
+      to a Y pixel coordiant.
+   */
+  private drawRightPriceBar(ctx: CanvasRenderingContext2D,
+      drawingWidth: number, rightBarPriceWidth: number, priceRange: ChartRange,
+      priceToPixel: LinearEquation) {
+    ctx.save();
+    ctx.translate(drawingWidth-rightBarPriceWidth, 0);
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, this.chartCanvas.height);
+    ctx.stroke();
+
+    // Draw the price tick follwed by the price it coorisponds to
+    const inc: number = (priceRange.max-priceRange.min)/this.NUM_TICKS;
+    for (let i: number = priceRange.min; i <= priceRange.max; i += inc) {
+      ctx.fillText('-' + (i/10000).toFixed(4), 0, priceToPixel.eval(i));
     }
+
+    ctx.restore();
   }
 
   /**
@@ -221,85 +327,59 @@ class CandleChart { // eslint-disable-line no-unused-vars
     @param {RootChartObject} chart The interface representing the candles
    */
   private drawFull(chart: RootChartObject) {
-    if (!this.chartCanvas) {
-      console.error('unable to get canvas element');
-      return;
-    }
+    // Get the drawing context for the canvas
+    const ctx: CanvasRenderingContext2D =
+      <CanvasRenderingContext2D> this.chartCanvas.getContext('2d');
 
-    const ctx: CanvasRenderingContext2D | null =
-      this.chartCanvas.getContext('2d');
+    // Setup the context defaults and clear the canvas
+    this.canvasRenderContex2DSetup(ctx);
 
-    if (!ctx) {
-      console.error('contex == undefined');
-      return;
-    }
-
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
-    ctx.translate(0.5, 0.5);
-    ctx.font = 'normal 1.4em Monospace';
-
+    // The drawing width and height of the candle chart
+    // (not including the bottom volume graph)
     const drawingWidth: number = this.chartCanvas.width;
     const drawingHeight: number =
       this.chartCanvas.height-this.PADDING_BOT;
 
-    ctx.strokeStyle = 'white';
-    ctx.textBaseline = 'middle';
+    // The amount of space needed to draw the right price bar
+    const rightBarPriceWidth: number = ctx.measureText(' 0000.0000').width;
 
-    ctx.fillStyle = '#131722';
-    ctx.fillRect(0, 0, this.chartCanvas.width, this.chartCanvas.height);
-    ctx.fillStyle = 'white';
-
+    // Hold a variable to store the candles to reduce typing of
+    // chart.chart
     const candles: Chart[] = chart.chart;
 
-    let numDisplayableCandles: number =
-      (this.chartCanvas.width-this.getPriceWidth(ctx)) /
-      (this.CANDLE_WIDTH+this.CANDLE_SPACING);
+    // Maximum number of candles allowed to be displayed
+    const numDisplayableCandles: number =
+      this.computeNumDisplayableCandles(ctx, rightBarPriceWidth);
 
-    numDisplayableCandles -= 1;
+    // The start index of the left most candle
+    const startIndex: number = this.computeCandleStartIndex(candles,
+        numDisplayableCandles);
 
-    let startIndex: number;
-    if (numDisplayableCandles < candles.length) {
-      startIndex = Math.floor(candles.length-numDisplayableCandles);
-    } else {
-      startIndex = 0;
-    }
-
+    // The price range that the chart covers
     const priceRange: ChartRange = this.getChartRange(candles, startIndex);
 
-
-    ctx.moveTo(drawingWidth-this.getPriceWidth(ctx), 0);
-    ctx.lineTo(drawingWidth-this.getPriceWidth(ctx), this.chartCanvas.height);
-    ctx.stroke();
-
+    // A linear equation when given a pixel will give back the price on the
+    // chart.
     const pixelToPrice: LinearEquation =
       new LinearEquation(this.PADDING_TOP, priceRange.max,
           drawingHeight-this.PADDING_BOT, priceRange.min);
 
+    // A linear equation when given a price will give back the pixel location
+    // on the chart.
     const priceToPixel: LinearEquation =
       new LinearEquation(priceRange.max, this.PADDING_TOP, priceRange.min,
           drawingHeight);
 
+    // A linear equation when given a volume will give back the pixel location
+    // on the chart.
     const volumeToPixel: LinearEquation =
       new LinearEquation(priceRange.vmin, this.chartCanvas.height,
           priceRange.vmax, drawingHeight);
 
-    // DRAW THE PRICE TICKS
-    const inc: number = (priceRange.max-priceRange.min)/this.NUM_TICKS;
-    for (let i: number = priceRange.min; i <= priceRange.max; i += inc) {
-      ctx.fillText('-' + (i/10000).toFixed(4),
-          drawingWidth-this.getPriceWidth(ctx),
-          priceToPixel.eval(i));
 
-      ctx.strokeStyle = 'gray';
-      ctx.setLineDash([2, 5]);
-      ctx.beginPath();
-      ctx.moveTo(0, priceToPixel.eval(i));
-      ctx.lineTo(drawingWidth-this.getPriceWidth(ctx),
-          priceToPixel.eval(i));
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
+    // Draw the right price bar
+    this.drawRightPriceBar(ctx, drawingWidth, rightBarPriceWidth, priceRange,
+        priceToPixel);
 
     // DRAW THE CANDLES
     let lastColor: string = '';

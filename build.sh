@@ -30,7 +30,7 @@ npm install > /dev/null
 for tsFile in `find ts -name "*.ts"`;
 do
   echo "[LINT  ] ${tsFile}"
-  ./node_modules/.bin/eslint ${tsFile}
+  ./node_modules/.bin/eslint ${tsFile} --fix
 done
 
 echo "[WEB   ] Compiling typescript"
