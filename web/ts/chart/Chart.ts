@@ -1,3 +1,5 @@
+type RectDrawFunc = (x: number, y: number, w: number, h: number) => void;
+
 /**
   Represents a CandleChart
  */
@@ -24,6 +26,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private ANALYSIS_RESULTS: RootAnalysisJSON;
 
   private CHART_STYLE_BACKGROUND_COLOR = '#131722';
+  private CHART_STYLE_CANDLE_FALLING = '#EF5350';
+  private CHART_STYLE_CANDLE_RISING = '#26A69A';
 
   /**
     Creates a candle chart bound to the largeCandleChart.
@@ -304,18 +308,274 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private drawRightPriceBar(ctx: CanvasRenderingContext2D,
       drawingWidth: number, rightBarPriceWidth: number, priceRange: ChartRange,
       priceToPixel: LinearEquation) {
+    // Save the context state so we don't mess anything else up
     ctx.save();
-    ctx.translate(drawingWidth-rightBarPriceWidth, 0);
 
+    // Translate to the  price bar so our drawing is 0 based
+    // set line width to 0.5
+    ctx.translate(drawingWidth-rightBarPriceWidth, 0);
+    ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(0, this.chartCanvas.height);
     ctx.stroke();
 
+    // Set the line dash now for when we draw the vertical bars
+    ctx.setLineDash([2, 10]);
+
     // Draw the price tick follwed by the price it coorisponds to
     const inc: number = (priceRange.max-priceRange.min)/this.NUM_TICKS;
     for (let i: number = priceRange.min; i <= priceRange.max; i += inc) {
       ctx.fillText('-' + (i/10000).toFixed(4), 0, priceToPixel.eval(i));
+
+      ctx.beginPath();
+      ctx.setLineDash([2, 10]);
+      ctx.moveTo(-drawingWidth, priceToPixel.eval(i));
+      ctx.lineTo(0, priceToPixel.eval(i));
+      ctx.stroke();
+    }
+
+    // Restore back to whatever we were before
+    ctx.restore();
+  }
+
+  /**
+    Draws a single candle.
+
+    @param {CanvasRenderingContext2D} ctx The canvas rendering context
+    @param {number} offset The left most x coordinant of the candle
+    @param {RectDrawFunc} draw A function pointer to either ctx.fillRect or
+      ctx.strokeRect
+    @param {Candle} candle The candle to draw
+    @param {LinearEquation} priceToPixel An equation that converts a price
+      to a Y pixel coordiant.
+   */
+  private drawCandle(ctx: CanvasRenderingContext2D,
+      offset: number, draw: RectDrawFunc, candle: Candle,
+      priceToPixel: LinearEquation) {
+    ctx.save();
+    // The candle's top left y coordiant
+    const y: number = (candle.o >= candle.c) ?
+      priceToPixel.eval(candle.o) : priceToPixel.eval(candle.c);
+
+    // height from the high to the top of the candle body
+    const highToY: number = priceToPixel.eval(candle.h) - y;
+
+    // The height of the candle
+    const h: number =
+      Math.abs(priceToPixel.eval(candle.o)-priceToPixel.eval(candle.c));
+
+    // height from the low to the bottom of the candle body
+    const lowToBottom : number = priceToPixel.eval(candle.l) - y;
+
+    // Set the color based on weather or not the candle is falling or rising
+    ctx.strokeStyle = (candle.o > candle.c) ?
+      this.CHART_STYLE_CANDLE_FALLING : this.CHART_STYLE_CANDLE_RISING;
+    ctx.fillStyle = ctx.strokeStyle;
+
+    // Translate to the top left corner of the candle
+    ctx.translate(offset, y);
+    ctx.beginPath();
+
+    // call the given rect function
+    draw.apply(ctx, [0, 0, this.CANDLE_WIDTH, h]);
+
+    ctx.stroke();
+
+    // Draw the wicks of the candle relative to the top left corner of the
+    // candle.
+    ctx.beginPath();
+    ctx.moveTo(this.CANDLE_WIDTH / 2.0, highToY);
+    ctx.lineTo(this.CANDLE_WIDTH / 2.0, 0);
+
+    ctx.moveTo(this.CANDLE_WIDTH / 2.0, h);
+    ctx.lineTo(this.CANDLE_WIDTH / 2.0, lowToBottom);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /**
+    Draws the volume box of a candle below candle chart
+
+    @param {CanvasRenderingContext2D} ctx The canvas rendering context
+    @param {number} offset The X offset of the candle
+    @param {Candle} candle The candle object containing the volume data
+    @param {LinearEquation} volumeToPixel An equation that converts volume
+            to an Y coordinant.
+           */
+  private drawVolume(ctx: CanvasRenderingContext2D,
+      offset: number, candle: Candle,
+      volumeToPixel: LinearEquation) {
+    ctx.save();
+
+    // Make the stroke style the same as the candle this volume represents.
+    ctx.strokeStyle = (candle.o > candle.c) ?
+      this.CHART_STYLE_CANDLE_FALLING : this.CHART_STYLE_CANDLE_RISING;
+    ctx.fillStyle = ctx.strokeStyle;
+
+    ctx.translate(offset, volumeToPixel.eval(candle.v));
+    ctx.beginPath();
+    ctx.fillRect(0, 0, this.CANDLE_WIDTH, volumeToPixel.eval(candle.v));
+    ctx.stroke();
+
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+    Draws an analysis that applies to a single candle
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {number} widthOffset The X offset of the candle
+    @param {LinearEquation} priceToPixel An equation that converts a price
+      to a Y pixel coordiant.
+    @param {Candle} candle The candle to draw below
+    @param {number} analysisCode The single candle analysis code number
+   */
+  private drawSingleCandleAnalysis(ctx: CanvasRenderingContext2D,
+      widthOffset: number, priceToPixel: LinearEquation, candle: Candle,
+      analysisCode: number) {
+    // Before doing analysis, check to make sure the code != 0
+    if (analysisCode == 0) {
+      return;
+    }
+
+    ctx.save();
+
+    // Set the baselines to draw from the top
+    // and set the fill style
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = 'white';
+
+    // Set the font to draw the width of the candle
+    ctx.font = 'normal ' +
+      (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
+
+
+    // Convert the analysisCode into a character for better visualization
+    let candleId: string;
+    switch (analysisCode) {
+      case 0:
+        // Nothing special
+        candleId = '';
+        break;
+      case 1:
+      case 2:
+        // Marubuzu
+        candleId = 'M';
+        break;
+      case 3:
+      case 4:
+        // Spinning Top
+        candleId = 'S';
+        break;
+      case 5:
+      case 6:
+      case 7:
+        // Doji
+        candleId = 'D';
+        break;
+      default:
+        console.error('i don\'t know this candle pattern');
+        candleId = '?';
+        break;
+    }
+
+    // Translate to the middle of the low of the candle
+    ctx.translate(
+        widthOffset + this.CANDLE_WIDTH / 2.0, priceToPixel.eval(candle.l));
+
+    ctx.fillText(candleId, - (ctx.measureText(candleId).width/2.0), 5);
+
+    ctx.restore();
+  }
+
+  /**
+    Draws a trend line
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {Chart[]} candles The full list of candles
+    @param {LinearEquation} priceToPixel An equation that converts a price
+          to a Y pixel coordiant
+    @param {TrendLine} trendLine The trend line object containing information
+          about the trend line to draw
+    @param {number} startIndex The left most draw candle index
+   */
+  private drawTrendLine(ctx: CanvasRenderingContext2D, candles: Chart[],
+      priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number) {
+    // Make sure the trend line is in a visible range
+    if (trendLine.s < startIndex) {
+      return;
+    }
+
+    const height: number = (trendLine.d) ?
+      priceToPixel.eval(candles[trendLine.e].candle.h) :
+      priceToPixel.eval(candles[trendLine.e].candle.l);
+
+    ctx.save();
+    ctx.strokeStyle = 'yellow';
+    ctx.fillStyle = 'yellow';
+
+    const startingOffsetX: number =
+      (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
+
+    const endingOffset =
+      (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING) +
+      this.CANDLE_WIDTH;
+
+    ctx.translate(startingOffsetX, height);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(endingOffset, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+    Draws the scene represented by the candle chart
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {number} startIndex The start index of the candle to draw
+    @param {Chart[]} candles The entire list of candles avaliable
+    @param {LinearEquation} priceToPixel An equation that converts a price
+      to a Y pixel coordiant.
+    @param {LinearEquation} volumeToPixel An equation that converts a volume
+      to a Y pixel coordiant.
+   */
+  private drawChart(ctx: CanvasRenderingContext2D, startIndex: number,
+      candles: Chart[], priceToPixel: LinearEquation,
+      volumeToPixel: LinearEquation) {
+    ctx.save();
+
+    const analysisData : AnalysisJSON = this.ANALYSIS_RESULTS.analysis;
+
+    for (let i: number = startIndex; i < candles.length; ++i) {
+      // Compute the X offset of the candle
+      const widthOffset: number =
+        ((i-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING));
+
+      // Extract the single candle analysis code
+      const analysisCode: number = (i < analysisData.singleCandle.length) ?
+        analysisData.singleCandle[i] : 0;
+
+      // Draw the candle body and wick
+      this.drawCandle(ctx, widthOffset,
+        (analysisCode > 0) ? ctx.strokeRect : ctx.fillRect, candles[i].candle,
+        priceToPixel);
+
+      // Draw the single candle analysis
+      this.drawSingleCandleAnalysis(
+          ctx, widthOffset, priceToPixel, candles[i].candle, analysisCode);
+
+      // Draw the volume box
+      this.drawVolume(ctx, widthOffset, candles[i].candle, volumeToPixel);
+    }
+
+    // Draw the trend lines of the analysis
+    for (let i: number = 0; i < analysisData.trendLines.length; ++i) {
+      const trendLine: TrendLine = analysisData.trendLines[i];
+      this.drawTrendLine(ctx, candles, priceToPixel, trendLine, startIndex);
     }
 
     ctx.restore();
@@ -360,9 +620,13 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     // A linear equation when given a pixel will give back the price on the
     // chart.
-    const pixelToPrice: LinearEquation =
-      new LinearEquation(this.PADDING_TOP, priceRange.max,
-          drawingHeight-this.PADDING_BOT, priceRange.min);
+
+    // May be usefull in the future when mouse tracking becomes more
+    // advanced.
+
+    // const pixelToPrice: LinearEquation =
+    //  new LinearEquation(this.PADDING_TOP, priceRange.max,
+    //                     drawingHeight-this.PADDING_BOT, priceRange.min);
 
     // A linear equation when given a price will give back the pixel location
     // on the chart.
@@ -372,214 +636,28 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     // A linear equation when given a volume will give back the pixel location
     // on the chart.
+
     const volumeToPixel: LinearEquation =
       new LinearEquation(priceRange.vmin, this.chartCanvas.height,
           priceRange.vmax, drawingHeight);
+
+    // Draw the symbol ticker
+    ctx.save();
+    ctx.font = (this.PADDING_TOP+1).toString() + 'px Monospace';
+    ctx.fillStyle = 'white';
+    ctx.textBaseline = 'top';
+    ctx.fillText(this.symbol.toUpperCase(), 0, 0);
+    ctx.restore();
 
 
     // Draw the right price bar
     this.drawRightPriceBar(ctx, drawingWidth, rightBarPriceWidth, priceRange,
         priceToPixel);
 
-    // DRAW THE CANDLES
-    let lastColor: string = '';
-    for (let i: number = startIndex; i < candles.length; ++i) {
-      const widthOffset: number =
-        ((i-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING));
+    // Draws the candle chart
+    this.drawChart(ctx, startIndex, candles, priceToPixel, volumeToPixel);
 
-      let hasAnalysis: boolean = false;
-      if (this.ANALYSIS_RESULTS &&
-          i < this.ANALYSIS_RESULTS.analysis.singleCandle.length &&
-          this.ANALYSIS_RESULTS.analysis.singleCandle[i] != 0) {
-        hasAnalysis = true;
-      }
-
-      if (candles[i].candle.o > candles[i].candle.c) {
-        ctx.fillStyle = '#EF5350';
-        ctx.strokeStyle = ctx.fillStyle;
-        lastColor = ctx.fillStyle;
-
-        if (hasAnalysis) {
-          ctx.strokeRect(
-              widthOffset,
-              priceToPixel.eval(candles[i].candle.c),
-              this.CANDLE_WIDTH,
-              priceToPixel.eval(candles[i].candle.o)-
-              priceToPixel.eval(candles[i].candle.c));
-        } else {
-          ctx.fillRect(
-              widthOffset,
-              priceToPixel.eval(candles[i].candle.c),
-              this.CANDLE_WIDTH,
-              priceToPixel.eval(candles[i].candle.o)-
-              priceToPixel.eval(candles[i].candle.c));
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.h));
-        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.o));
-        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.l));
-        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.c));
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.fillRect(widthOffset,
-            volumeToPixel.eval(candles[i].candle.v),
-            this.CANDLE_WIDTH,
-            this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
-        ctx.stroke();
-
-
-        ctx.fillStyle = 'black';
-      } else if (candles[i].candle.o < candles[i].candle.c) {
-        ctx.fillStyle = '#26A69A';
-        ctx.strokeStyle = ctx.fillStyle;
-        lastColor = ctx.fillStyle;
-
-        if (hasAnalysis) {
-          ctx.strokeRect(
-              widthOffset,
-              priceToPixel.eval(candles[i].candle.o),
-              this.CANDLE_WIDTH,
-              priceToPixel.eval(candles[i].candle.c)-
-              priceToPixel.eval(candles[i].candle.o));
-        } else {
-          ctx.fillRect(
-              widthOffset,
-              priceToPixel.eval(candles[i].candle.o),
-              this.CANDLE_WIDTH,
-              priceToPixel.eval(candles[i].candle.c)-
-              priceToPixel.eval(candles[i].candle.o));
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.h));
-        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.c));
-        ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.l));
-        ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-            priceToPixel.eval(candles[i].candle.o));
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.fillRect(widthOffset,
-            volumeToPixel.eval(candles[i].candle.v),
-            this.CANDLE_WIDTH,
-            this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
-        ctx.stroke();
-
-        ctx.fillStyle = 'black';
-      } else {
-        if (candles[i].candle.v != 0) {
-          ctx.fillStyle = 'white';
-          ctx.strokeStyle = 'white';
-          ctx.beginPath();
-          ctx.moveTo(widthOffset,
-              priceToPixel.eval(candles[i].candle.o));
-          ctx.lineTo(widthOffset + this.CANDLE_WIDTH,
-              priceToPixel.eval(candles[i].candle.c));
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-              priceToPixel.eval(candles[i].candle.h));
-          ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-              priceToPixel.eval(candles[i].candle.c));
-          ctx.moveTo(widthOffset + this.CANDLE_WIDTH/2.0,
-              priceToPixel.eval(candles[i].candle.l));
-          ctx.lineTo(widthOffset + this.CANDLE_WIDTH/2.0,
-              priceToPixel.eval(candles[i].candle.o));
-          ctx.stroke();
-
-
-          ctx.beginPath();
-          ctx.fillRect(widthOffset,
-              volumeToPixel.eval(candles[i].candle.v),
-              this.CANDLE_WIDTH,
-              this.chartCanvas.height-volumeToPixel.eval(candles[i].candle.v));
-          ctx.stroke();
-        }
-      }
-
-      if (this.ANALYSIS_RESULTS != undefined &&
-          i < this.ANALYSIS_RESULTS.analysis.singleCandle.length &&
-          this.ANALYSIS_RESULTS.analysis.singleCandle[i] != 0) {
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = 'white';
-
-        const candleCode: number =
-          this.ANALYSIS_RESULTS.analysis.singleCandle[i];
-        let candleId: string;
-
-        switch (candleCode) {
-          case 0:
-            candleId = '';
-            break;
-          case 1:
-          case 2:
-            candleId = 'M';
-            break;
-          case 3:
-          case 4:
-            candleId = 'S';
-            break;
-          case 5:
-          case 6:
-          case 7:
-            candleId = 'D';
-            break;
-          default:
-            console.error('i don\'t know this candle pattern');
-            candleId = 'X';
-            break;
-        }
-
-        ctx.font = 'normal ' +
-          (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
-
-        ctx.fillText(candleId,
-            (widthOffset + (this.CANDLE_WIDTH/2.0)) -
-              ctx.measureText(candleId).width/2.0,
-            priceToPixel.eval(candles[i].candle.l) + 5);
-
-        ctx.textBaseline = 'middle';
-        ctx.font = 'normal 1.4em Monospace';
-      }
-    }
-
-    // Draw the trend lines
-    if (this.ANALYSIS_RESULTS != undefined &&
-        this.ANALYSIS_RESULTS.analysis.trendLines.length != 0) {
-      for (let i: number = 0;
-        i < this.ANALYSIS_RESULTS.analysis.trendLines.length; ++i) {
-        const trend: TrendLine = this.ANALYSIS_RESULTS.analysis.trendLines[i];
-        if (trend.s >= startIndex) {
-          ctx.beginPath();
-          ctx.save();
-          ctx.lineWidth = 0.5;
-          ctx.strokeStyle = 'yellow';
-          ctx.fillStyle = 'yellow';
-          if (trend.d) {
-            ctx.moveTo(
-                (trend.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING),
-                priceToPixel.eval(candles[trend.e].candle.h));
-            ctx.lineTo(
-                (trend.e-startIndex+1)*(this.CANDLE_WIDTH+this.CANDLE_SPACING),
-                priceToPixel.eval(candles[trend.e].candle.h));
-          }
-          ctx.stroke();
-          ctx.restore();
-          ctx.strokeStyle = 'black';
-        }
-      }
-    }
-
+    /*
     ctx.fillStyle = lastColor;
     ctx.fillRect(drawingWidth-this.getPriceWidth(ctx),
         priceToPixel.eval(candles[candles.length-1].candle.c) - (20.0/2.0),
@@ -599,11 +677,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
         '-' + ((pixelToPrice.eval(this.MOUSE_Y))/10000).toFixed(4),
         drawingWidth-this.getPriceWidth(ctx),
         this.MOUSE_Y);
-
-    ctx.font = (this.PADDING_TOP+1).toString() + 'px Monospace';
-    ctx.fillStyle = 'white';
-    ctx.textBaseline = 'top';
-    ctx.fillText(this.symbol.toUpperCase(), 0, 0);
 
     // CONERT MOUSE COORDIANTES TO CANDLE INDEX
     let mouseCandleIndex =
@@ -634,7 +707,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
         ctx.measureText(new Date(hoveredCandle.e/1000000).toDateString())
             .width - this.getPriceWidth(ctx),
         0);
-
+*/
     this.CANDLE_UPDATES_SENT += 1;
     // sync chart every 100 updates
     if (this.CANDLE_UPDATES_SENT % 100 == 0) {
