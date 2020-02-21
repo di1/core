@@ -101,21 +101,22 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
   // both lie on the same y axis
 
   for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
-    if (cur_analysis->trend_lines[i].start_index == start) {
+    if (cur_analysis->trend_lines[i].start_index == start &&
+        cur_analysis->trend_lines[i].direction == direction) {
       cur_analysis->trend_lines[i].end_index = end;
       return;
     }
 
     // TODO this will need to be abstracted as end points won't always
     // begin from the high
-    int64_t t1_end =
-        candle_high(cht->candles[cur_analysis->trend_lines[i].end_index]);
-    int64_t t2_end = candle_high(cht->candles[end]);
+    // int64_t t1_end =
+    //    candle_high(cht->candles[cur_analysis->trend_lines[i].end_index]);
+    // int64_t t2_end = candle_high(cht->candles[end]);
 
-    if (t1_end == t2_end) {
-      cur_analysis->trend_lines[i].end_index = end;
-      return;
-    }
+    // if (t1_end == t2_end) {
+    //  cur_analysis->trend_lines[i].end_index = end;
+    //  return;
+    //}
   }
 
   // Add 1 new element to the analysis

@@ -528,8 +528,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
       priceToPixel.eval(candles[trendLine.e].candle.l);
 
     ctx.save();
-    ctx.strokeStyle = 'yellow';
-    ctx.fillStyle = 'yellow';
+    ctx.strokeStyle = (trendLine.d) ? 'yellow' : '#2c84e6';
+    ctx.fillStyle = ctx.strokeStyle;
 
     const startingOffsetX: number =
       (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
