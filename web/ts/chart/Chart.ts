@@ -29,6 +29,19 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private CHART_STYLE_CANDLE_FALLING = '#EF5350';
   private CHART_STYLE_CANDLE_RISING = '#26A69A';
 
+
+  /**
+    Resets all the top level data that determines the chart
+   */
+  private resetChart() {
+    this.ROOT_CHART = <RootChartObject> {
+      chart: [],
+    };
+
+    this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
+      analysis: <AnalysisJSON> {singleCandle: [], trendLines: []},
+    };
+  }
   /**
     Creates a candle chart bound to the largeCandleChart.
 
@@ -73,6 +86,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private onMessage(evt: MessageEvent) {
     if (this.RESET_CHART) {
       this.RESET_CHART = false;
+      this.resetChart();
       this.conn.send('init|' + this.symbol);
       return;
     }
@@ -582,6 +596,27 @@ class CandleChart { // eslint-disable-line no-unused-vars
   }
 
   /**
+    Converts the mouse X coordiant into a candle index
+
+    @param {number} startIndex The start index of the left most displayed
+    candle.
+    @param {Chart[]} candles The full list of candles
+    @return {number} Returns the candle index of the candle or the last candle
+      if the mouse is to far to the right.
+     */
+  private mouseToCandleIndex(startIndex: number, candles: Chart[]): number {
+    let mouseCandleIndex =
+      Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH+this.CANDLE_SPACING));
+    mouseCandleIndex += startIndex;
+
+    if (mouseCandleIndex >= candles.length) {
+      mouseCandleIndex = candles.length-1;
+    }
+
+    return mouseCandleIndex;
+  }
+
+  /**
     Draws the chart on the html canvas
 
     @param {RootChartObject} chart The interface representing the candles
@@ -641,11 +676,22 @@ class CandleChart { // eslint-disable-line no-unused-vars
       new LinearEquation(priceRange.vmin, this.chartCanvas.height,
           priceRange.vmax, drawingHeight);
 
-    // Draw the symbol ticker
+    const mouseCandleIndex: number =
+      this.mouseToCandleIndex(startIndex, candles);
+
     ctx.save();
+    // Draw the hovered candle data
     ctx.font = (this.PADDING_TOP+1).toString() + 'px Monospace';
-    ctx.fillStyle = 'white';
     ctx.textBaseline = 'top';
+    ctx.fillStyle = 'white';
+    ctx.fillText(' O:' + (candles[mouseCandleIndex].candle.o/10000).toFixed(4) +
+                 ' H:' + (candles[mouseCandleIndex].candle.h/10000).toFixed(4) +
+                 ' L:' + (candles[mouseCandleIndex].candle.l/10000).toFixed(4) +
+                 ' C:' + (candles[mouseCandleIndex].candle.c/10000).toFixed(4),
+    ctx.measureText(this.symbol).width + this.PADDING_TOP+1, 0);
+
+
+    // Draw the symbol ticker
     ctx.fillText(this.symbol.toUpperCase(), 0, 0);
     ctx.restore();
 
@@ -657,57 +703,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     // Draws the candle chart
     this.drawChart(ctx, startIndex, candles, priceToPixel, volumeToPixel);
 
-    /*
-    ctx.fillStyle = lastColor;
-    ctx.fillRect(drawingWidth-this.getPriceWidth(ctx),
-        priceToPixel.eval(candles[candles.length-1].candle.c) - (20.0/2.0),
-        this.getPriceWidth(ctx), 20);
-    ctx.fillStyle = 'white';
-    ctx.fillText(
-        '-' + ((candles[candles.length-1].candle.c)/10000.0).toFixed(4),
-        drawingWidth-this.getPriceWidth(ctx),
-        priceToPixel.eval(candles[candles.length-1].candle.c));
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(drawingWidth-this.getPriceWidth(ctx),
-        this.MOUSE_Y - (20.0/2.0),
-        this.getPriceWidth(ctx), 20);
-    ctx.fillStyle = 'black';
-    ctx.fillText(
-        '-' + ((pixelToPrice.eval(this.MOUSE_Y))/10000).toFixed(4),
-        drawingWidth-this.getPriceWidth(ctx),
-        this.MOUSE_Y);
-
-    // CONERT MOUSE COORDIANTES TO CANDLE INDEX
-    let mouseCandleIndex =
-      Math.floor(this.MOUSE_X / (this.CANDLE_WIDTH+this.CANDLE_SPACING));
-
-    mouseCandleIndex += startIndex;
-    if (!this.ROOT_CHART) {
-      console.error('this.ROOT_CHART undefined');
-      return;
-    }
-
-    if (mouseCandleIndex >= this.ROOT_CHART.chart.length) {
-      mouseCandleIndex = this.ROOT_CHART.chart.length-1;
-    }
-
-    const hoveredCandle: Candle =
-      this.ROOT_CHART.chart[mouseCandleIndex].candle;
-    ctx.fillText(' O:' + (hoveredCandle.o/10000).toFixed(4) +
-                 ' H:' + (hoveredCandle.h/10000).toFixed(4) +
-                 ' L:' + (hoveredCandle.l/10000).toFixed(4) +
-                 ' C:' + (hoveredCandle.c/10000).toFixed(4),
-    ctx.measureText(this.symbol).width + this.PADDING_TOP,
-    0);
-
-    ctx.fillText(
-        new Date(hoveredCandle.e/1000000).toDateString(),
-        drawingWidth -
-        ctx.measureText(new Date(hoveredCandle.e/1000000).toDateString())
-            .width - this.getPriceWidth(ctx),
-        0);
-*/
+    // Send a new update
     this.CANDLE_UPDATES_SENT += 1;
     // sync chart every 100 updates
     if (this.CANDLE_UPDATES_SENT % 100 == 0) {
