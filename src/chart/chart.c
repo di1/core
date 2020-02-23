@@ -99,17 +99,11 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
 
   int64_t current_trend_start_price = 0;
   switch (direction) {
-    case DIRECTION_OPEN:
-      current_trend_start_price = candle_open(cht->candles[end]);
-      break;
-    case DIRECTION_HIGH:
-      current_trend_start_price = candle_high(cht->candles[end]);
-      break;
-    case DIRECTION_LOW:
+    case DIRECTION_SUPPORT:
       current_trend_start_price = candle_low(cht->candles[end]);
       break;
-    case DIRECTION_CLOSE:
-      current_trend_start_price = candle_close(cht->candles[end]);
+    case DIRECTION_RESISTANCE:
+      current_trend_start_price = candle_high(cht->candles[end]);
       break;
   }
 

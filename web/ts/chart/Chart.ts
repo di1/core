@@ -523,18 +523,12 @@ class CandleChart { // eslint-disable-line no-unused-vars
     }
 
     let height: number = 0;
-    if (trendLine.d == 0) {
-      height = priceToPixel.eval(candles[trendLine.e].candle.o);
+    if (trendLine.d == 0) { // support
+      height = priceToPixel.eval(candles[trendLine.e].candle.l);
       ctx.strokeStyle = 'yellow';
-    } else if (trendLine.d == 1) {
+    } else if (trendLine.d == 1) { // resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
       ctx.strokeStyle = 'lightblue';
-    } else if (trendLine.d == 2) {
-      height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = 'lightpink';
-    } else if (trendLine.d == 3) {
-      height = priceToPixel.eval(candles[trendLine.e].candle.c);
-      ctx.strokeStyle = 'gray';
     }
 
     ctx.save();

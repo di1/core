@@ -20,15 +20,9 @@ void horizontal_line_analysis(struct chart* cht, size_t num_candles,
 
     // Check if the candle closes above the latest_high_price
     // break out because we have looked to far
-    if (direction == DIRECTION_HIGH) {
+    if (direction == DIRECTION_RESISTANCE) {
       if (candle_close(current_candle) > compare_price) break;
-    } else if (direction == DIRECTION_LOW) {
-      if (candle_close(current_candle) < compare_price) break;
-    } else if (candle_close(current_candle) > candle_open(current_candle) &&
-               (direction == DIRECTION_OPEN || direction == DIRECTION_CLOSE)) {
-      if (candle_close(current_candle) > compare_price) break;
-    } else if (candle_close(current_candle) < candle_open(current_candle) &&
-               (direction == DIRECTION_OPEN || direction == DIRECTION_CLOSE)) {
+    } else if (direction == DIRECTION_SUPPORT) {
       if (candle_close(current_candle) < compare_price) break;
     }
 
@@ -64,20 +58,10 @@ void find_horizontal_line(struct chart* cht, size_t num_candles) {
   // Find horizontal prices from the candle high
   horizontal_line_analysis(cht, num_candles,
                            candle_high(chart_get_candle(cht, num_candles - 1)),
-                           DIRECTION_HIGH);
-
-  // Find horizontal prices from the candle open
-  horizontal_line_analysis(cht, num_candles,
-                           candle_open(chart_get_candle(cht, num_candles - 1)),
-                           DIRECTION_OPEN);
-
-  // Find horizontal prices from the candle close
-  horizontal_line_analysis(cht, num_candles,
-                           candle_close(chart_get_candle(cht, num_candles - 1)),
-                           DIRECTION_CLOSE);
+                           DIRECTION_RESISTANCE);
 
   // Find horizontal prices from the candle low
   horizontal_line_analysis(cht, num_candles,
                            candle_low(chart_get_candle(cht, num_candles - 1)),
-                           DIRECTION_LOW);
+                           DIRECTION_SUPPORT);
 }

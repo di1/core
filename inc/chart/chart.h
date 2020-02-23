@@ -62,10 +62,8 @@ enum SINGLE_CANDLE_PATTERNS {
  * enumeration of candle parts
  */
 enum DIRECTION {
-  DIRECTION_OPEN = 0,
-  DIRECTION_HIGH = 1,
-  DIRECTION_LOW = 2,
-  DIRECTION_CLOSE = 3
+  DIRECTION_SUPPORT = 0,
+  DIRECTION_RESISTANCE = 1,
 };
 
 /**
