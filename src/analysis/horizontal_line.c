@@ -4,6 +4,15 @@
 
 void horizontal_line_analysis(struct chart* cht, size_t num_candles,
                               int64_t compare_price, enum DIRECTION direction) {
+  /*
+   * Loop backwards from the end candles high/close, if three prices
+   * (high/close) before this candle had the same price and all data
+   * between the left-most and the end candle closed above/below the price
+   * then it is a valid support line. Continue looking back until this
+   * isn't valid. The left most candle that has this property will be the start
+   * of the trend.
+   */
+
   size_t num_confirmations = 0;
   size_t last_valid_confirmation = num_candles - 1;
   for (int i = (int)(num_candles)-2; i >= 0; --i) {
@@ -51,15 +60,6 @@ void horizontal_line_analysis(struct chart* cht, size_t num_candles,
 void find_horizontal_line(struct chart* cht, size_t num_candles) {
   // Analysis requires at least 3 candles
   if (num_candles < 3) return;
-
-  /*
-   * Loop backwards from the end candles high/close, if three prices
-   * (high/close) before this candle had the same price and all data
-   * between the left-most and the end candle closed above/below the price
-   * then it is a valid support line. Continue looking back until this
-   * isn't valid. The left most candle that has this property will be the start
-   * of the trend.
-   */
 
   // Find horizontal prices from the candle high
   horizontal_line_analysis(cht, num_candles,

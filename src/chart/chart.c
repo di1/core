@@ -115,21 +115,14 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
 
   for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
     struct trend_line* t = &cur_analysis->trend_lines[i];
-    if ((candle_open(cht->candles[t->start_index]) ==
-             current_trend_start_price ||
-         candle_high(cht->candles[t->start_index]) ==
-             current_trend_start_price ||
-         candle_low(cht->candles[t->start_index]) ==
-             current_trend_start_price ||
-         candle_close(cht->candles[t->start_index]) ==
-             current_trend_start_price) &&
-        direction == t->direction) {
+
+    // simple join
+    if (t->start_index == start && t->direction == direction) {
       t->end_index = end;
-      t->direction = direction;
-      log_debug("joined");
       return;
     }
   }
+
   // Add 1 new element to the analysis
   cur_analysis->num_trend_lines += 1;
   cur_analysis->trend_lines = (struct trend_line*)realloc(
