@@ -64,6 +64,8 @@ enum SINGLE_CANDLE_PATTERNS {
 enum DIRECTION {
   DIRECTION_SUPPORT = 0,
   DIRECTION_RESISTANCE = 1,
+  DIRECTION_INVALIDATED_SUPPORT = 2,
+  DIRECTION_INVALIDATED_RESISTANCE = 3
 };
 
 /**
@@ -88,6 +90,11 @@ void chart_put_single_candle_pattern(struct chart* cht, size_t index,
  */
 void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
                                   enum DIRECTION direction);
+
+/**
+ * Invalidates trends that are currently broken
+ */
+void chart_invalidate_trends(struct chart* cht);
 
 /**
  * Returns a json that represents the analysis

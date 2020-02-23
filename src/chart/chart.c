@@ -89,6 +89,36 @@ void chart_put_single_candle_pattern(struct chart* cht, size_t index,
   cht->analysis->scp[index] = identifier;
 }
 
+void chart_invalidate_trends(struct chart* cht) {
+  // First invalidate any trend lines that were broken before
+  // this will stop us from joining new trend lines with previously
+  // broken ones.
+
+  if (cht->cur_candle < 2) return;
+
+  struct chart_analysis* cur_analysis = cht->analysis;
+
+  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
+    struct trend_line* t = &cur_analysis->trend_lines[i];
+
+    if (t->direction > 1) continue;
+
+    if (t->direction == DIRECTION_SUPPORT) {
+      if (candle_close(cht->candles[cht->cur_candle - 1]) <
+          candle_low(cht->candles[t->end_index])) {
+        t->direction = DIRECTION_INVALIDATED_SUPPORT;
+        break;
+      }
+    } else if (t->direction == DIRECTION_RESISTANCE) {
+      if (candle_close(cht->candles[cht->cur_candle - 1]) >
+          candle_high(cht->candles[t->end_index])) {
+        t->direction = DIRECTION_INVALIDATED_RESISTANCE;
+        break;
+      }
+    }
+  }
+}
+
 void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
                                   enum DIRECTION direction) {
   struct chart_analysis* cur_analysis = cht->analysis;
@@ -105,10 +135,16 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
     case DIRECTION_RESISTANCE:
       current_trend_start_price = candle_high(cht->candles[end]);
       break;
+    default:
+      log_error("DIRECTION_INVALIDATED is not a valid direction");
+      exit(1);
   }
 
   for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
     struct trend_line* t = &cur_analysis->trend_lines[i];
+
+    // don't join to an invalidated trend
+    if (t->direction > 1) continue;
 
     // simple join
     if (t->start_index == start && t->direction == direction) {
@@ -141,18 +177,6 @@ struct candle* chart_get_candle(struct chart* cht, size_t index) {
 void chart_update(struct chart* cht, int64_t price, uint64_t ts) {
   // special case where this is the first chart update
   if (cht->last_update == 0) {
-    cht->last_update = ts;
-    // check if we need to pre fill the data to make sure
-    // all charts are on the same candle index
-    // removed for now, this may or may not be needed I am unsure
-    //
-    /*
-    for (size_t i = 0; i < g_max_candles; ++i) {
-      chart_new_candle(cht, price);
-      cht->cur_candle += 1;
-    }
-    */
-
     cht->last_update = ts;
     chart_new_candle(cht, price);
     return;

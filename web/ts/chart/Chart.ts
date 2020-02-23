@@ -521,6 +521,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     if (trendLine.s < startIndex) {
       return;
     }
+    ctx.save();
 
     let height: number = 0;
     if (trendLine.d == 0) { // support
@@ -528,11 +529,16 @@ class CandleChart { // eslint-disable-line no-unused-vars
       ctx.strokeStyle = 'yellow';
     } else if (trendLine.d == 1) { // resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
-      ctx.strokeStyle = 'lightblue';
+      ctx.strokeStyle = 'blue';
+    } else if (trendLine.d == 2) { // invalidated support
+      height = priceToPixel.eval(candles[trendLine.e].candle.l);
+      ctx.strokeStyle = 'pink';
+      ctx.setLineDash([5, 5]);
+    } else if (trendLine.d == 3) { // invalidated resistance
+      height = priceToPixel.eval(candles[trendLine.e].candle.h);
+      ctx.setLineDash([5, 5]);
     }
 
-    ctx.save();
-    // ctx.strokeStyle = (trendLine.d) ? 'yellow' : '#2c84e6';
     ctx.fillStyle = ctx.strokeStyle;
 
     const startingOffsetX: number =

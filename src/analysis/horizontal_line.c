@@ -42,10 +42,6 @@ void horizontal_line_analysis(struct chart* cht, size_t num_candles,
   }
 
   if (num_confirmations >= 3) {
-    log_debug(
-        "%s: found trend line spanning %lu candles with %lu confirmations",
-        chart_get_name(cht), num_candles - last_valid_confirmation - 1,
-        num_confirmations);
     chart_put_trend_line_pattern(cht, last_valid_confirmation, num_candles - 1,
                                  direction);
   }
