@@ -3,7 +3,7 @@
 #include "chart/chart.h"
 
 void horizontal_line_analysis(struct chart* cht, size_t num_candles,
-                              int64_t compare_price, bool direction) {
+                              int64_t compare_price, enum DIRECTION direction) {
   size_t num_confirmations = 0;
   size_t last_valid_confirmation = num_candles - 1;
   for (int i = (int)(num_candles)-2; i >= 0; --i) {
@@ -11,9 +11,15 @@ void horizontal_line_analysis(struct chart* cht, size_t num_candles,
 
     // Check if the candle closes above the latest_high_price
     // break out because we have looked to far
-    if (direction) {
+    if (direction == DIRECTION_HIGH) {
       if (candle_close(current_candle) > compare_price) break;
-    } else {
+    } else if (direction == DIRECTION_LOW) {
+      if (candle_close(current_candle) < compare_price) break;
+    } else if (candle_close(current_candle) > candle_open(current_candle) &&
+               (direction == DIRECTION_OPEN || direction == DIRECTION_CLOSE)) {
+      if (candle_close(current_candle) > compare_price) break;
+    } else if (candle_close(current_candle) < candle_open(current_candle) &&
+               (direction == DIRECTION_OPEN || direction == DIRECTION_CLOSE)) {
       if (candle_close(current_candle) < compare_price) break;
     }
 
@@ -58,17 +64,20 @@ void find_horizontal_line(struct chart* cht, size_t num_candles) {
   // Find horizontal prices from the candle high
   horizontal_line_analysis(cht, num_candles,
                            candle_high(chart_get_candle(cht, num_candles - 1)),
-                           true);
-  // TODO need to abstract analysis furthur to get these to work
-  /*
+                           DIRECTION_HIGH);
+
+  // Find horizontal prices from the candle open
   horizontal_line_analysis(cht, num_candles,
                            candle_open(chart_get_candle(cht, num_candles - 1)),
-                           direction);
+                           DIRECTION_OPEN);
+
+  // Find horizontal prices from the candle close
   horizontal_line_analysis(cht, num_candles,
                            candle_close(chart_get_candle(cht, num_candles - 1)),
-                           direction);
-  */
+                           DIRECTION_CLOSE);
+
+  // Find horizontal prices from the candle low
   horizontal_line_analysis(cht, num_candles,
                            candle_low(chart_get_candle(cht, num_candles - 1)),
-                           false);
+                           DIRECTION_LOW);
 }

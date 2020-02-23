@@ -29,7 +29,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private CHART_STYLE_CANDLE_FALLING = '#EF5350';
   private CHART_STYLE_CANDLE_RISING = '#26A69A';
 
-
   /**
     Resets all the top level data that determines the chart
    */
@@ -523,12 +522,23 @@ class CandleChart { // eslint-disable-line no-unused-vars
       return;
     }
 
-    const height: number = (trendLine.d) ?
-      priceToPixel.eval(candles[trendLine.e].candle.h) :
-      priceToPixel.eval(candles[trendLine.e].candle.l);
+    let height: number = 0;
+    if (trendLine.d == 0) {
+      height = priceToPixel.eval(candles[trendLine.e].candle.o);
+      ctx.strokeStyle = 'yellow';
+    } else if (trendLine.d == 1) {
+      height = priceToPixel.eval(candles[trendLine.e].candle.h);
+      ctx.strokeStyle = 'lightblue';
+    } else if (trendLine.d == 2) {
+      height = priceToPixel.eval(candles[trendLine.e].candle.l);
+      ctx.strokeStyle = 'lightpink';
+    } else if (trendLine.d == 3) {
+      height = priceToPixel.eval(candles[trendLine.e].candle.c);
+      ctx.strokeStyle = 'gray';
+    }
 
     ctx.save();
-    ctx.strokeStyle = (trendLine.d) ? 'yellow' : '#2c84e6';
+    // ctx.strokeStyle = (trendLine.d) ? 'yellow' : '#2c84e6';
     ctx.fillStyle = ctx.strokeStyle;
 
     const startingOffsetX: number =
@@ -542,6 +552,9 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(endingOffset, 0);
+
+    // Draw the arrow head
+
     ctx.stroke();
     ctx.restore();
   }

@@ -59,6 +59,16 @@ enum SINGLE_CANDLE_PATTERNS {
 };
 
 /**
+ * enumeration of candle parts
+ */
+enum DIRECTION {
+  DIRECTION_OPEN = 0,
+  DIRECTION_HIGH = 1,
+  DIRECTION_LOW = 2,
+  DIRECTION_CLOSE = 3
+};
+
+/**
  * Aquires the analysis lock
  */
 void chart_analysis_lock(struct chart* cht);
@@ -79,7 +89,7 @@ void chart_put_single_candle_pattern(struct chart* cht, size_t index,
  * which indicates weather this line should be draw from the lows or the highs
  */
 void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
-                                  bool direction);
+                                  enum DIRECTION direction);
 
 /**
  * Returns a json that represents the analysis

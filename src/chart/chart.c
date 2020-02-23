@@ -6,7 +6,7 @@ size_t g_max_candles = 0;
 struct trend_line {
   size_t start_index;
   size_t end_index;
-  bool direction;
+  enum DIRECTION direction;
 };
 
 struct chart_analysis {
@@ -90,35 +90,46 @@ void chart_put_single_candle_pattern(struct chart* cht, size_t index,
 }
 
 void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
-                                  bool direction) {
+                                  enum DIRECTION direction) {
   struct chart_analysis* cur_analysis = cht->analysis;
 
   // Compute the "trend union"
-  // If two seperate trend lines are created where both have the same
-  // start index, then simply extend the trend line to the most recent
-  // end index. By induction this will be the first trend line found with the
-  // same start index. We will also combine trends whos "end" candle
-  // both lie on the same y axis
+  // If the start price of the current trend line is the
+  // same end price of a different line then join the two lines together.
 
-  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
-    if (cur_analysis->trend_lines[i].start_index == start &&
-        cur_analysis->trend_lines[i].direction == direction) {
-      cur_analysis->trend_lines[i].end_index = end;
-      return;
-    }
-
-    // TODO this will need to be abstracted as end points won't always
-    // begin from the high
-    // int64_t t1_end =
-    //    candle_high(cht->candles[cur_analysis->trend_lines[i].end_index]);
-    // int64_t t2_end = candle_high(cht->candles[end]);
-
-    // if (t1_end == t2_end) {
-    //  cur_analysis->trend_lines[i].end_index = end;
-    //  return;
-    //}
+  int64_t current_trend_start_price = 0;
+  switch (direction) {
+    case DIRECTION_OPEN:
+      current_trend_start_price = candle_open(cht->candles[end]);
+      break;
+    case DIRECTION_HIGH:
+      current_trend_start_price = candle_high(cht->candles[end]);
+      break;
+    case DIRECTION_LOW:
+      current_trend_start_price = candle_low(cht->candles[end]);
+      break;
+    case DIRECTION_CLOSE:
+      current_trend_start_price = candle_close(cht->candles[end]);
+      break;
   }
 
+  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
+    struct trend_line* t = &cur_analysis->trend_lines[i];
+    if ((candle_open(cht->candles[t->start_index]) ==
+             current_trend_start_price ||
+         candle_high(cht->candles[t->start_index]) ==
+             current_trend_start_price ||
+         candle_low(cht->candles[t->start_index]) ==
+             current_trend_start_price ||
+         candle_close(cht->candles[t->start_index]) ==
+             current_trend_start_price) &&
+        direction == t->direction) {
+      t->end_index = end;
+      t->direction = direction;
+      log_debug("joined");
+      return;
+    }
+  }
   // Add 1 new element to the analysis
   cur_analysis->num_trend_lines += 1;
   cur_analysis->trend_lines = (struct trend_line*)realloc(
@@ -234,7 +245,7 @@ char* chart_analysis_json(struct chart* cht) {
   size_t num_candles = cht->cur_candle + 1;
   // analysis proto {"analysis":
   //                {"singleCandle":[000000000,000000000,000000000,...]},
-  //                {"trendLines":[{s:000000000,e:00000000,d:aaaaa}...]}}
+  //                {"trendLines":[{s:000000000,e:00000000,d:00000000}...]}}
 
   // begining prototype length {"analy...[
   size_t total_json_size = 30;
@@ -251,7 +262,7 @@ char* chart_analysis_json(struct chart* cht) {
   total_json_size += 16;
 
   // each trend line {s:...}
-  total_json_size += (chta->num_trend_lines * 32);
+  total_json_size += (chta->num_trend_lines * 36);
 
   // commas between each trend json
   total_json_size += (chta->num_trend_lines - 1);
@@ -275,9 +286,9 @@ char* chart_analysis_json(struct chart* cht) {
   strcat(buf, "\"trendLines\":[\x0");
   for (size_t i = 0; i < chta->num_trend_lines; ++i) {
     char trend_line_json_buf[34];
-    sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%s}",
+    sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%u}",
             chta->trend_lines[i].start_index, chta->trend_lines[i].end_index,
-            (chta->trend_lines[i].direction) ? "true" : "false");
+            (chta->trend_lines[i].direction));
     if (i != chta->num_trend_lines - 1) strcat(trend_line_json_buf, ",\x0");
     strcat(buf, trend_line_json_buf);
   }

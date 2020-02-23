@@ -1,7 +1,7 @@
 interface TrendLine {
   s: number;
   e: number;
-  d: boolean;
+  d: number;
 }
 
 interface AnalysisJSON {
