@@ -1,7 +1,4 @@
 #include <book/book.h>
-#include <stdlib.h>
-
-#include "log/log.h"
 
 /**
  * Defines a level inside the book

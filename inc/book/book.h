@@ -4,6 +4,7 @@
 #ifndef BOOK_
 #define BOOK_
 
+#include <log/log.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

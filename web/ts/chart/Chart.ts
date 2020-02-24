@@ -525,17 +525,17 @@ class CandleChart { // eslint-disable-line no-unused-vars
       return;
     }
     ctx.save();
-
+    ctx.beginPath();
     let height: number = 0;
     if (trendLine.d == 0) { // support
       height = priceToPixel.eval(candles[trendLine.e].candle.l);
       ctx.strokeStyle = 'yellow';
     } else if (trendLine.d == 1) { // resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
-      ctx.strokeStyle = 'blue';
+      ctx.strokeStyle = '#6666ff';
     } else if (trendLine.d == 2) { // invalidated support
       height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = 'pink';
+      ctx.strokeStyle = 'white';
       ctx.setLineDash([5, 5]);
     } else if (trendLine.d == 3) { // invalidated resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
@@ -543,7 +543,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     }
 
     ctx.fillStyle = ctx.strokeStyle;
-
+    ctx.lineWidth = 1.0;
     const startingOffsetX: number =
       (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
@@ -552,8 +552,13 @@ class CandleChart { // eslint-disable-line no-unused-vars
       this.CANDLE_WIDTH;
 
     ctx.translate(startingOffsetX, height);
-    ctx.beginPath();
     ctx.moveTo(0, 0);
+    ctx.lineTo(endingOffset, 0);
+    ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
+        -10*Math.cos(Math.PI/4.0));
+    ctx.lineTo(endingOffset, 0);
+    ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
+        10*Math.cos(Math.PI/4.0));
     ctx.lineTo(endingOffset, 0);
     ctx.stroke();
     ctx.restore();
@@ -564,7 +569,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
       ctx.textBaseline = 'middle';
       ctx.translate(-(drawingWidth - rightBarPriceWidth), height - (22.4/2.0));
       ctx.beginPath();
-      ctx.fillStyle = (trendLine.d == 0) ? 'yellow' : 'blue';
+      ctx.fillStyle = (trendLine.d == 0) ? 'yellow' : '#6666ff';
 
       const fillTextData: number =
         (trendLine.d == 0) ? candles[trendLine.e].candle.l :
