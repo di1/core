@@ -514,9 +514,12 @@ class CandleChart { // eslint-disable-line no-unused-vars
     @param {TrendLine} trendLine The trend line object containing information
           about the trend line to draw
     @param {number} startIndex The left most draw candle index
+    @param {number} rightBarPriceWidth The pixel location of the price bar
+    @param {number} drawingWidth The entire drawing width
    */
   private drawTrendLine(ctx: CanvasRenderingContext2D, candles: Chart[],
-      priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number) {
+      priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number,
+      rightBarPriceWidth: number, drawingWidth: number) {
     // Make sure the trend line is in a visible range
     if (trendLine.s < startIndex) {
       return;
@@ -552,11 +555,29 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(endingOffset, 0);
-
-    // Draw the arrow head
-
     ctx.stroke();
     ctx.restore();
+
+    // Draw a side price indicator
+    if (trendLine.d <= 1) {
+      ctx.save();
+      ctx.textBaseline = 'middle';
+      ctx.translate(-(drawingWidth - rightBarPriceWidth), height - (22.4/2.0));
+      ctx.beginPath();
+      ctx.fillStyle = (trendLine.d == 0) ? 'yellow' : 'blue';
+
+      const fillTextData: number =
+        (trendLine.d == 0) ? candles[trendLine.e].candle.l :
+        candles[trendLine.e].candle.h;
+      const fillTextDataString: string = (fillTextData/10000).toFixed(4);
+
+      ctx.fillRect(0, 0, rightBarPriceWidth, 22.4);
+      ctx.fillStyle = (trendLine.d == 0) ? 'black' : 'white';
+
+      ctx.fillText('-' + fillTextDataString, 0, (22.4/2.0));
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 
   /**
@@ -569,10 +590,13 @@ class CandleChart { // eslint-disable-line no-unused-vars
       to a Y pixel coordiant.
     @param {LinearEquation} volumeToPixel An equation that converts a volume
       to a Y pixel coordiant.
+    @param {number} drawingWidth The entire drawing width of the canvas
+    @param {number} rightBarPriceWidth The pixel offset of the price bar
    */
   private drawChart(ctx: CanvasRenderingContext2D, startIndex: number,
       candles: Chart[], priceToPixel: LinearEquation,
-      volumeToPixel: LinearEquation) {
+      volumeToPixel: LinearEquation, drawingWidth: number,
+      rightBarPriceWidth: number) {
     ctx.save();
 
     const analysisData : AnalysisJSON = this.ANALYSIS_RESULTS.analysis;
@@ -602,7 +626,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
     // Draw the trend lines of the analysis
     for (let i: number = 0; i < analysisData.trendLines.length; ++i) {
       const trendLine: TrendLine = analysisData.trendLines[i];
-      this.drawTrendLine(ctx, candles, priceToPixel, trendLine, startIndex);
+      this.drawTrendLine(ctx, candles, priceToPixel, trendLine, startIndex,
+          drawingWidth, rightBarPriceWidth);
     }
 
     ctx.restore();
@@ -714,7 +739,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
         priceToPixel);
 
     // Draws the candle chart
-    this.drawChart(ctx, startIndex, candles, priceToPixel, volumeToPixel);
+    this.drawChart(ctx, startIndex, candles, priceToPixel, volumeToPixel,
+        drawingWidth, rightBarPriceWidth);
 
     // Send a new update
     this.CANDLE_UPDATES_SENT += 1;
