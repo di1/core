@@ -6,5 +6,6 @@ vgcore.*
 *.js
 3rdparty/
 web/node_modules/
+web/package-lock.json
 *.log
 *.aux
