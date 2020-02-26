@@ -3,6 +3,7 @@
 #include <chart/candle.h>
 #include <chart/chart.h>
 #include <exchange/exchange.h>
+#include <fxpig/fix.h>
 #include <iex/iex.h>
 #include <log/log.h>
 #include <pthread.h>

@@ -9,3 +9,4 @@ web/node_modules/
 web/package-lock.json
 *.log
 *.aux
+fxpig.ini
