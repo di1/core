@@ -3,7 +3,8 @@
 #include <chart/candle.h>
 #include <chart/chart.h>
 #include <exchange/exchange.h>
-#include <fxpig/fix.h>
+#include <fxpig/fxpig.h>
+#include <fxpig/ini.h>
 #include <iex/iex.h>
 #include <log/log.h>
 #include <pthread.h>
@@ -22,6 +23,8 @@
 typedef struct {
   bool pcap_feed;
   char* pcap_feed_file;
+  bool fxpig;
+  char* fxpig_ini_file;
 } cli;
 
 /**
@@ -31,6 +34,8 @@ cli* cli_parse(int argc, char** argv) {
   cli* options = (cli*)malloc(1 * sizeof(cli));
   options->pcap_feed = false;
   options->pcap_feed_file = NULL;
+  options->fxpig = false;
+  options->fxpig_ini_file = NULL;
 
   for (int i = 0; i < argc; ++i) {
     if (strcmp("-pcap_feed", argv[i]) == 0) {
@@ -41,7 +46,14 @@ cli* cli_parse(int argc, char** argv) {
         log_error("%s",
                   "-pcap_feed must be followed "
                   "by a file location");
-        EXIT_FAILURE;
+        exit(1);
+      }
+    } else if (strcmp("-fxpig", argv[i]) == 0) {
+      if (i + 1 < argc) {
+        options->fxpig = true;
+        options->fxpig_ini_file = argv[i + 1];
+      } else {
+        log_error("%s", "-fxpig must  be followed by a .ini file");
       }
     }
   }
@@ -74,10 +86,12 @@ int main(int argc, char** argv) {
   pthread_t id;
   pthread_create(&id, NULL, server_start, NULL);
 
-  analysis_init();
-
   if (options->pcap_feed) {
+    analysis_init();
     iex_parse_deep(options->pcap_feed_file);
+  } else if (options->fxpig) {
+    struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
+    fxpig_live(cfg);
   }
 
   free(options);

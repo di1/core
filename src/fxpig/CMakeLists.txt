@@ -1,1 +1,1 @@
-ADD_LIBRARY(fxpig fix.c)
+ADD_LIBRARY(fxpig fxpig.c ini.c)
