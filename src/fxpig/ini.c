@@ -42,7 +42,6 @@ void fxpig_init_config(struct fxpig_ini_config* config) {
 }
 
 struct fxpig_ini_config* fxpig_ini_parse(char* file) {
-  log_debug("parsing ini file %s", file);
   FILE* fp = fopen(file, "r");
 
   if (fp == NULL) {
