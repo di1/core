@@ -5,13 +5,15 @@
 - [x] Websocket/HTML server
 - [x] Analysis
 - [x] Multithreaded Analysis
+- [ ] Live forex feed through fix api
 
 ### Frontend
 - [x] Develop protocol for web socket server
 - [x] Charting application using canvas
-- [ ] Canvas draw lines
+- [x] Canvas draw horizontal lines
+- [ ] Canvas draw sloped lines
 - [x] Canvas display single chart patterns
-- [ ] Canvas display multiple chart patterns
+- [x] Canvas display multiple chart patterns
 
 ### Simple Candle Stick Patterns
 - [ ] Big Black Candle
@@ -76,6 +78,9 @@
 - [ ] The Ascending Triangle
 - [ ] The Descending Triangle
 - [ ] The Symmetrical Triangle
+- [x] Support Lines
+- [x] Resistance Lines
+- [ ] Horizontal Channel
 
 ### Flag Patterns
 - [ ] Flag Pattern

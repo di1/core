@@ -119,7 +119,10 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
-    if (!inf) continue;
+    if (!inf) {
+      // wait a few seconds for data to populate
+      continue;
+    }
 
     struct chart* cht = inf->cht;
 
