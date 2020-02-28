@@ -26,4 +26,6 @@ void analysis_init();
  */
 void analysis_push(struct chart* sec, size_t start, size_t end);
 
+void analysis_cleanup();
+
 #endif

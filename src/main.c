@@ -92,11 +92,12 @@ int main(int argc, char** argv) {
   } else if (options->fxpig) {
     struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
     fxpig_live(cfg);
+    fxpig_ini_free(&cfg);
   }
 
   free(options);
+  analysis_cleanup();
   SERVER_INTERRUPTED = 1;
-
   pthread_join(id, NULL);
   return 0;
 }

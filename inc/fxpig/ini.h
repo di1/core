@@ -42,4 +42,7 @@ struct fxpig_ini_config {
 // Parses an INI file
 struct fxpig_ini_config* fxpig_ini_parse(char* file);
 
+// Frees the config file
+void fxpig_ini_free(struct fxpig_ini_config** cfg);
+
 #endif

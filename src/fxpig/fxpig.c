@@ -25,13 +25,13 @@
 #define BooleanTrue "Y"
 #define BooleanFalse "N"
 
-size_t message_number = 0;
+size_t message_number_sent = 0;
 
 // Generates a fix message given a config
 // and the parameters of the message body
 char* fxpig_generate_fix_message(struct fxpig_ini_config* cfg,
                                  char* message_type, int num_tags, ...) {
-  message_number += 1;
+  message_number_sent += 1;
   va_list tags;
 
   // arguments are given like so,
@@ -53,7 +53,7 @@ char* fxpig_generate_fix_message(struct fxpig_ini_config* cfg,
                            "=%lu" FIX_DELI SendingTime "=%s" FIX_DELI,
                message_type, cfg->sessions[FXPIG_SESSION_INDEX].sender_comp_id,
                cfg->sessions[FXPIG_SESSION_INDEX].target_comp_id,
-               message_number, timebuf);
+               message_number_sent, timebuf);
 
   char* msg = (char*)malloc((initial_size + 1) * sizeof(char));
   snprintf(msg, initial_size + 1,
@@ -61,8 +61,8 @@ char* fxpig_generate_fix_message(struct fxpig_ini_config* cfg,
                        "=%s" FIX_DELI MsgSeqNum "=%lu" FIX_DELI SendingTime
                        "=%s" FIX_DELI,
            message_type, cfg->sessions[FXPIG_SESSION_INDEX].sender_comp_id,
-           cfg->sessions[FXPIG_SESSION_INDEX].target_comp_id, message_number,
-           timebuf);
+           cfg->sessions[FXPIG_SESSION_INDEX].target_comp_id,
+           message_number_sent, timebuf);
 
   for (int i = 0; i < num_tags; ++i) {
     char* tag_id = va_arg(tags, char*);
@@ -143,14 +143,9 @@ void fxpig_live(struct fxpig_ini_config* cfg) {
   // send login message
   int sent_len = send(sock, login_message, strlen(login_message), 0);
   printf("=> (%d) %s\n", sent_len, login_message);
+  free(login_message);
 
-  // char* logout_message = fxpig_generate_fix_message(cfg, Logout, 0);
-  // int sent_len = send(sock, logout_message, strlen(logout_message), 0);
-  // printf("=> (%d) %s\n", sent_len, logout_message);
-
-  // exit(1);
   char buff[1024] = {0};
-
   bool sent_logout = false;
 
   while (true) {
@@ -173,10 +168,10 @@ void fxpig_live(struct fxpig_ini_config* cfg) {
       sent_len = send(sock, logout_message, strlen(logout_message), 0);
       printf("=> (%d) %s\n", sent_len, logout_message);
       sent_logout = true;
+      free(logout_message);
     }
   }
   printf("server closed connection");
 
   close(sock);
-  free(login_message);
 }

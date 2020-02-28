@@ -41,6 +41,17 @@ void fxpig_init_config(struct fxpig_ini_config* config) {
   config->defaults.start_time = NULL;
 }
 
+void fxpig_init_session(struct fxpig_ini_session* s) {
+  s->session_qualifier = NULL;
+  s->sender_comp_id = NULL;
+  s->target_comp_id = NULL;
+  s->username = NULL;
+  s->password = NULL;
+  s->reset_on_logon = NULL;
+  s->socket_connection_host = NULL;
+  s->socket_connection_port = -1;
+}
+
 struct fxpig_ini_config* fxpig_ini_parse(char* file) {
   FILE* fp = fopen(file, "r");
 
@@ -58,6 +69,7 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
   while ((line = file_read_line(fp)) && line != NULL) {
     if (strcmp(line, "[DEFAULT]") == 0) {
       inSession = false;
+      free(line);
       continue;
     } else if (strcmp(line, "[SESSION]") == 0) {
       inSession = true;
@@ -65,12 +77,28 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
       config->sessions =
           realloc(config->sessions,
                   sizeof(struct fxpig_ini_session) * config->num_sessions);
+      fxpig_init_session(&config->sessions[config->num_sessions - 1]);
+      free(line);
       continue;
     } else if (strcmp(line, "\x0") == 0) {
+      free(line);
       continue;
     }
-    char* id = strtok(line, "=");
-    char* value = strtok(NULL, "=");
+    char* id_ = strtok(line, "=");
+    char* value_ = strtok(NULL, "=");
+
+    char* id = NULL;
+    char* value = NULL;
+
+    id = (char*)malloc((strlen(id_) + 1) * sizeof(char));
+    id[strlen(id_)] = '\x0';
+    strcpy(id, id_);
+
+    value = (char*)malloc((strlen(value_) + 1) * sizeof(char));
+    value[strlen(value_)] = '\x0';
+    strcpy(value, value_);
+
+    free(line);
     if (!inSession) {
       if (strcmp(id, "BeginString") == 0) {
         config->defaults.begin_string = value;
@@ -78,8 +106,10 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
         config->defaults.connection_type = value;
       } else if (strcmp(id, "HeartBtInt") == 0) {
         config->defaults.heart_beat_interval = atoi(value);
+        free(value);
       } else if (strcmp(id, "ReconnectInterval") == 0) {
         config->defaults.reconnect_interval = atoi(value);
+        free(value);
       } else if (strcmp(id, "StartTime") == 0) {
         config->defaults.start_time = value;
       } else if (strcmp(id, "EndTime") == 0) {
@@ -94,6 +124,7 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
         log_error("unknown id=%s with value=%s", id, value);
         exit(1);
       }
+      free(id);
     } else {
       if (strcmp(id, "SessionQualifier") == 0) {
         config->sessions[config->num_sessions - 1].session_qualifier = value;
@@ -113,11 +144,38 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
       } else if (strcmp(id, "SocketConnectPort") == 0) {
         config->sessions[config->num_sessions - 1].socket_connection_port =
             atoi(value);
+        free(value);
       } else {
         log_error("unknown id=%s with value=%s", id, value);
         exit(1);
       }
+      free(id);
     }
   }
+  fclose(fp);
   return config;
+}
+
+void fxpig_ini_free(struct fxpig_ini_config** cfg) {
+  free((*cfg)->defaults.begin_string);
+  free((*cfg)->defaults.connection_type);
+  free((*cfg)->defaults.data_dictionary);
+  free((*cfg)->defaults.end_day);
+  free((*cfg)->defaults.end_time);
+  free((*cfg)->defaults.start_day);
+  free((*cfg)->defaults.start_time);
+
+  for (size_t i = 0; i < (*cfg)->num_sessions; ++i) {
+    free((*cfg)->sessions[i].password);
+    free((*cfg)->sessions[i].username);
+    free((*cfg)->sessions[i].reset_on_logon);
+    free((*cfg)->sessions[i].sender_comp_id);
+    free((*cfg)->sessions[i].target_comp_id);
+    free((*cfg)->sessions[i].session_qualifier);
+    free((*cfg)->sessions[i].socket_connection_host);
+  }
+
+  free((*cfg)->sessions);
+  free(*cfg);
+  *cfg = NULL;
 }

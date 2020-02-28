@@ -99,6 +99,8 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
 }
 
+int ANALYSIS_INTERRUPED = 0;
+
 void* analysis_thread_func(void* index) {
   // wait for the sync
 
@@ -110,7 +112,7 @@ void* analysis_thread_func(void* index) {
   struct analysis_list* bin = thread_operations[assigned_bin];
   log_trace("thread was assigned bin id %lu %p", assigned_bin, bin);
 
-  while (true) {
+  while (ANALYSIS_INTERRUPED == 0) {
     // get the next analysis in the queue
     pthread_mutex_lock(&(bin->can_remove));
     struct analysis_info* inf = analysis_pop(bin);
@@ -138,6 +140,7 @@ void* analysis_thread_func(void* index) {
     chart_analysis_unlock(cht);
     free(inf);
   }
+  return NULL;
 }
 
 void analysis_init() {
@@ -265,4 +268,11 @@ struct analysis_info* analysis_pop(struct analysis_list* bin) {
   }
 
   return element;
+}
+
+void analysis_cleanup() {
+  ANALYSIS_INTERRUPED = 1;
+  for (size_t i = 0; i < num_analysis_threads; ++i) {
+    pthread_join(threads[i], NULL);
+  }
 }

@@ -165,7 +165,7 @@ void chart_put_trend_line_pattern(struct chart* cht, size_t start, size_t end,
   cur_analysis->trend_lines[num_trend_lines - 1].end_index = end;
 }
 
-inline void chart_new_candle(struct chart* cht, int64_t price) {
+void chart_new_candle(struct chart* cht, int64_t price) {
   cht->candles[cht->cur_candle] = candle_new(price, cht->last_update);
 }
 
