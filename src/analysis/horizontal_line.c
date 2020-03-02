@@ -42,8 +42,8 @@ void horizontal_line_analysis(struct chart* cht, size_t num_candles,
   }
 
   if (num_confirmations >= 3) {
-    chart_put_trend_line_pattern(cht, last_valid_confirmation, num_candles - 1,
-                                 direction);
+    chart_put_horizontal_line_pattern(cht, last_valid_confirmation,
+                                      num_candles - 1, direction);
   }
 }
 
