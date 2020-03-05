@@ -47,8 +47,3 @@ MESSAGE(STATUS "libwebsockets " ${LIBWEBSOCKETS_LIBRARIES})
 MESSAGE(STATUS "pcap library " ${PCAP_LIBRARY})
 
 ADD_SUBDIRECTORY(src/)
-
-ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARY} ${LIBWEBSOCKETS_LIBRARIES}
-  Threads::Threads)
-TARGET_LINK_LIBRARIES(riski fxpig log book iex chart security exchange server math analysis)

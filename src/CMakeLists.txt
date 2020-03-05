@@ -8,3 +8,7 @@ ADD_SUBDIRECTORY(server)
 ADD_SUBDIRECTORY(analysis)
 ADD_SUBDIRECTORY(fxpig)
 ADD_SUBDIRECTORY(math)
+
+ADD_EXECUTABLE(riski main.c)
+TARGET_LINK_LIBRARIES(riski
+  fxpig log book iex chart security exchange server math analysis Threads::Threads)
