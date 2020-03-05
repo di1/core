@@ -32,6 +32,7 @@ INCLUDE_DIRECTORIES(
   inc/
   /usr/include/
   /usr/local/include/
+  /usr/local/opt
   ${PCAP_INCLUDE_DIRS}
   ${LIBWEBSOCKETS_INCLUDE_DIR}
 )

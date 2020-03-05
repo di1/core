@@ -5,6 +5,7 @@ case "$(uname -s)" in
     echo 'Mac OS X'
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
     brew install libwebsockets
+    brew install openssl
     ;;
   *)
     git clone https://libwebsockets.org/repo/libwebsockets
