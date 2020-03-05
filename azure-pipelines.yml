@@ -31,9 +31,9 @@ steps:
       cmake ..
       sudo make install
 
-- task: CmdLine@2:
+- task: CmdLine@2
   inputs:
-    script: export CC=/usr/bin/clang
+    script: 'export CC=/usr/bin/clang'
 
 - task: NodeTool@0
   inputs:
