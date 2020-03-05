@@ -76,7 +76,7 @@ done
 
 echo
 
-tree
+echo $(pwd)
 
 rm -rf build/
 mkdir -p build/
