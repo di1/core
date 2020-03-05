@@ -15,9 +15,6 @@ pool:
   vmImage: $(imageName)
 
 steps:
-- bash: sudo apt-get update && sudo apt-get upgrade
-  condition: eq( variables['Agent.OS'], 'Linux')
-
 - bash: sudo apt-get install libpcap-dev
   condition: eq( variables['Agent.OS'], 'Linux' )
 
