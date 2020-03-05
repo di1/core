@@ -61,3 +61,10 @@ export CC=/usr/bin/gcc
 cmake ..
 make -s
 cd ..
+rm -rf build
+mkdir -p build/
+cd build/
+export CC=/usr/bin/clang
+cmake ..
+make -s
+cd ..

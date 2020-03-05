@@ -21,6 +21,9 @@ steps:
 - bash: sudo apt-get install clang
   condition: eq( variables['Agent.OS'], 'Linux')
 
+- bash: sudo apt-get install clang-format
+  condition: eq( variables['Agent.OS'], 'Linux')
+
 - task: CmdLine@2
   inputs:
     script: |
@@ -35,7 +38,7 @@ steps:
   inputs:
     versionSpec: '>=13.9.0'
     checkLatest: true
-    
+
 - task: Bash@3
   inputs:
     filePath: 'build.sh'
