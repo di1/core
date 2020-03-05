@@ -32,4 +32,5 @@ steps:
 - task: Bash@3
   inputs:
     filePath: 'build.sh'
-    noProfile: true
+    noProfile: false
+    noRc: false
