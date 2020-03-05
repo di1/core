@@ -8,11 +8,13 @@
 # This currently works probably only for Linux
 
 FIND_PATH ( LIBWEBSOCKETS_INCLUDE_DIR libwebsockets.h
-  ./3rdparty/libwebsockets/build/include
+    /usr/local/include
+    /usr/include
 )
 
 FIND_LIBRARY ( LIBWEBSOCKETS_LIBRARIES websockets
-  ./3rdparty/libwebsockets/build/lib
+    /usr/local/lib
+    /usr/lib
 )
 
 GET_FILENAME_COMPONENT( LIBWEBSOCKETS_LIBRARY_DIR ${LIBWEBSOCKETS_LIBRARIES} PATH )
