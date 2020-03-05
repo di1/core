@@ -37,6 +37,6 @@ INCLUDE_DIRECTORIES(
 ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES}
+TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARY} ${LIBWEBSOCKETS_LIBRARIES}
   fxpig log book iex chart security exchange server math analysis
   Threads::Threads)
