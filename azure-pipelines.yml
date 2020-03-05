@@ -19,6 +19,14 @@ steps:
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Installing GCC'
 
+- bash: sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 50
+  condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Setting GCC version to 9'
+
+- bash: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 50
+  condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Setting G++ version to 9'
+
 - bash: sudo apt-get install libpcap-dev
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Install libpcap'
