@@ -15,7 +15,7 @@ pool:
   vmImage: $(imageName)
 
 steps:
-- bash: sudo apt-get install gcc
+- bash: sudo apt-get install g++-9
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Installing GCC'
 
