@@ -1,2 +1,2 @@
 ADD_LIBRARY(server server.c message_parser.c)
-TARGET_LINK_LIBRARIES(server ${LIBWEBSOCKETS_INCLUDE_DIR}) 
+TARGET_LINK_LIBRARIES(server)

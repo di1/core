@@ -3,6 +3,10 @@
 #Exit on first error
 set -e
 
+command -v git >/dev/null 2>&1 || {
+  echo >&2 "[ERROR] git is not installed."
+}
+
 command -v npm >/dev/null 2>&1 || {
   echo >&2 "[ERROR] npm is not installed."
   exit 1
@@ -18,7 +22,24 @@ command -v clang-format >/dev/null 2>&1 || {
   exit 1
 }
 
-cd web
+echo "[3RDPTY] Installing libwebsockets"
+mkdir -p 3rdparty/
+cd 3rdparty
+if [ -d "libwebsockets" ]
+then
+  cd libwebsockets
+  git pull origin master
+else
+  git clone https://libwebsockets.org/repo/libwebsockets
+  cd libwebsockets
+fi
+
+mkdir -p build/
+cd build/
+cmake ..
+make
+
+cd ../../../web/
 
 echo "[WEB   ] Updating NPM"
 npm update > /dev/null
@@ -58,13 +79,16 @@ echo
 mkdir -p build/
 cd build/
 export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
 cmake ..
-make -s
+make
+
 cd ..
 rm -rf build
 mkdir -p build/
 cd build/
 export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
 cmake ..
-make -s
+make
 cd ..
