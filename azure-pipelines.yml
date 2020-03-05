@@ -35,15 +35,7 @@ steps:
   inputs:
     versionSpec: '>=13.9.0'
     checkLatest: true
-
-- task: CMake@1
-  inputs:
-    cmakeArgs: '-s ..'
-- task: CmdLine@2
-  inputs:
-    script: 'make -s'
-    workingDirectory: 'build'
-
+    
 - task: Bash@3
   inputs:
     filePath: 'build.sh'
