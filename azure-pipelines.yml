@@ -21,8 +21,7 @@ steps:
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Install libpcap'
 
-- bash: sudo apt-get install libwebsockets-dev
-  condition: eq( variables['Agent.OS'], 'Linux')
+- script: 'install_libwebsockets.sh'
   displayName: 'Install libwebsockets'
 
 - bash: |

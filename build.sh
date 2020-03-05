@@ -12,24 +12,7 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
-echo "[3RDPTY] Installing libwebsockets"
-mkdir -p 3rdparty/
-cd 3rdparty
-if [ -d "libwebsockets" ]
-then
-  cd libwebsockets
-  git pull origin master
-else
-  git clone https://libwebsockets.org/repo/libwebsockets
-  cd libwebsockets
-fi
-
-mkdir -p build/
-cd build/
-cmake ..
-make
-
-cd ../../../web/
+cd web/
 
 echo "[WEB   ] Updating NPM"
 npm update > /dev/null
