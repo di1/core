@@ -47,7 +47,7 @@ steps:
     script: 'make -s'
     workingDirectory: 'build'
 
-- task: CmdLine@2:
+- task: CmdLine@2
   inputs:
     script: |
       export CC=/usr/bin/gcc
