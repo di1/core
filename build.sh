@@ -78,16 +78,6 @@ echo
 
 echo $(pwd)
 
-rm -rf build/
-mkdir -p build/
-cd build/
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
-cmake ..
-make
-
-cd ..
-rm -rf build
 mkdir -p build/
 cd build/
 export CC=/usr/bin/clang
