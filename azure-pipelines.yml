@@ -21,9 +21,11 @@ steps:
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Install libpcap'
 
-- script: 'install_libwebsockets.sh'
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: 'sh ./install_libwebsockets.sh'
   displayName: 'Install libwebsockets'
-  workingDirectory: './'
 
 - bash: |
     export OPENSSL_ROOT_DIR=/usr/local/ssl
