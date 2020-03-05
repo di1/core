@@ -12,16 +12,6 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
-command -v clang >/dev/null 2>&1 || {
-  echo >&2 "[ERROR] clang is not installed."
-  exit 1
-}
-
-command -v clang-format >/dev/null 2>&1 || {
-  echo >&2 "[ERROR] clang-format is not installed."
-  exit 1
-}
-
 echo "[3RDPTY] Installing libwebsockets"
 mkdir -p 3rdparty/
 cd 3rdparty
@@ -61,35 +51,10 @@ echo "[WEB   ] Minimizing javascript"
 ./node_modules/.bin/uglifyjs main.js -o main.min.js
 cd ..
 
-for chFile in `find ./inc/ -name "*.h" -o -name "*.c"`
-do
-  echo "[FORMAT] ${chFile}"
-  clang-format -i -style=Google ${chFile}
-done
-
-for chFile in `find ./src/ -name "*.h" -o -name "*.c"`
-do
-  echo "[FORMAT] ${chFile}"
-  clang-format -i -style=Google ${chFile}
-done
-
-
-echo
-
 echo $(pwd)
 
 mkdir -p build/
 cd build/
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
 cmake ..
 make
 cd ../
-
-mkdir -p build/
-cd build/
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
-cmake ..
-make
-cd ..
