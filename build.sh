@@ -76,6 +76,7 @@ done
 
 echo
 
+rm -rf build/
 mkdir -p build/
 cd build/
 export CC=/usr/bin/gcc
