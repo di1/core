@@ -15,14 +15,21 @@ pool:
   vmImage: $(imageName)
 
 steps:
+- bash: sudo apt-get install gcc
+  condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Installing GCC'
+
 - bash: sudo apt-get install libpcap-dev
-  condition: eq( variables['Agent.OS'], 'Linux' )
+  condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Install libpcap'
 
 - bash: sudo apt-get install clang
   condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Install clang'
 
 - bash: sudo apt-get install clang-format
   condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Install clang-format'
 
 - task: NodeTool@0
   inputs:
@@ -34,3 +41,4 @@ steps:
     filePath: 'build.sh'
     noProfile: false
     noRc: false
+    displayName: 'Building with GCC and Clang'
