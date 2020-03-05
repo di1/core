@@ -32,12 +32,13 @@ INCLUDE_DIRECTORIES(
   inc/
   /usr/include/
   /usr/local/include/
-  /usr/local/opt
+  /usr/local/opt/openssl/include
   ${PCAP_INCLUDE_DIRS}
   ${LIBWEBSOCKETS_INCLUDE_DIR}
 )
 
 LINK_DIRECTORIES(
+  /usr/local/opt/openssl/lib
   ${LIBWEBSOCKETS_LIBRARY_DIR}
   ${PCAP_LIBRARY_DIR}
 )
