@@ -136,6 +136,7 @@ void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
       current_trend_start_price = candle_high(cht->candles[end]);
       break;
     default:
+      (void)current_trend_start_price;
       log_error("DIRECTION_INVALIDATED is not a valid direction");
       exit(1);
   }

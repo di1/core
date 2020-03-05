@@ -57,7 +57,7 @@ echo
 
 mkdir -p build/
 cd build/
-export CC=/usr/bin/clang
+export CC=/usr/bin/gcc
 cmake ..
 make -s
 cd ..

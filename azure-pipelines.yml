@@ -1,0 +1,78 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-16.04'
+
+pool:
+  vmImage: $(imageName)
+
+steps:
+- bash: sudo apt-get install libpcap-dev
+  condition: eq( variables['Agent.OS'], 'Linux' )
+
+- bash: sudo apt-get install clang
+  condition: eq( variables['Agent.OS'], 'Linux')
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      git clone https://libwebsockets.org/repo/libwebsockets
+      cd libwebsockets
+      mkdir build
+      cd build
+      cmake ..
+      sudo make install
+
+- task: CmdLine@2:
+  inputs:
+    script: export CC=/usr/bin/clang
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '>=13.9.0'
+    checkLatest: true
+- task: CMake@1
+  inputs:
+    cmakeArgs: '-s ..'
+- task: CmdLine@2
+  inputs:
+    script: 'make -s'
+    workingDirectory: 'build'
+
+- task: CmdLine@2:
+  inputs:
+    script: |
+      export CC=/usr/bin/gcc
+      rm -rf build
+
+- task: CMake@1
+  inputs:
+    cmakeArgs: '-s ..'
+- task: CmdLine@2
+  inputs:
+    script: 'make -s'
+    workingDirectory: 'build'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      set -e
+      npm update
+      npm install
+      # Run ES lint on all typescript files
+      for tsFile in `find ts -name "*.ts"`;
+      do
+        echo "[LINT  ] ${tsFile}"
+        ./node_modules/.bin/eslint ${tsFile} --fix
+      done
+      ./node_modules/.bin/tsc
+      ./node_modules/.bin/uglifyjs main.js -o main.min.js
+    workingDirectory: 'web'

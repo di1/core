@@ -3,7 +3,7 @@ PROJECT(riski)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
       "In-source builds not allowed."
       "Please make a new directory (called a build directory) "
       "and run CMake from there. You may need to remove CMakeCache.txt.")
@@ -28,8 +28,8 @@ ADD_COMPILE_DEFINITIONS(RUN_TESTS=$ENV{RUN_TESTS})
 
 INCLUDE_DIRECTORIES(
   inc/
-  /usr/include/ 
-  /usr/local/include/ 
+  /usr/include/
+  /usr/local/include/
   ${PCAP_INCLUDE_DIRS}
   ${LIBWEBSOCKETS_INCLUDE_DIR}
 )
@@ -37,5 +37,6 @@ INCLUDE_DIRECTORIES(
 ADD_SUBDIRECTORY(src/)
 
 ADD_EXECUTABLE(riski src/main.c)
-TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES} 
-  fxpig log book iex chart security exchange server analysis Threads::Threads)
+TARGET_LINK_LIBRARIES(riski ${PCAP_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES}
+  fxpig log book iex chart security exchange server math analysis
+  Threads::Threads)
