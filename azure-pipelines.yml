@@ -23,6 +23,7 @@ steps:
 
 - script: 'install_libwebsockets.sh'
   displayName: 'Install libwebsockets'
+  workingDirectory: './'
 
 - bash: |
     export OPENSSL_ROOT_DIR=/usr/local/ssl
