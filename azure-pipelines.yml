@@ -32,8 +32,3 @@ steps:
     versionSpec: '>=13.9.0'
     checkLatest: true
 
-- task: Bash@3
-  inputs:
-    filePath: 'build.sh'
-    noProfile: false
-    noRc: false
