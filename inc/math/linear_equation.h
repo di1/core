@@ -28,7 +28,7 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
  * @param {int64_t} z The point to evaluate at
  * @return {double} The Y coordinate at z.
  */
-double linear_equation_eval(struct linear_equation* eq, int64_t z);
+int64_t linear_equation_eval(struct linear_equation* eq, int64_t z);
 
 /*
  * Frees a linear equation allocated by linear_equation_new

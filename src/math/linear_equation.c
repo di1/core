@@ -26,16 +26,19 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
 }
 
 // Evaluates mx+b and returns y
-double linear_equation_eval(struct linear_equation* eq, int64_t z) {
-  return (eq->slope * z) + eq->intercept;
+int64_t linear_equation_eval(struct linear_equation* eq, int64_t z) {
+  return (int64_t) ((eq->slope * z) + eq->intercept);
 }
 
 enum LINEAR_EQUATION_DIRECTION linear_equation_direction(
-    struct linear_equation* eq, int64_t z) {
-  (void)eq;
-  (void)z;
-  // TODO impliment this
-  return IS_EQUAL;
+    struct linear_equation* eq, int64_t z, int64_t y) {
+
+  if (linear_equation_eval(eq, z) < y)
+    return IS_BELOW;
+  else if (linear_equation_eval(eq, z) > y)
+    return IS_ABOVE;
+  else
+    return IS_EQUAL;
 }
 
 // Frees the linear equation
