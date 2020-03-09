@@ -10,7 +10,8 @@
  */
 struct linear_equation;
 
-enum LINEAR_EQUATION_DIRECTION { IS_BELOW = 0, IS_ABOVE = 1, IS_EQUAL = 2 };
+enum LINEAR_EQUATION_DIRECTION { LINEAR_EQUATION_DIRECTION_BELOW = 0,
+  LINEAR_EQUATION_DIRECTION_ABOVE = 1, LINEAR_EQUATION_DIRECTION_EQUAL = 2 };
 
 /*
  * Creates a new linear equation from two points
@@ -29,6 +30,17 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
  * @return {double} The Y coordinate at z.
  */
 int64_t linear_equation_eval(struct linear_equation* eq, int64_t z);
+
+/*
+ * Determines if a given y coordiant is above or below the y
+ * coordiant of m*z + b for a given eq.
+ * @param {struct linear_equation* eq} eq The linear equation
+ * @param {int64_t} z The x coordiant on the line
+ * @param {int64_t} y The y coordiant to test against
+ * @return {enum LINEAR_EQUATION_EVAL} The direction
+ */
+enum LINEAR_EQUATION_DIRECTION linear_equation_direction(
+    struct linear_equation* eq, int64_t z, int64_t y);
 
 /*
  * Frees a linear equation allocated by linear_equation_new

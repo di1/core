@@ -33,12 +33,12 @@ int64_t linear_equation_eval(struct linear_equation* eq, int64_t z) {
 enum LINEAR_EQUATION_DIRECTION linear_equation_direction(
     struct linear_equation* eq, int64_t z, int64_t y) {
 
-  if (linear_equation_eval(eq, z) < y)
-    return IS_BELOW;
+  if (linear_equation_eval(eq, z) == y)
+    return LINEAR_EQUATION_DIRECTION_EQUAL;
   else if (linear_equation_eval(eq, z) > y)
-    return IS_ABOVE;
+    return LINEAR_EQUATION_DIRECTION_BELOW;
   else
-    return IS_EQUAL;
+    return LINEAR_EQUATION_DIRECTION_ABOVE;
 }
 
 // Frees the linear equation

@@ -3,6 +3,7 @@
 #include <analysis/horizontal_line.h>
 #include <analysis/marubozu.h>
 #include <analysis/spinning_top.h>
+#include <analysis/trend_line.h>
 #include <chart/candle.h>
 #include <chart/chart.h>
 
@@ -138,7 +139,7 @@ void* analysis_thread_func(void* index) {
     simple_analysis(cht, end_candle);
     chart_invalidate_trends(cht);
     find_horizontal_line(cht, end_candle);
-
+    find_trend_line(cht, end_candle);
     // release the analysis struct lock
     chart_analysis_unlock(cht);
     free(inf);
