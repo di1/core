@@ -1,7 +1,6 @@
 #include <analysis/trend_line.h>
 
 void find_trend_line(struct chart* cht, size_t num_candles) {
-  log_debug("ummmmmmm");
   if (num_candles < 3) return;
 
   size_t slope_first_point = num_candles - 1;
@@ -40,8 +39,9 @@ void find_trend_line(struct chart* cht, size_t num_candles) {
           break;
       }
     }
+    //log_debug("ok?");
+    //log_debug("number of confirmations %lu", number_of_confirmations);
 continue_outer_loop:
-    log_debug("number of confirmations %lu", number_of_confirmations);
     linear_equation_free(&eq);
   }
 }

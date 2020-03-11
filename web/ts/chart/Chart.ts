@@ -251,7 +251,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.translate(0.5, 0.5);
 
     // Set font
-    ctx.font = 'normal 1.4em Monospace';
+    ctx.font = 'normal 1.4em Hack';
 
     // Most drawing of text has a baseline of middle and drawing text is
     // mainly of white text
@@ -463,7 +463,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     // Set the font to draw the width of the candle
     ctx.font = 'normal ' +
-      (this.CANDLE_WIDTH*2.0).toString() + 'px monospace';
+      (this.CANDLE_WIDTH*2.0).toString() + 'px Hack';
 
 
     // Convert the analysisCode into a character for better visualization
@@ -579,7 +579,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
       ctx.fillRect(0, 0, rightBarPriceWidth, 22.4);
       ctx.fillStyle = (trendLine.d == 0) ? 'black' : 'white';
 
-      ctx.fillText('-' + fillTextDataString, 0, (22.4/2.0));
+      ctx.fillText('-' + fillTextDataString, 0, (22.4/2.0)+3);
       ctx.stroke();
       ctx.restore();
     }
@@ -724,14 +724,14 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     ctx.save();
     // Draw the hovered candle data
-    ctx.font = (this.PADDING_TOP+1).toString() + 'px Monospace';
+    ctx.font = (this.PADDING_TOP+1).toString() + 'px Hack';
     ctx.textBaseline = 'top';
     ctx.fillStyle = 'white';
     ctx.fillText(' O:' + (candles[mouseCandleIndex].candle.o/10000).toFixed(4) +
                  ' H:' + (candles[mouseCandleIndex].candle.h/10000).toFixed(4) +
                  ' L:' + (candles[mouseCandleIndex].candle.l/10000).toFixed(4) +
                  ' C:' + (candles[mouseCandleIndex].candle.c/10000).toFixed(4),
-    ctx.measureText(this.symbol).width + this.PADDING_TOP+1, 0);
+    ctx.measureText(this.symbol).width + this.PADDING_TOP+1, 2);
 
 
     // Draw the symbol ticker
