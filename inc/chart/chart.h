@@ -108,6 +108,16 @@ char* chart_analysis_json(struct chart* cht);
 struct candle* chart_get_candle(struct chart* cht, size_t index);
 
 /**
+ * Adds a sloped line pattern to the chart representation.
+ * @param {struct chart*} cht The chart
+ * @param {size_t} start The start of the trend line (should be less than end)
+ * @param {size_t} end The end of the trend line (should be greater than start)
+ * @param {enum DIRECTION} direction Weather or not this is a suport or resistance line
+ */
+void chart_put_sloped_line_pattern(struct chart* cht, size_t start,
+    size_t end, enum DIRECTION direction);
+
+/**
  * Runs tests on the chart class
  */
 void test_chart();

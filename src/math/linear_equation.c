@@ -19,9 +19,6 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
   eq->c = x2;
   eq->d = y2;
 
-  ASSERT_TEST(linear_equation_eval(eq, x1) == y1);
-  ASSERT_TEST(linear_equation_eval(eq, x2) == y2);
-
   return eq;
 }
 

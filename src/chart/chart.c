@@ -119,6 +119,14 @@ void chart_invalidate_trends(struct chart* cht) {
   }
 }
 
+void chart_put_sloped_line_pattern(struct chart* cht, size_t start,
+    size_t end, enum DIRECTION direction) {
+  (void) cht;
+  (void) start;
+  (void) end;
+  (void) direction;
+}
+
 void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
                                        size_t end, enum DIRECTION direction) {
   struct chart_analysis* cur_analysis = cht->analysis;

@@ -24,23 +24,34 @@ void find_trend_line(struct chart* cht, size_t num_candles) {
 
 
     size_t number_of_confirmations = 0;
+    size_t last_valid_confirmation = 0;
 
     // Verify that from the second point to the first point everything is below (or equal) to the line
-    for (size_t j = slope_second_point; j <= slope_first_point; ++j) {
+    for (int j = (int)slope_first_point; j >= 0; --j) {
       enum LINEAR_EQUATION_DIRECTION led = linear_equation_direction(eq, j, candle_close(chart_get_candle(cht, j)));
       switch (led) {
         case LINEAR_EQUATION_DIRECTION_ABOVE:
           goto continue_outer_loop;
-          break;
         case LINEAR_EQUATION_DIRECTION_EQUAL:
+          last_valid_confirmation = j;
           number_of_confirmations += 1;
-          break;
+          continue;
         case LINEAR_EQUATION_DIRECTION_BELOW:
-          break;
+          if (linear_equation_direction(eq, j, candle_high(chart_get_candle(cht, j))) == LINEAR_EQUATION_DIRECTION_EQUAL) {
+            last_valid_confirmation = j;
+            number_of_confirmations += 1;
+          }
+          continue;
       }
     }
-    //log_debug("ok?");
-    //log_debug("number of confirmations %lu", number_of_confirmations);
+
+    // Two confirmations at least from the two points that were used to construct the line
+    // one more for it to be valid (thats what the great economics said don't ask me why)
+    if (number_of_confirmations >= 3) {
+      log_debug("number of confirmations %lu, %lu %lu", number_of_confirmations, slope_second_point, last_valid_confirmation);
+      chart_put_sloped_line_pattern(cht, last_valid_confirmation,
+          slope_first_point, DIRECTION_RESISTANCE);
+    }
 continue_outer_loop:
     linear_equation_free(&eq);
   }
