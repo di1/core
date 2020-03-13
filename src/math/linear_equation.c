@@ -2,32 +2,32 @@
 
 // Defines a linear equation
 struct linear_equation {
-  // m
-  double slope;
-
-  // b
-  double intercept;
+  int64_t a;
+  int64_t b;
+  int64_t c;
+  int64_t d;
 };
 
 struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
                                             int64_t y2) {
-  double slope = (y2 - y1) / (x2 - x1);
-
-  // y - (mx) = b
-  double intercept = y1 - (slope * x1);
 
   struct linear_equation* eq =
       (struct linear_equation*)malloc(1 * sizeof(struct linear_equation));
 
-  eq->slope = slope;
-  eq->intercept = intercept;
+  eq->a = x1;
+  eq->b = y1;
+  eq->c = x2;
+  eq->d = y2;
+
+  ASSERT_TEST(linear_equation_eval(eq, x1) == y1);
+  ASSERT_TEST(linear_equation_eval(eq, x2) == y2);
 
   return eq;
 }
 
 // Evaluates mx+b and returns y
-int64_t linear_equation_eval(struct linear_equation* eq, int64_t z) {
-  return (int64_t) ((eq->slope * z) + eq->intercept);
+int64_t linear_equation_eval(struct linear_equation* eq, int64_t x) {
+  return ((eq->d - eq->b)*(x - eq->c)) / (eq->c - eq->a) + eq->d;
 }
 
 enum LINEAR_EQUATION_DIRECTION linear_equation_direction(
