@@ -1,5 +1,11 @@
 #include <analysis/analysis.h>
 
+/*
+ * String representations of the error codes
+ */
+const char* ANALYSIS_ERROR_CODE_STR[3] = {
+    "ANALYSIS_NO_ERROR", "ANALYSIS_MALLOC_ERROR", "ANALYSIS_INVALID_PTR"};
+
 struct analysis_info {
   // chart to analyize
   struct chart* cht;
@@ -32,9 +38,6 @@ struct analysis_list {
   size_t num_elements;
 };
 
-// fwd declaration of analysis_pop
-struct analysis_info* analysis_pop(struct analysis_list* bin);
-
 // Keeps track of which bin the next request will go into
 size_t current_analysis_index = 0;
 size_t num_analysis_threads = 0;
@@ -53,7 +56,7 @@ pthread_t* threads;
     ret = ANALYSIS_FUNCTION(last_candle);                        \
     if (ret != SINGLE_CANDLE_PATTERN_NONE) {                     \
       chart_put_single_candle_pattern(cht, end_candle - 1, ret); \
-      return;                                                    \
+      return ANALYSIS_NO_ERROR;                                  \
     }                                                            \
   } while (0);
 
@@ -66,7 +69,7 @@ pthread_t* threads;
  * index, which since is 1 indexed will be end_candle-1 in the
  * array.
  */
-void simple_analysis(struct chart* cht, size_t end_candle) {
+enum ANALYSIS_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   struct candle* last_candle = chart_get_candle(cht, end_candle - 1);
 
   if (!last_candle) {
@@ -76,7 +79,7 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
 
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
-  if (candle_volume(last_candle) == 0) return;
+  if (candle_volume(last_candle) == 0) return ANALYSIS_NO_ERROR;
 
   // Now that we have a valid candle perform all single candle
   // analysis
@@ -91,6 +94,8 @@ void simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_dragonfly);
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_gravestone);
   SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
+
+  return ANALYSIS_NO_ERROR;
 }
 
 int ANALYSIS_INTERRUPED = 0;
@@ -108,8 +113,9 @@ void* analysis_thread_func(void* index) {
 
   while (ANALYSIS_INTERRUPED == 0) {
     // get the next analysis in the queue
+    struct analysis_info* inf = NULL;
     pthread_mutex_lock(&(bin->can_remove));
-    struct analysis_info* inf = analysis_pop(bin);
+    analysis_pop(bin, &inf);
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
@@ -117,7 +123,6 @@ void* analysis_thread_func(void* index) {
       // wait a few seconds for data to populate
       continue;
     }
-
     struct chart* cht = inf->cht;
 
     size_t start_index = inf->start_candle;
@@ -140,7 +145,7 @@ void* analysis_thread_func(void* index) {
   return NULL;
 }
 
-void analysis_init() {
+enum ANALYSIS_ERROR_CODE analysis_init() {
   int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
   log_info("processor has %d processing threads", numCPU);
   log_trace("creating %d processing units", numCPU);
@@ -157,10 +162,17 @@ void analysis_init() {
   thread_operations = (struct analysis_list**)malloc(
       num_analysis_threads * sizeof(struct analysis_list*));
 
+  // make sure malloc was correct
+  PTR_CHECK(thread_operations, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+
   // create the lists
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     thread_operations[i] =
         (struct analysis_list*)malloc(1 * sizeof(struct analysis_list));
+
+    // make sure malloc was correct
+    PTR_CHECK(thread_operations, ANALYSIS_MALLOC_ERROR,
+              ANALYSIS_ERROR_CODE_STR);
 
     pthread_mutex_init(&(thread_operations[i]->can_remove), NULL);
 
@@ -171,18 +183,32 @@ void analysis_init() {
   }
 
   threads = (pthread_t*)calloc(num_analysis_threads, sizeof(pthread_t));
+
+  PTR_CHECK(threads, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     size_t* id = (size_t*)malloc(1 * sizeof(size_t));
+
+    PTR_CHECK(id, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+
     *id = i;
     pthread_create(&(threads[i]), NULL, analysis_thread_func, (void*)id);
   }
   init_completed = true;
+
+  return ANALYSIS_NO_ERROR;
 }
 
-struct analysis_info* analysis_create_info(struct chart* cht, size_t start,
-                                           size_t end) {
+enum ANALYSIS_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
+                                              size_t end,
+                                              struct analysis_info** inf) {
+  PTR_CHECK(cht, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(inf, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+
   struct analysis_info* element =
       (struct analysis_info*)malloc(1 * sizeof(struct analysis_info));
+
+  PTR_CHECK(element, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
 
   element->cht = cht;
   element->start_candle = start;
@@ -191,21 +217,35 @@ struct analysis_info* analysis_create_info(struct chart* cht, size_t start,
   element->next = NULL;
   element->prev = NULL;
 
-  return element;
+  *inf = element;
+
+  return ANALYSIS_NO_ERROR;
 }
 
-void analysis_push(struct chart* cht, size_t start, size_t end) {
+enum ANALYSIS_ERROR_CODE analysis_push(struct chart* cht, size_t start,
+                                       size_t end) {
   while (!init_completed)
     ;
+
+  PTR_CHECK(cht, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(thread_operations, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
 
   // what bin the analysis will go into
   size_t thread_bin = current_analysis_index % num_analysis_threads;
   // get the list
+
   struct analysis_list* bin = thread_operations[thread_bin];
 
   // create the new element
-  struct analysis_info* element = analysis_create_info(cht, start, end);
+  struct analysis_info* element = NULL;
 
+  // Create a new info struct
+  TRACE(analysis_create_info(cht, start, end, &element));
+
+  // Make sure the info object was set correctly
+  PTR_CHECK(element, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+
+  // The number of elements
   size_t ne = 0;
 
   // aquire lock to make sure no removing occurs
@@ -238,16 +278,14 @@ void analysis_push(struct chart* cht, size_t start, size_t end) {
   }
 
   current_analysis_index += 1;
+  return ANALYSIS_NO_ERROR;
 }
 
-struct analysis_info* analysis_pop(struct analysis_list* bin) {
-  // make sure there is no appending
-
-  // make sure no appending can happen
+enum ANALYSIS_ERROR_CODE analysis_pop(struct analysis_list* bin,
+                                      struct analysis_info** inf) {
+  PTR_CHECK(bin, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
 
   struct analysis_info* element = bin->head;
-
-  // log_trace("%p", bin->head);
 
   // remove the head
   if (bin->head) {
@@ -264,12 +302,16 @@ struct analysis_info* analysis_pop(struct analysis_list* bin) {
     bin->tail = NULL;
   }
 
-  return element;
+  PTR_CHECK(inf, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  *inf = element;
+
+  return ANALYSIS_NO_ERROR;
 }
 
-void analysis_cleanup() {
+enum ANALYSIS_ERROR_CODE analysis_cleanup() {
   ANALYSIS_INTERRUPED = 1;
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     pthread_join(threads[i], NULL);
   }
+  return ANALYSIS_NO_ERROR;
 }

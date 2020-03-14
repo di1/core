@@ -66,7 +66,7 @@ struct chart* chart_new(uint64_t interval, char* name) {
       (struct chart_analysis*)malloc(1 * sizeof(struct chart_analysis));
   cht->analysis->scp = (enum SINGLE_CANDLE_PATTERNS*)malloc(
       (cht->num_candles_allocated) * sizeof(enum SINGLE_CANDLE_PATTERNS));
-  
+
   cht->analysis->trend_lines_horizontal = NULL;
   cht->analysis->num_trend_lines_horizontal = 0;
 
@@ -126,8 +126,8 @@ void chart_invalidate_trends(struct chart* cht) {
   }
 }
 
-void chart_put_sloped_line_pattern(struct chart* cht, size_t start,
-    size_t end, enum DIRECTION direction) {
+void chart_put_sloped_line_pattern(struct chart* cht, size_t start, size_t end,
+                                   enum DIRECTION direction) {
   struct chart_analysis* cur_analysis = cht->analysis;
 
   cur_analysis->num_trend_lines_sloped += 1;
@@ -139,7 +139,6 @@ void chart_put_sloped_line_pattern(struct chart* cht, size_t start,
   cur_analysis->trend_lines_sloped[num_trend_lines - 1].direction = direction;
   cur_analysis->trend_lines_sloped[num_trend_lines - 1].start_index = start;
   cur_analysis->trend_lines_sloped[num_trend_lines - 1].end_index = end;
-
 }
 
 void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
@@ -184,7 +183,8 @@ void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
       cur_analysis->num_trend_lines_horizontal * sizeof(struct trend_line));
 
   size_t num_trend_lines = cur_analysis->num_trend_lines_horizontal;
-  cur_analysis->trend_lines_horizontal[num_trend_lines - 1].direction = direction;
+  cur_analysis->trend_lines_horizontal[num_trend_lines - 1].direction =
+      direction;
   cur_analysis->trend_lines_horizontal[num_trend_lines - 1].start_index = start;
   cur_analysis->trend_lines_horizontal[num_trend_lines - 1].end_index = end;
 }
@@ -322,9 +322,11 @@ char* chart_analysis_json(struct chart* cht) {
   for (size_t i = 0; i < chta->num_trend_lines_horizontal; ++i) {
     char trend_line_json_buf[34];
     sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%u}",
-            chta->trend_lines_horizontal[i].start_index, chta->trend_lines_horizontal[i].end_index,
+            chta->trend_lines_horizontal[i].start_index,
+            chta->trend_lines_horizontal[i].end_index,
             (chta->trend_lines_horizontal[i].direction));
-    if (i != chta->num_trend_lines_horizontal - 1) strcat(trend_line_json_buf, ",\x0");
+    if (i != chta->num_trend_lines_horizontal - 1)
+      strcat(trend_line_json_buf, ",\x0");
     strcat(buf, trend_line_json_buf);
   }
 

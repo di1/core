@@ -1,9 +1,9 @@
 #ifndef LINEAR_EQUATION_
 #define LINEAR_EQUATION_
 
-#include <stdlib.h>
 #include <log/log.h>
 #include <math.h>
+#include <stdlib.h>
 
 /*
  * Defines a linear equation.
@@ -12,8 +12,11 @@
  */
 struct linear_equation;
 
-enum LINEAR_EQUATION_DIRECTION { LINEAR_EQUATION_DIRECTION_BELOW = 0,
-  LINEAR_EQUATION_DIRECTION_ABOVE = 1, LINEAR_EQUATION_DIRECTION_EQUAL = 2 };
+enum LINEAR_EQUATION_DIRECTION {
+  LINEAR_EQUATION_DIRECTION_BELOW = 0,
+  LINEAR_EQUATION_DIRECTION_ABOVE = 1,
+  LINEAR_EQUATION_DIRECTION_EQUAL = 2
+};
 
 /*
  * Creates a new linear equation from two points

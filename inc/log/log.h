@@ -10,8 +10,6 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -39,13 +37,13 @@ enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
     }                               \
   } while (0);
 
-#define MEM_CHECK(VAR, ERROR_CODE)  \
-  do {                              \
-    if (VAR == NULL) {              \
+#define MEM_CHECK(VAR, ERROR_CODE)                                          \
+  do {                                                                      \
+    if (VAR == NULL) {                                                      \
       printf("error: %s@%s:%d => " #VAR, __FUNCTION__, __FILE__, __LINE__); \
-      return ERROR_CODE; \
-    } \
-  } while (0);                            
+      return ERROR_CODE;                                                    \
+    }                                                                       \
+  } while (0);
 
 void log_set_udata(void *udata);
 void log_set_lock(log_LockFn fn);

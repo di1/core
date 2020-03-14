@@ -12,10 +12,10 @@ struct string_builder {
 };
 
 enum STRING_BUILDER_ERROR_CODE string_builder_new(struct string_builder** sb) {
-  struct string_builder* sb_ = (struct string_builder*)
-    malloc(1 * sizeof(struct string_builder));
+  struct string_builder* sb_ =
+      (struct string_builder*)malloc(1 * sizeof(struct string_builder));
 
-  PTR_CHECK(sb, STRING_BUILDER_MALLOC_FAILURE, STRING_BUILDER_ERROR_STR); 
+  PTR_CHECK(sb, STRING_BUILDER_MALLOC_FAILURE, STRING_BUILDER_ERROR_STR);
 
   sb_->allocated_size = 0;
   sb_->len = 0;
@@ -27,15 +27,14 @@ enum STRING_BUILDER_ERROR_CODE string_builder_new(struct string_builder** sb) {
 }
 
 enum STRING_BUILDER_ERROR_CODE string_builder_append(struct string_builder* sb,
-    char* c, size_t n) {
-  
+                                                     char* c, size_t n) {
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, STRING_BUILDER_INVALID_PTR, STRING_BUILDER_ERROR_STR);
 
   // Reallocate if needed
   if (sb->len + n > sb->allocated_size) {
     sb->allocated_size = sb->allocated_size * 2;
-    sb->c = (char*) realloc(sb->c, sb->allocated_size * sizeof(char));
+    sb->c = (char*)realloc(sb->c, sb->allocated_size * sizeof(char));
     PTR_CHECK(sb, STRING_BUILDER_MALLOC_FAILURE, STRING_BUILDER_ERROR_STR);
   }
 
@@ -49,7 +48,7 @@ enum STRING_BUILDER_ERROR_CODE string_builder_append(struct string_builder* sb,
 }
 
 enum STRING_BUILDER_ERROR_CODE string_builder_str(struct string_builder* sb,
-    char** c) {
+                                                  char** c) {
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, STRING_BUILDER_INVALID_PTR, STRING_BUILDER_ERROR_STR);
 

@@ -10,7 +10,6 @@ struct linear_equation {
 
 struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
                                             int64_t y2) {
-
   struct linear_equation* eq =
       (struct linear_equation*)malloc(1 * sizeof(struct linear_equation));
 
@@ -24,12 +23,11 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
 
 // Evaluates mx+b and returns y
 int64_t linear_equation_eval(struct linear_equation* eq, int64_t x) {
-  return ((eq->d - eq->b)*(x - eq->c)) / (eq->c - eq->a) + eq->d;
+  return ((eq->d - eq->b) * (x - eq->c)) / (eq->c - eq->a) + eq->d;
 }
 
 enum LINEAR_EQUATION_DIRECTION linear_equation_direction(
     struct linear_equation* eq, int64_t z, int64_t y) {
-
   if (linear_equation_eval(eq, z) == y)
     return LINEAR_EQUATION_DIRECTION_EQUAL;
   else if (linear_equation_eval(eq, z) > y)
