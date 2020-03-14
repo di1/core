@@ -1,7 +1,5 @@
 #include <analysis/marubozu.h>
 
-#include "chart/chart.h"
-
 enum SINGLE_CANDLE_PATTERNS is_white_marubozu(struct candle* cnd) {
   int64_t o = candle_open(cnd);
   int64_t h = candle_high(cnd);

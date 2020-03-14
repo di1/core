@@ -1,7 +1,5 @@
 #include <analysis/horizontal_line.h>
 
-#include "chart/chart.h"
-
 void horizontal_line_analysis(struct chart* cht, size_t num_candles,
                               int64_t compare_price, enum DIRECTION direction) {
   /*

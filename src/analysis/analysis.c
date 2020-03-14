@@ -1,11 +1,4 @@
 #include <analysis/analysis.h>
-#include <analysis/doji.h>
-#include <analysis/horizontal_line.h>
-#include <analysis/marubozu.h>
-#include <analysis/spinning_top.h>
-#include <analysis/trend_line.h>
-#include <chart/candle.h>
-#include <chart/chart.h>
 
 struct analysis_info {
   // chart to analyize

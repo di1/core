@@ -1,7 +1,5 @@
 #include <analysis/spinning_top.h>
 
-#include "chart/chart.h"
-
 enum SINGLE_CANDLE_PATTERNS is_white_spinning_top(struct candle* cnd) {
   int64_t a = candle_high(cnd);
   int64_t b = candle_low(cnd);

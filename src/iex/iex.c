@@ -1,9 +1,4 @@
-// header file that makes iex_parse_deep public
 #include <iex/iex.h>
-
-// iex packet and type data
-#include "packet.h"
-#include "types.h"
 
 #define TIME(CODE, MESSAGE)                                     \
   do {                                                          \

@@ -543,7 +543,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     }
 
     ctx.fillStyle = ctx.strokeStyle;
-    ctx.lineWidth = 1.0;
+    ctx.lineWidth = 2.0;
     const startingOffsetX: number =
       (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 

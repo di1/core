@@ -2,14 +2,26 @@
 #define ANALYSIS_
 
 #include <chart/candle.h>
+
+// if guard circular dependency
+#ifndef CHART_
+#include <chart/chart.h>
+#else
+struct chart;
+#endif
+
+#include <analysis/doji.h>
+#include <analysis/horizontal_line.h>
+#include <analysis/marubozu.h>
+#include <analysis/spinning_top.h>
+#include <analysis/trend_line.h>
+
+
 #include <log/log.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-// foward declaration to struct chart in chart/chart.h
-struct chart;
 
 /**
  * Adds a security to be analyzed.

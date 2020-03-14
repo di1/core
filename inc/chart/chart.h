@@ -1,7 +1,13 @@
 #ifndef CHART_
 #define CHART_
 
+#include <analysis/enumations.h>
+
+// if guard circular dependency
+#ifndef ANALYSIS_
 #include <analysis/analysis.h>
+#endif
+
 #include <chart/candle.h>
 #include <log/log.h>
 #include <pthread.h>
@@ -43,30 +49,6 @@ char* chart_json(struct chart* cht);
  * Gets the latest candle update
  */
 char* chart_latest_candle(struct chart* cht);
-
-/**
- * enumation for candle patterns
- */
-enum SINGLE_CANDLE_PATTERNS {
-  SINGLE_CANDLE_PATTERN_NONE,
-  SINGLE_CANDLE_PATTERN_WHITE_MARUBOZU,
-  SINGLE_CANDLE_PATTERN_BLACK_MARUBOZU,
-  SINGLE_CANDLE_PATTERN_WHITE_SPINNING_TOP,
-  SINGLE_CANDLE_PATTERN_BLACK_SPINNING_TOP,
-  SINGLE_CANDLE_PATTERN_DOJI_DRAGONFLY,
-  SINGLE_CANDLE_PATTERN_DOJI_GRAVESTONE,
-  SINGLE_CANDLE_PATTERN_DOJI_GENERIC
-};
-
-/**
- * enumeration of candle parts
- */
-enum DIRECTION {
-  DIRECTION_SUPPORT = 0,
-  DIRECTION_RESISTANCE = 1,
-  DIRECTION_INVALIDATED_SUPPORT = 2,
-  DIRECTION_INVALIDATED_RESISTANCE = 3
-};
 
 /**
  * Aquires the analysis lock

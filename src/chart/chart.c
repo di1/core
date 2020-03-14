@@ -18,8 +18,11 @@ struct chart_analysis {
   enum SINGLE_CANDLE_PATTERNS* scp;
 
   // A list of trend lines (not preallocted)
-  size_t num_trend_lines;
-  struct trend_line* trend_lines;
+  size_t num_trend_lines_horizontal;
+  struct trend_line* trend_lines_horizontal;
+
+  size_t num_trend_lines_sloped;
+  struct trend_line* trend_lines_sloped;
 };
 
 struct chart {
@@ -63,8 +66,12 @@ struct chart* chart_new(uint64_t interval, char* name) {
       (struct chart_analysis*)malloc(1 * sizeof(struct chart_analysis));
   cht->analysis->scp = (enum SINGLE_CANDLE_PATTERNS*)malloc(
       (cht->num_candles_allocated) * sizeof(enum SINGLE_CANDLE_PATTERNS));
-  cht->analysis->trend_lines = NULL;
-  cht->analysis->num_trend_lines = 0;
+  
+  cht->analysis->trend_lines_horizontal = NULL;
+  cht->analysis->num_trend_lines_horizontal = 0;
+
+  cht->analysis->num_trend_lines_sloped = 0;
+  cht->analysis->trend_lines_sloped = NULL;
 
   // initalize all the analysis to NONE
   for (size_t i = 0; i < cht->num_candles_allocated; ++i) {
@@ -98,8 +105,8 @@ void chart_invalidate_trends(struct chart* cht) {
 
   struct chart_analysis* cur_analysis = cht->analysis;
 
-  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
-    struct trend_line* t = &cur_analysis->trend_lines[i];
+  for (size_t i = 0; i < cur_analysis->num_trend_lines_horizontal; ++i) {
+    struct trend_line* t = &cur_analysis->trend_lines_horizontal[i];
 
     if (t->direction > 1) continue;
 
@@ -121,10 +128,18 @@ void chart_invalidate_trends(struct chart* cht) {
 
 void chart_put_sloped_line_pattern(struct chart* cht, size_t start,
     size_t end, enum DIRECTION direction) {
-  (void) cht;
-  (void) start;
-  (void) end;
-  (void) direction;
+  struct chart_analysis* cur_analysis = cht->analysis;
+
+  cur_analysis->num_trend_lines_sloped += 1;
+  cur_analysis->trend_lines_sloped = (struct trend_line*)realloc(
+      cur_analysis->trend_lines_sloped,
+      cur_analysis->num_trend_lines_sloped * sizeof(struct trend_line));
+
+  size_t num_trend_lines = cur_analysis->num_trend_lines_sloped;
+  cur_analysis->trend_lines_sloped[num_trend_lines - 1].direction = direction;
+  cur_analysis->trend_lines_sloped[num_trend_lines - 1].start_index = start;
+  cur_analysis->trend_lines_sloped[num_trend_lines - 1].end_index = end;
+
 }
 
 void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
@@ -149,8 +164,8 @@ void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
       exit(1);
   }
 
-  for (size_t i = 0; i < cur_analysis->num_trend_lines; ++i) {
-    struct trend_line* t = &cur_analysis->trend_lines[i];
+  for (size_t i = 0; i < cur_analysis->num_trend_lines_horizontal; ++i) {
+    struct trend_line* t = &cur_analysis->trend_lines_horizontal[i];
 
     // don't join to an invalidated trend
     if (t->direction > 1) continue;
@@ -163,15 +178,15 @@ void chart_put_horizontal_line_pattern(struct chart* cht, size_t start,
   }
 
   // Add 1 new element to the analysis
-  cur_analysis->num_trend_lines += 1;
-  cur_analysis->trend_lines = (struct trend_line*)realloc(
-      cur_analysis->trend_lines,
-      cur_analysis->num_trend_lines * sizeof(struct trend_line));
+  cur_analysis->num_trend_lines_horizontal += 1;
+  cur_analysis->trend_lines_horizontal = (struct trend_line*)realloc(
+      cur_analysis->trend_lines_horizontal,
+      cur_analysis->num_trend_lines_horizontal * sizeof(struct trend_line));
 
-  size_t num_trend_lines = cur_analysis->num_trend_lines;
-  cur_analysis->trend_lines[num_trend_lines - 1].direction = direction;
-  cur_analysis->trend_lines[num_trend_lines - 1].start_index = start;
-  cur_analysis->trend_lines[num_trend_lines - 1].end_index = end;
+  size_t num_trend_lines = cur_analysis->num_trend_lines_horizontal;
+  cur_analysis->trend_lines_horizontal[num_trend_lines - 1].direction = direction;
+  cur_analysis->trend_lines_horizontal[num_trend_lines - 1].start_index = start;
+  cur_analysis->trend_lines_horizontal[num_trend_lines - 1].end_index = end;
 }
 
 void chart_new_candle(struct chart* cht, int64_t price) {
@@ -282,10 +297,10 @@ char* chart_analysis_json(struct chart* cht) {
   total_json_size += 16;
 
   // each trend line {s:...}
-  total_json_size += (chta->num_trend_lines * 36);
+  total_json_size += (chta->num_trend_lines_horizontal * 36);
 
   // commas between each trend json
-  total_json_size += (chta->num_trend_lines - 1);
+  total_json_size += (chta->num_trend_lines_horizontal - 1);
 
   // ending ]}}
   total_json_size += 3;
@@ -304,12 +319,12 @@ char* chart_analysis_json(struct chart* cht) {
 
   // build the trend_lines json
   strcat(buf, "\"trendLines\":[\x0");
-  for (size_t i = 0; i < chta->num_trend_lines; ++i) {
+  for (size_t i = 0; i < chta->num_trend_lines_horizontal; ++i) {
     char trend_line_json_buf[34];
     sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%u}",
-            chta->trend_lines[i].start_index, chta->trend_lines[i].end_index,
-            (chta->trend_lines[i].direction));
-    if (i != chta->num_trend_lines - 1) strcat(trend_line_json_buf, ",\x0");
+            chta->trend_lines_horizontal[i].start_index, chta->trend_lines_horizontal[i].end_index,
+            (chta->trend_lines_horizontal[i].direction));
+    if (i != chta->num_trend_lines_horizontal - 1) strcat(trend_line_json_buf, ",\x0");
     strcat(buf, trend_line_json_buf);
   }
 

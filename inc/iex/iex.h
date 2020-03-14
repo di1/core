@@ -14,6 +14,9 @@
 #include <string.h>
 
 // iex packet and type data
+#include <iex/packet.h>
+#include <iex/types.h>
+
 #include <exchange/exchange.h>
 #include <security/security.h>
 

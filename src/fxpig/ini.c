@@ -1,7 +1,4 @@
 #include <fxpig/ini.h>
-#include <stdio.h>
-
-#include "log/log.h"
 
 /**
  * Reads up to \n and returns the data up to \n incrementing the fp
