@@ -1,6 +1,15 @@
 #include <analysis/doji.h>
 
-enum SINGLE_CANDLE_PATTERNS is_doji_dragonfly(struct candle* cnd) {
+/*
+ * String representation of the error codes
+ */
+const char* DOJI_ERROR_CODE_STR[1] = {"DOJI_NO_ERROR"};
+
+enum DOJI_ERROR_CODE perform_doji_dragonfly(struct chart* cht,
+                                            size_t end_candle) {
+  struct candle* last_candle = NULL;
+  TRACE(chart_get_candle(cht, end_candle - 1, &last_candle));
+
   int64_t o = candle_open(cnd);
   int64_t h = candle_high(cnd);
   int64_t l = candle_low(cnd);
@@ -12,7 +21,8 @@ enum SINGLE_CANDLE_PATTERNS is_doji_dragonfly(struct candle* cnd) {
   return SINGLE_CANDLE_PATTERN_NONE;
 }
 
-enum SINGLE_CANDLE_PATTERNS is_doji_gravestone(struct candle* cnd) {
+enum DOJI_ERROR_CODE perform_doji_gravestone(struct chart* cht,
+                                             size_t end_candle) {
   int64_t o = candle_open(cnd);
   int64_t h = candle_high(cnd);
   int64_t l = candle_low(cnd);
@@ -24,7 +34,7 @@ enum SINGLE_CANDLE_PATTERNS is_doji_gravestone(struct candle* cnd) {
   return SINGLE_CANDLE_PATTERN_NONE;
 }
 
-enum SINGLE_CANDLE_PATTERNS is_doji_generic(struct candle* cnd) {
+enum DOJI_ERROR_CODE is_doji_generic(struct chart* cht, size_t end_candle) {
   int64_t o = candle_open(cnd);
   int64_t h = candle_high(cnd);
   int64_t l = candle_low(cnd);

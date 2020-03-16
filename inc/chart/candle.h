@@ -9,17 +9,18 @@
 
 #define JSON_CANDLE_MAX_LEN 200
 
-/**
+/*
  * Private candle struct
  */
 struct candle;
 
-/**
+/*
  * Creates a new candle given the start time and opening
- * price, the price is a fixed point number with 4 assumed
- * decimal places
+ * price.
+ * @param {int64_t} price A fixed point
+ * @param {uint64_t} time The timestamp
  */
-struct candle* candle_new(int64_t price, uint64_t time);
+enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time, struct candle** cnd);
 
 /**
  * Updates the given candle

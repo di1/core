@@ -26,3 +26,14 @@
     }                                                                \
   } while (0)
 #endif
+
+#ifndef RANGE_CHECK
+#define RANGE_CHECK(VAR, MIN, MAX, ERROR_CODE, ERROR_CODE_STR)            \
+  do {                                                                    \
+    if (!(VAR >= MIN && VAR < MAX)) {                                     \
+      printf("error: %s@%s:%d => %s\n", __func__, __FILENAME__, __LINE__, \
+             ERROR_CODE_STR[ERROR_CODE]);                                 \
+      return ERROR_CODE;                                                  \
+    }                                                                     \
+  } while (0)
+#endif

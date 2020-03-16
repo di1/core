@@ -6,49 +6,74 @@
 const char* ANALYSIS_ERROR_CODE_STR[3] = {
     "ANALYSIS_NO_ERROR", "ANALYSIS_MALLOC_ERROR", "ANALYSIS_INVALID_PTR"};
 
+/*
+ * The analysis info struct is the value of the linked list
+ * created by analysis_list.
+ *
+ * @param {struct chart*} cht A candle stick chart
+ * @param {size_t} start_candle The start analysis candle
+ * @param {size_t} end_candle The end analysis candle
+ * @param {struct analysis_info* | NULL} next The next element in the list
+ * @param {struct analysis_info* | NULL} prev The prev element in the list
+ */
 struct analysis_info {
-  // chart to analyize
   struct chart* cht;
-
-  // where to start in the chart
   size_t start_candle;
-
-  // where to end in the chart
   size_t end_candle;
-
-  // the next element
   struct analysis_info* next;
-
-  // the previous element
   struct analysis_info* prev;
 };
 
+/*
+ * An overarching structure containing meta data for the linked list
+ * @param {struct analysis_info*} head The head of the linked list
+ * @param {struct analysis_info*} tail The tail of the linked list
+ * @param {pthread_mutex_t} can_remove A mutex locking head and tail
+ *  from being written and read at the same time.
+ * @param {size_t} num_elements The number of elements in the list
+ */
 struct analysis_list {
-  // the head of the list
   struct analysis_info* head;
-
-  // the tail of the list
   struct analysis_info* tail;
-
-  // Need two mutexes to stop race conditions
-  // where 1 thread tries to append and 1 thread
-  // tries to remove
   pthread_mutex_t can_remove;
-
   size_t num_elements;
 };
 
-// Keeps track of which bin the next request will go into
+/*
+ * Keeps track of which bin the next request will go into.
+ * This is incremented everytime analysis_push is called and
+ * modded (%) by num_analysis_threads
+ */
 size_t current_analysis_index = 0;
+
+/*
+ * The number of availibale threads that can work. If the number of
+ * threads > 2, then two are taken away for the web browser to display
+ * the chart.
+ *
+ * TODO: Add compile time option to not reduce the number threads for
+ * analysis threads. This should only be turned on if chart display
+ * is being offloaded to different machine.
+ */
 size_t num_analysis_threads = 0;
 
-// Holds num_analysis_threads analysis_lists
+/*
+ * A list of struct analysis_list* of length num_analysis_threads.
+ * Each thread has its own bin that it pops. This ensures equal
+ * working amung all the threads.
+ */
 struct analysis_list** thread_operations;
 
-// Set to true once all the threads have been created
+/*
+ * A wait check must be set before starting the analysis workflow.
+ * Analysis is haulted until init_completed is set to true in
+ * which case pushing and popping to the analysis_list can occure
+ */
 bool init_completed = false;
 
-// The list of analysis threads
+/*
+ * A list of pthreads that are performing analysis
+ */
 pthread_t* threads;
 
 #define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)         \
@@ -60,7 +85,7 @@ pthread_t* threads;
     }                                                            \
   } while (0);
 
-/**
+/*
  * Performs simple candle stick analysis on the chart
  * because this only requires the most recent candle
  * we only need to perform analysis on the last candle.
@@ -98,6 +123,7 @@ enum ANALYSIS_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   return ANALYSIS_NO_ERROR;
 }
 
+// Set to 1 if the threads need to be joined
 int ANALYSIS_INTERRUPED = 0;
 
 void* analysis_thread_func(void* index) {
@@ -138,6 +164,7 @@ void* analysis_thread_func(void* index) {
     chart_invalidate_trends(cht);
     find_horizontal_line(cht, end_candle);
     find_trend_line(cht, end_candle);
+
     // release the analysis struct lock
     chart_analysis_unlock(cht);
     free(inf);
