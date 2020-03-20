@@ -7,15 +7,16 @@
  * The RISKI error codes
  */
 enum RISKI_ERROR_CODE {
-  NO_ERROR = 0,
-  NULL_PTR = 1,
-  MALLOC_ERROR = 2
+  RISKI_ERROR_CODE_NONE = 0,
+  RISKI_ERROR_CODE_NULL_PTR = 1,
+  RISKI_ERROR_CODE_MALLOC_ERROR = 2,
+  RISKI_ERROR_CODE_JSON_CREATION = 3
 };
 
 
 /*
  * The RISKI error texts
  */
-extern const char* RISKI_ERROR_TEXT[3];
+extern const char* RISKI_ERROR_TEXT[4];
 
 #endif
