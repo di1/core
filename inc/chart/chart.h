@@ -1,6 +1,7 @@
 #ifndef CHART_
 #define CHART_
 
+// public enumations for analysis results
 #include <analysis/enumations.h>
 
 // if guard circular dependency
@@ -16,16 +17,6 @@
 #include <tracer.h>
 
 /*
- * Enumeration of error codes
- */
-enum CHART_ERROR_CODE {
-  CHART_NO_ERROR = 0,
-  CHART_INVALID_PTR = 1,
-  CHART_MALLOC_ERROR = 2,
-  CHART_CANDLE_INDEX_INVALID = 3
-};
-
-/*
  * Private chart struct
  */
 struct chart;
@@ -37,17 +28,17 @@ struct chart;
  * units as the chart_new interval.
  * @param {char*} name A name for the chart to be identifyed as.
  * @param {struct chart**} cht A pointer to the resulting struct pointer
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_new(uint64_t interval, char* name,
+enum RISKI_ERROR_CODE chart_new(uint64_t interval, char* name,
                                 struct chart** cht);
 
 /*
  * Frees a given chart. And sets *cht to NULL on success
  * @param {struct chart**} cht A pointer to an allocated chart.
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_free(struct chart** cht);
+enum RISKI_ERROR_CODE chart_free(struct chart** cht);
 
 /*
  * Updates the chart given the chart, price, and timestamp
@@ -56,57 +47,57 @@ enum CHART_ERROR_CODE chart_free(struct chart** cht);
  * @param {int64_t} price The new price
  * @param {uint64_t} ts The time this price happened, must be in the same
  * time format used in chart_new interval variable.
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_update(struct chart* cht, int64_t price,
+enum RISKI_ERROR_CODE chart_update(struct chart* cht, int64_t price,
                                    uint64_t ts);
 
 /*
  * Sets *name to the name of the chart
  * @param {struct chart*} cht A chart
  * @param {char**} A pointer to where to store the resulting name
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_get_name(struct chart* cht, char** name);
+enum RISKI_ERROR_CODE chart_get_name(struct chart* cht, char** name);
 
 /*
  * Converts the chart to a json object and sets *json to the json string
  * @param {struct chart*} cht A chart
  * @param {char**} json A place to set the json string ptr
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_json(struct chart* cht, char** json);
+enum RISKI_ERROR_CODE chart_json(struct chart* cht, char** json);
 
 /*
  * Gets the latest candle update as a json
  * @param {struct chart* cht} A chart
  * @param {char**} json A place to set the json string ptr
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_latest_candle(struct chart* cht, char** json);
+enum RISKI_ERROR_CODE chart_latest_candle(struct chart* cht, char** json);
 
 /*
  * Aquires the analysis lock mutex, (blocking)
  * @param {struct chart*} A chart
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_analysis_lock(struct chart* cht);
+enum RISKI_ERROR_CODE chart_analysis_lock(struct chart* cht);
 
 /*
  * Releases the analysis lock, (blocking)
  * @param {struct chart*} cht A chart
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_analysis_unlock(struct chart* cht);
+enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart* cht);
 
 /*
  * Sets a candle tag with a single candle pattern
  * @param {struct chart*} cht A chart
  * @param {size_t} index The index of the candle to flag
  * @param {enum SINGLE_CANDLE_PATTERNS} identifier The flag to assign
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_put_single_candle_pattern(
+enum RISKI_ERROR_CODE chart_put_single_candle_pattern(
     struct chart* cht, size_t index, enum SINGLE_CANDLE_PATTERNS identifier);
 
 /*
@@ -116,9 +107,9 @@ enum CHART_ERROR_CODE chart_put_single_candle_pattern(
  * @param {size_t} start The start index
  * @param {size_t} end The end index
  * @param {enum DIRECTION} The direction of the line
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_put_horizontal_line_pattern(
+enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
     struct chart* cht, size_t start, size_t end, enum DIRECTION direction);
 
 /*
@@ -127,17 +118,17 @@ enum CHART_ERROR_CODE chart_put_horizontal_line_pattern(
  * lines are marked as invalid and will not be considered when joining trend
  * lines together.
  * @param {struct chart*} cht A chart
- * @param {enum CHART_ERROR_CODE} The status
+ * @param {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_invalidate_trends(struct chart* cht);
+enum RISKI_ERROR_CODE chart_invalidate_trends(struct chart* cht);
 
 /*
  * Sets *json to a json representing the analysis of the chart.
  * @param {struct chart*} cht A chart
  * @param {char**} json A place to store the json result pointer
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_analysis_json(struct chart* cht, char** json);
+enum RISKI_ERROR_CODE chart_analysis_json(struct chart* cht, char** json);
 
 /*
  * Returns a candle, this will only return finalized candles. And will cause
@@ -145,9 +136,9 @@ enum CHART_ERROR_CODE chart_analysis_json(struct chart* cht, char** json);
  * @param {struct chart*} cht A chart
  * @param {size_t} index The candle index to obtain
  * @param {struct candle**} cnd A place to store the candle pointer
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
+enum RISKI_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
                                        struct candle** cnd);
 
 /*
@@ -157,9 +148,9 @@ enum CHART_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
  * @param {size_t} end The end of the trend line (should be greater than start)
  * @param {enum DIRECTION} direction Weather or not this is a suport or
  * resistance line
- * @return {enum CHART_ERROR_CODE} The status
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum CHART_ERROR_CODE chart_put_sloped_line_pattern(struct chart* cht,
+enum RISKI_ERROR_CODE chart_put_sloped_line_pattern(struct chart* cht,
                                                     size_t start, size_t end,
                                                     enum DIRECTION direction);
 
