@@ -1,6 +1,10 @@
 #ifndef ANALYSIS_
 #define ANALYSIS_
 
+// riski error codes to enable stack tracing
+#include <error_codes.h>
+
+// used for candle interface
 #include <chart/candle.h>
 
 // if guard circular dependency
