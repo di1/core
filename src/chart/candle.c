@@ -1,30 +1,32 @@
 #include <chart/candle.h>
 
+#include "error_codes.h"
+
+/*
+ * Represents a candle
+ * @param {int64_t} open The open price
+ * @param {int64_t} high The high price
+ * @param {int64_t} low The low price
+ * @param {int64_t} close The close price
+ * @param {uint64_t} start_time The start_time price
+ * @param {uint64_t} end_time The end_time price
+ * @param {uint64_t} volume The volume of the candle
+ */
 struct candle {
-  // the open price
   int64_t open;
-
-  // the high price
   int64_t high;
-
-  // the low price
   int64_t low;
-
-  // the close price
   int64_t close;
-
-  // the start time
   uint64_t start_time;
-
-  // the end time
   uint64_t end_time;
-
-  // the volume (number of trades that happened in this candle
   uint64_t volume;
 };
 
-struct candle* candle_new(int64_t price, uint64_t time) {
+enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
+                                 struct candle** cnd) {
   struct candle* c = (struct candle*)malloc(1 * sizeof(struct candle));
+  PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
+
   c->open = price;
   c->high = price;
   c->low = price;
@@ -32,24 +34,30 @@ struct candle* candle_new(int64_t price, uint64_t time) {
   c->start_time = time;
   c->end_time = time;
   c->volume = 0;
-  return c;
+
+  *cnd = c;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-uint64_t candle_volume(struct candle* c) { return c->volume; }
+#define CREATE_CANDLE_GET_FUNCTION(NAME, TYPE, ELEMENT)            \
+  enum RISKI_ERROR_CODE NAME(struct candle* c, TYPE* t) {          \
+    PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT); \
+    *t = c->ELEMENT;                                               \
+    return RISKI_ERROR_CODE_NONE;                                  \
+  }
+CREATE_CANDLE_GET_FUNCTION(candle_volume, uint64_t, volume)
+CREATE_CANDLE_GET_FUNCTION(candle_open, int64_t, open)
+CREATE_CANDLE_GET_FUNCTION(candle_high, int64_t, high)
+CREATE_CANDLE_GET_FUNCTION(candle_low, int64_t, low)
+CREATE_CANDLE_GET_FUNCTION(candle_close, int64_t, close)
+CREATE_CANDLE_GET_FUNCTION(candle_start, uint64_t, start_time)
+CREATE_CANDLE_GET_FUNCTION(candle_end, uint64_t, end_time)
+#undef CREATE_CANDLE_GET_FUNCTION
 
-int64_t candle_open(struct candle* c) { return c->open; }
+enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price,
+                                    uint64_t time) {
+  PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-int64_t candle_high(struct candle* c) { return c->high; }
-
-int64_t candle_low(struct candle* c) { return c->low; }
-
-int64_t candle_close(struct candle* c) { return c->close; }
-
-uint64_t candle_start(struct candle* c) { return c->start_time; }
-
-uint64_t candle_end(struct candle* c) { return c->end_time; }
-
-void candle_update(struct candle* c, int64_t price, uint64_t time) {
   c->volume += 1;
   // set the close time only if the last price time
   // is greater than the most recent price
@@ -62,17 +70,20 @@ void candle_update(struct candle* c, int64_t price, uint64_t time) {
   // the time doesn't matter in this case
   if (price > c->high) c->high = price;
   if (price < c->low) c->low = price;
+
+  return RISKI_ERROR_CODE_NONE;
 }
 
-void candle_free(struct candle** c) {
-  if (*c == NULL) return;
-
+enum RISKI_ERROR_CODE candle_free(struct candle** c) {
+  PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(*c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   free(*c);
   *c = NULL;
+  return RISKI_ERROR_CODE_NONE;
 }
 
 // convert a candle struct to json
-char* candle_json(struct candle* c) {
+enum RISKI_ERROR_CODE candle_json(struct candle* c, char** json) {
   /**
    * {
    *  "candle" : {
@@ -89,6 +100,8 @@ char* candle_json(struct candle* c) {
 
   // max 170 characters (no whitespace or new lines
   char* buf = (char*)malloc(JSON_CANDLE_MAX_LEN * sizeof(char));
+  PTR_CHECK(buf, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
+
   int ret = sprintf(buf,
                     "{\"candle\":{"
                     "\"o\":%lld,\"h\":%lld,\"l\":%lld,\"c\":%lld,\"s\":%llu,"
@@ -98,77 +111,9 @@ char* candle_json(struct candle* c) {
                     (unsigned long long)c->end_time, (long long)c->volume);
 
   if (ret == -1) {
-    log_error(
-        "sprintf on candle ran out of space in buf of 170 allocated"
-        " characters");
+    return RISKI_ERROR_CODE_JSON_CREATION;
   }
 
-  return buf;
-}
-
-void test_candle() {
-  // make sure candle creation is good
-  struct candle* c = candle_new(0, 0);
-  ASSERT_TEST(c != NULL);
-  ASSERT_TEST(c->start_time == 0);
-  ASSERT_TEST(c->end_time == 0);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 0);
-  ASSERT_TEST(c->low == 0);
-  ASSERT_TEST(c->close == 0);
-
-  // new high
-  candle_update(c, 1, 1);
-  ASSERT_TEST(c->end_time == 1);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 1);
-  ASSERT_TEST(c->low == 0);
-  ASSERT_TEST(c->close == 1);
-
-  // new low
-  candle_update(c, -1, 2);
-  ASSERT_TEST(c->end_time == 2);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 1);
-  ASSERT_TEST(c->low == -1);
-  ASSERT_TEST(c->close == -1);
-
-  // test high that happend before
-  candle_update(c, 5, 1);
-  ASSERT_TEST(c->end_time == 2);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 5);
-  ASSERT_TEST(c->low == -1);
-  ASSERT_TEST(c->close == -1);
-
-  // test low that happened before
-  candle_update(c, -5, 1);
-  ASSERT_TEST(c->end_time == 2);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 5);
-  ASSERT_TEST(c->low == -5);
-  ASSERT_TEST(c->close == -1);
-
-  // test price update that doesn't update high or low
-  candle_update(c, 3, 6);
-  ASSERT_TEST(c->end_time == 6);
-  ASSERT_TEST(c->open == 0);
-  ASSERT_TEST(c->high == 5);
-  ASSERT_TEST(c->low == -5);
-  ASSERT_TEST(c->close == 3);
-
-  // make sure the json is correct
-  char* json = candle_json(c);
-  ASSERT_TEST(
-      strcmp(
-          json,
-          "{\"candle\":{\"o\":0,\"h\":5,\"l\":-5,\"c\":3,\"s\":0,\"e\":6}}") ==
-      0);
-
-  // make sure freeing works
-  candle_free(&c);
-  ASSERT_TEST(c == NULL);
-
-  // free the candle json
-  free(json);
+  *json = buf;
+  return RISKI_ERROR_CODE_NONE;
 }

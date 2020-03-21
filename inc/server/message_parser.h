@@ -9,7 +9,11 @@
 
 /**
  * Takes in a message
+ * @param {char*} msg The message to parse
+ * @param {int} len The length of the message
+ * @param {char**} resp Will set *resp to the message to send back
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-char* parse_message(char* msg, int len);
+enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp);
 
 #endif
