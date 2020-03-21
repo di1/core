@@ -50,7 +50,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
 
     this.symbol = symbol;
-    this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
+    this.conn = new WebSocket('ws://riski.local:7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);

@@ -156,7 +156,7 @@ void *server_start(void *s) {
   info.port = 7681;
   info.mounts = &mount;
   info.protocols = protocols;
-  info.vhost_name = "localhost";
+  info.vhost_name = "0.0.0.0";
   info.ws_ping_pong_interval = 20;
   //info.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
   context = lws_create_context(&info);

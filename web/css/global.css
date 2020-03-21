@@ -39,9 +39,72 @@ body, html {
 }
 
 .bar {
+  padding-top: 10px;
   padding-left: calc(50% - 800px);
   padding-right: calc(50% - 800px);
   height: 2em;
+  display: flex;
+  align-items: center;
+}
+
+.bar-content {
+  padding-left: 20px;
+}
+
+input {
+  text-transform: uppercase;
+}
+
+#analysis-list {
+  width: 20%;
+  height: 75vh;
+}
+
+.expand-analysis {
+  display: inline;
+  width: 1em;
+  text-align: center;
+}
+
+.analysis-type {
+  display: inline-block;
+  text-align: center;
+}
+
+.time-ts {
+  display: inline-block;
+  text-align: center;
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 0.5em solid transparent;
+  border-right: 0.5em solid transparent;
+  border-top: 0.5em solid black;
+}
+
+.arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 0.5em solid transparent;
+  border-bottom: 0.5em solid transparent;
+  border-left: 0.5em solid black;
+}
+
+.analysis-group {
+  display: flex;
+  align-items: center;
+}
+
+#chart {
+  display: flex;
+  flex-grow: 1;
+}
+
+#dash-group {
+  padding-left: calc(50% - 800px);
+  padding-right: calc(50% - 800px);
   display: flex;
   align-items: center;
 }

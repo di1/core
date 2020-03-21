@@ -13,7 +13,35 @@
 
   <body>
     <div class="bar">
-      <img src="/img/riski_logo.svg" height="25em"/>
+      <img src="/img/riski_logo.svg" height="75%"/>
+      <span class="bar-content">
+        <input id="stock-search-input"></input>
+      </span>
+    </div>
+
+    <div class="bar">
+      <span>IEX&nbsp;</span>
+      /
+      <span>&nbsp;%SECURITY%</span>
+    </div>
+    <br/>
+    <div id="dash-group">
+      <div id="analysis-list">
+        <span class="analysis-group">
+          <span class="expand-analysis">
+            <div class="arrow-right">
+            </div>
+          </span>
+          &nbsp;
+          <span class="analysis-type">
+            %TYPE%&nbsp;
+          </span>
+          <span class="time-ts">
+            %TIME%
+          </span>
+        </span>
+      </div>
+      <canvas id="chart"></canvas>
     </div>
   </body>
 </html>

@@ -16,7 +16,7 @@
    version="1.1"
    id="SVGRoot"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
-   sodipodi:docname="drawing.svg">
+   sodipodi:docname="riski_logo.svg">
   <defs
      id="defs10">
     <linearGradient
@@ -47,14 +47,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.6296602"
-     inkscape:cx="6.561034"
+     inkscape:cx="117.74362"
      inkscape:cy="-86.115258"
      inkscape:document-units="px"
      inkscape:current-layer="layer4"
      showgrid="false"
-     inkscape:window-width="1676"
+     inkscape:window-width="836"
      inkscape:window-height="1007"
-     inkscape:window-x="0"
+     inkscape:window-x="840"
      inkscape:window-y="20"
      inkscape:window-maximized="0"
      inkscape:grid-bbox="true"
@@ -80,7 +80,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -96,104 +96,84 @@
      inkscape:label="Layer 2"
      transform="translate(156.96518,15.899166)">
     <g
-       id="g7026"
-       transform="matrix(8.0933262,0,0,8.0933262,-159.95162,-15.899162)">
+       style="display:inline"
+       id="g6963"
+       transform="matrix(8.8626972,0,0,8.5367328,-183.55648,-110.62928)">
       <g
-         transform="matrix(1.0950624,0,0,1.0547867,-2.9165837,-11.70472)"
-         id="g6963"
-         style="display:inline">
-        <text
-           xml:space="preserve"
-           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;line-height:1.25;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.27218297"
-           x="12.622187"
-           y="19.598736"
-           id="text59"
-           transform="matrix(1.0054051,2.5463923e-4,-5.1452598e-4,0.99462383,0,0)"><tspan
-             sodipodi:role="line"
-             x="12.622187"
-             y="19.598736"
-             id="tspan61"
-             style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297">riski</tspan><tspan
-             sodipodi:role="line"
-             x="12.622187"
-             y="33.207561"
-             style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
-             id="tspan126" /></text>
+         aria-label="riski
+"
+         transform="matrix(1.0054051,2.5463923e-4,-5.1452598e-4,0.99462383,0,0)"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;line-height:1.25;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.27218297"
+         id="text59">
         <path
-           sodipodi:type="star"
-           style="fill:#d35f5f"
-           id="path63"
-           sodipodi:sides="5"
-           sodipodi:cx="18.029316"
-           sodipodi:cy="12.204151"
-           sodipodi:r1="1.1899645"
-           sodipodi:r2="0.59498227"
-           sodipodi:arg1="0.26299473"
-           sodipodi:arg2="0.89131326"
-           inkscape:flatsided="false"
-           inkscape:rounded="0"
-           inkscape:randomized="0"
-           d="m 19.178364,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536913,-0.579796 -0.173239,-0.770991 0.717334,0.331466 0.679723,-0.403009 -0.09358,0.784655 z"
-           inkscape:transform-center-x="-0.018805977"
-           inkscape:transform-center-y="0.095597255" />
+           d="m 15.474596,13.861256 q 0.348386,0 0.653224,0.05444 0.315724,0.05443 0.435482,0.10887 l -0.141532,0.609676 q -0.0871,-0.04355 -0.359273,-0.0871 -0.261289,-0.05443 -0.696771,-0.05443 -0.457257,0 -0.74032,0.06532 -0.272177,0.06532 -0.359273,0.108871 v 4.931838 h -0.707659 v -5.36732 q 0.272176,-0.119758 0.751207,-0.239516 0.47903,-0.130644 1.164915,-0.130644 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+           id="path842" />
         <path
-           sodipodi:type="star"
-           style="fill:#d35f5f"
-           id="path63-0"
-           sodipodi:sides="5"
-           sodipodi:cx="30.736425"
-           sodipodi:cy="12.204151"
-           sodipodi:r1="1.1899645"
-           sodipodi:r2="0.59498227"
-           sodipodi:arg1="0.26299473"
-           sodipodi:arg2="0.89131326"
-           inkscape:flatsided="false"
-           inkscape:rounded="0"
-           inkscape:randomized="0"
-           d="m 31.885474,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536912,-0.579796 -0.173239,-0.770991 0.717335,0.331466 0.679722,-0.403009 -0.09358,0.784655 z"
-           inkscape:transform-center-x="-0.018805977"
-           inkscape:transform-center-y="0.095597255" />
+           d="m 18.337878,19.598736 h -0.707659 v -5.62861 h 0.707659 z m 0.163306,-7.326991 q 0,0.250402 -0.152419,0.402821 -0.152419,0.141532 -0.37016,0.141532 -0.217741,0 -0.37016,-0.141532 -0.152419,-0.152419 -0.152419,-0.402821 0,-0.250402 0.152419,-0.391934 0.152419,-0.152419 0.37016,-0.152419 0.217741,0 0.37016,0.152419 0.152419,0.141532 0.152419,0.391934 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+           id="path844" />
+        <path
+           d="m 21.364475,19.097931 q 0.609675,0 1.001609,-0.195967 0.402821,-0.206854 0.402821,-0.685885 0,-0.228628 -0.07621,-0.391934 -0.06532,-0.163306 -0.228628,-0.29395 -0.163306,-0.130645 -0.435483,-0.250403 -0.261289,-0.119757 -0.653223,-0.283063 -0.315725,-0.130645 -0.598788,-0.26129 -0.283064,-0.141532 -0.500805,-0.315724 -0.217741,-0.18508 -0.348386,-0.435483 -0.130645,-0.250402 -0.130645,-0.609675 0,-0.685885 0.511692,-1.11048 0.522579,-0.424596 1.426205,-0.424596 0.577014,0 0.947174,0.09798 0.381047,0.09798 0.533466,0.174193 l -0.163306,0.631449 q -0.130645,-0.06532 -0.446369,-0.174193 -0.304838,-0.10887 -0.903626,-0.10887 -0.239516,0 -0.457257,0.05443 -0.206854,0.04355 -0.37016,0.152419 -0.163306,0.09798 -0.261289,0.261289 -0.09798,0.152419 -0.09798,0.381047 0,0.228629 0.0871,0.391935 0.0871,0.163305 0.250402,0.29395 0.174193,0.119758 0.413708,0.228628 0.250403,0.108871 0.566127,0.239516 0.326612,0.130644 0.620563,0.272176 0.304837,0.130645 0.533466,0.326612 0.228628,0.18508 0.37016,0.457256 0.141531,0.26129 0.141531,0.664111 0,0.762094 -0.577014,1.154028 -0.566127,0.391935 -1.556849,0.391935 -0.74032,0 -1.132254,-0.130645 -0.391934,-0.119758 -0.522579,-0.18508 l 0.18508,-0.642337 q 0.03266,0.02177 0.141532,0.07621 0.10887,0.04355 0.29395,0.10887 0.18508,0.05444 0.435483,0.09798 0.261289,0.04355 0.598788,0.04355 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+           id="path846" />
+        <path
+           d="m 26.372517,16.539472 q 0.337499,0.228628 0.718546,0.587901 0.391934,0.359273 0.762094,0.783869 0.381047,0.413708 0.707659,0.860077 0.337499,0.435483 0.566127,0.827417 H 28.28864 Q 28.02735,19.163253 27.689851,18.749545 27.36324,18.32495 26.99308,17.95479 26.633807,17.58463 26.263647,17.279792 25.904374,16.974955 25.577762,16.7681 v 2.830636 h -0.707659 v -8.317713 l 0.707659,-0.130645 v 5.356433 q 0.272176,-0.261289 0.609675,-0.598788 0.337499,-0.337499 0.674998,-0.685885 0.348386,-0.348386 0.653223,-0.674998 0.304838,-0.326611 0.522579,-0.577014 h 0.849191 q -0.250402,0.26129 -0.566127,0.587901 -0.315725,0.326612 -0.664111,0.685885 -0.337499,0.348386 -0.674997,0.685885 -0.337499,0.337499 -0.609676,0.609675 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+           id="path848" />
+        <path
+           d="m 30.966845,19.598736 h -0.707659 v -5.62861 h 0.707659 z m 0.163306,-7.326991 q 0,0.250402 -0.152419,0.402821 -0.152419,0.141532 -0.37016,0.141532 -0.217741,0 -0.37016,-0.141532 -0.152419,-0.152419 -0.152419,-0.402821 0,-0.250402 0.152419,-0.391934 0.152419,-0.152419 0.37016,-0.152419 0.217741,0 0.37016,0.152419 0.152419,0.141532 0.152419,0.391934 z"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+           id="path850" />
       </g>
-      <g
-         transform="matrix(0.96246125,0,0,0.99999999,-0.83532322,-10.824066)"
-         id="g7009">
-        <path
-           sodipodi:type="star"
-           style="opacity:1;fill:#00a21d;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           id="path6984"
-           sodipodi:sides="3"
-           sodipodi:cx="6.2260895"
-           sodipodi:cy="15.995948"
-           sodipodi:r1="7.4336748"
-           sodipodi:r2="3.7168374"
-           sodipodi:arg1="0.51914611"
-           sodipodi:arg2="1.5663437"
-           inkscape:flatsided="true"
-           inkscape:rounded="0"
-           inkscape:randomized="0"
-           d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
-           inkscape:transform-center-x="-0.0080699531"
-           inkscape:transform-center-y="-0.99435556"
-           transform="matrix(0.48761829,0,0,0.5392183,6.4971676,9.0700658)" />
-        <path
-           sodipodi:type="star"
-           style="opacity:1;fill:#ff0000;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           id="path6984-4"
-           sodipodi:sides="3"
-           sodipodi:cx="6.2260895"
-           sodipodi:cy="15.995948"
-           sodipodi:r1="7.4336748"
-           sodipodi:r2="3.7168374"
-           sodipodi:arg1="0.51914611"
-           sodipodi:arg2="1.5663437"
-           inkscape:flatsided="true"
-           inkscape:rounded="0"
-           inkscape:randomized="0"
-           d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
-           inkscape:transform-center-x="0.0059730688"
-           inkscape:transform-center-y="0.99717689"
-           transform="matrix(-0.48663871,-6.5901201e-4,5.5976668e-4,-0.53959487,7.4110146,24.339277)" />
-      </g>
+      <path
+         style="fill:#d35f5f"
+         inkscape:transform-center-x="-0.018805977"
+         inkscape:transform-center-y="0.095597255"
+         d="m 19.178364,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536913,-0.579796 -0.173239,-0.770991 0.717334,0.331466 0.679723,-0.403009 -0.09358,0.784655 z"
+         id="path63" />
+      <path
+         style="fill:#d35f5f"
+         inkscape:transform-center-x="-0.018805977"
+         inkscape:transform-center-y="0.095597255"
+         d="m 31.885474,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536912,-0.579796 -0.173239,-0.770991 0.717335,0.331466 0.679722,-0.403009 -0.09358,0.784655 z"
+         id="path63-0" />
     </g>
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:#00a21d;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path6984"
+       sodipodi:sides="3"
+       sodipodi:cx="6.2260895"
+       sodipodi:cy="15.995948"
+       sodipodi:r1="7.4336748"
+       sodipodi:r2="3.7168374"
+       sodipodi:arg1="0.51914611"
+       sodipodi:arg2="1.5663437"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
+       inkscape:transform-center-x="-0.0080699531"
+       inkscape:transform-center-y="-0.99435556"
+       transform="matrix(3.798309,0,0,4.3640695,-116.10239,-30.09486)" />
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:#ff0000;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path6984-4"
+       sodipodi:sides="3"
+       sodipodi:cx="6.2260895"
+       sodipodi:cy="15.995948"
+       sodipodi:r1="7.4336748"
+       sodipodi:r2="3.7168374"
+       sodipodi:arg1="0.51914611"
+       sodipodi:arg2="1.5663437"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
+       inkscape:transform-center-x="0.0059730688"
+       inkscape:transform-center-y="0.99717689"
+       transform="matrix(-3.7906785,-0.0053336,0.00436031,-4.3671172,-108.98397,93.483846)" />
   </g>
 </svg>
