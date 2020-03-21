@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="256"
+   height="72.839935"
+   viewBox="0 0 256 72.839935"
+   version="1.1"
+   id="SVGRoot"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   sodipodi:docname="drawing.svg">
+  <defs
+     id="defs10">
+    <linearGradient
+       id="linearGradient5484"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#999999;stop-opacity:1;"
+         offset="0"
+         id="stop5480" />
+      <stop
+         style="stop-color:#999999;stop-opacity:0;"
+         offset="1"
+         id="stop5482" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="7.6455921 : 1.5485051 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="32 : 16 : 1"
+       inkscape:persp3d-origin="16 : 10.666667 : 1"
+       id="perspective27" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.6296602"
+     inkscape:cx="6.561034"
+     inkscape:cy="-86.115258"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer4"
+     showgrid="false"
+     inkscape:window-width="1676"
+     inkscape:window-height="1007"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
+     inkscape:window-maximized="0"
+     inkscape:grid-bbox="true"
+     inkscape:snap-text-baseline="true"
+     inkscape:snap-others="true"
+     showborder="true"
+     inkscape:pagecheckerboard="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid835"
+       originx="156.96518"
+       originy="24.940774" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata13">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"
+     transform="translate(156.96518,15.899166)" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Layer 2"
+     transform="translate(156.96518,15.899166)">
+    <g
+       id="g7026"
+       transform="matrix(8.0933262,0,0,8.0933262,-159.95162,-15.899162)">
+      <g
+         transform="matrix(1.0950624,0,0,1.0547867,-2.9165837,-11.70472)"
+         id="g6963"
+         style="display:inline">
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;line-height:1.25;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.27218297"
+           x="12.622187"
+           y="19.598736"
+           id="text59"
+           transform="matrix(1.0054051,2.5463923e-4,-5.1452598e-4,0.99462383,0,0)"><tspan
+             sodipodi:role="line"
+             x="12.622187"
+             y="19.598736"
+             id="tspan61"
+             style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297">riski</tspan><tspan
+             sodipodi:role="line"
+             x="12.622187"
+             y="33.207561"
+             style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:10.88705921px;font-family:'Ubuntu Nerd Font';-inkscape-font-specification:'Ubuntu Nerd Font, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;stroke-width:0.27218297"
+             id="tspan126" /></text>
+        <path
+           sodipodi:type="star"
+           style="fill:#d35f5f"
+           id="path63"
+           sodipodi:sides="5"
+           sodipodi:cx="18.029316"
+           sodipodi:cy="12.204151"
+           sodipodi:r1="1.1899645"
+           sodipodi:r2="0.59498227"
+           sodipodi:arg1="0.26299473"
+           sodipodi:arg2="0.89131326"
+           inkscape:flatsided="false"
+           inkscape:rounded="0"
+           inkscape:randomized="0"
+           d="m 19.178364,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536913,-0.579796 -0.173239,-0.770991 0.717334,0.331466 0.679723,-0.403009 -0.09358,0.784655 z"
+           inkscape:transform-center-x="-0.018805977"
+           inkscape:transform-center-y="0.095597255" />
+        <path
+           sodipodi:type="star"
+           style="fill:#d35f5f"
+           id="path63-0"
+           sodipodi:sides="5"
+           sodipodi:cx="30.736425"
+           sodipodi:cy="12.204151"
+           sodipodi:r1="1.1899645"
+           sodipodi:r2="0.59498227"
+           sodipodi:arg1="0.26299473"
+           sodipodi:arg2="0.89131326"
+           inkscape:flatsided="false"
+           inkscape:rounded="0"
+           inkscape:randomized="0"
+           d="m 31.885474,12.51351 -0.775167,0.153476 -0.313024,0.725572 -0.385504,-0.6898 -0.78679,-0.07349 0.536912,-0.579796 -0.173239,-0.770991 0.717335,0.331466 0.679722,-0.403009 -0.09358,0.784655 z"
+           inkscape:transform-center-x="-0.018805977"
+           inkscape:transform-center-y="0.095597255" />
+      </g>
+      <g
+         transform="matrix(0.96246125,0,0,0.99999999,-0.83532322,-10.824066)"
+         id="g7009">
+        <path
+           sodipodi:type="star"
+           style="opacity:1;fill:#00a21d;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path6984"
+           sodipodi:sides="3"
+           sodipodi:cx="6.2260895"
+           sodipodi:cy="15.995948"
+           sodipodi:r1="7.4336748"
+           sodipodi:r2="3.7168374"
+           sodipodi:arg1="0.51914611"
+           sodipodi:arg2="1.5663437"
+           inkscape:flatsided="true"
+           inkscape:rounded="0"
+           inkscape:randomized="0"
+           d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
+           inkscape:transform-center-x="-0.0080699531"
+           inkscape:transform-center-y="-0.99435556"
+           transform="matrix(0.48761829,0,0,0.5392183,6.4971676,9.0700658)" />
+        <path
+           sodipodi:type="star"
+           style="opacity:1;fill:#ff0000;fill-opacity:0.52586209;fill-rule:nonzero;stroke:none;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path6984-4"
+           sodipodi:sides="3"
+           sodipodi:cx="6.2260895"
+           sodipodi:cy="15.995948"
+           sodipodi:r1="7.4336748"
+           sodipodi:r2="3.7168374"
+           sodipodi:arg1="0.51914611"
+           sodipodi:arg2="1.5663437"
+           inkscape:flatsided="true"
+           inkscape:rounded="0"
+           inkscape:randomized="0"
+           d="M 12.680327,19.684083 -0.19504816,19.741413 6.1929899,8.5623467 Z"
+           inkscape:transform-center-x="0.0059730688"
+           inkscape:transform-center-y="0.99717689"
+           transform="matrix(-0.48663871,-6.5901201e-4,5.5976668e-4,-0.53959487,7.4110146,24.339277)" />
+      </g>
+    </g>
+  </g>
+</svg>
