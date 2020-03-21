@@ -16,34 +16,32 @@ struct candle;
 struct chart;
 #endif
 
+#include <error_codes.h>
 #include <tracer.h>
-
-enum DOJI_ERROR_CODE { DOJI_NO_ERROR = 0 };
 
 /*
  * Attempts to find a dragonfly doji pattern on the last confirmed candle.
- * @param {struct candle*} cnd The candle to check
- * @param {struct chart*} cht The chart this candle belongs to
- * @param {size_t} end_candle The last candle
- * @return {enum DOJI_ERROR_CODE} The status
+ * @param {struct candle*} cnd The candle to analyize
+ * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum DOJI_ERROR_CODE perform_doji_dragonfly(struct chart* cht,
-                                            size_t end_candle);
+enum RISKI_ERROR_CODE perform_doji_dragonfly(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Attempts to find a gravestone doji pattern on the last confirmed candle.
- * @param {struct candle*} cnd The candle to check
- * @param {struct chart*} cht The chart this candle belongs to
- * @return {enum DOJI_ERROR_CODE} The status
+ * @param {struct candle*} cht The candle to analyzie
+ * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum DOJI_ERROR_CODE perform_doji_gravestone(struct chart* cht);
+enum RISKI_ERROR_CODE perform_doji_gravestone(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Attempts to find a gravestone doji pattern on the last confirmed candle.
- * @param {struct candle*} cnd The candle to check
- * @param {struct chart*} cht The chart this candle belongs to
- * @return {enum DOJI_ERROR_CODE} The status
+ * @param {struct chart*} cht The candle to analyzie
+ * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
+ * @return {enum RISKI_ERROR_CODE} The status
  */
-enum DOJI_ERROR_CODE perform_doji_generic(struct chart* cht);
+enum RISKI_ERROR_CODE perform_doji_generic(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
 
 #endif

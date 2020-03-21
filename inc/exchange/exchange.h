@@ -22,7 +22,8 @@ enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange);
  * Name and interval definitions are equivelent to security_new
  * and can be found in security.h
  */
-enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name, uint64_t interval);
+enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
+                                   uint64_t interval);
 
 /*
  * Gets a security given its name
@@ -32,7 +33,8 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name, uint64_t inte
  * @param {struct security**} sec Will set *sec to the security
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name, struct security** sec);
+enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name,
+                                   struct security** sec);
 
 /*
  * Frees the exchange and all the securities that were added to it

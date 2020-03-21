@@ -1,47 +1,58 @@
 #include <analysis/doji.h>
 
-/*
- * String representation of the error codes
- */
-const char* DOJI_ERROR_CODE_STR[1] = {"DOJI_NO_ERROR"};
+enum RISKI_ERROR_CODE perform_doji_dragonfly(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res) {
+  int64_t o = 0;
+  TRACE(candle_open(cnd, &o));
+  int64_t h = 0;
+  TRACE(candle_high(cnd, &h));
+  int64_t l = 0;
+  TRACE(candle_low(cnd, &l));
+  int64_t c = 0;
+  TRACE(candle_close(cnd, &c));
 
-enum DOJI_ERROR_CODE perform_doji_dragonfly(struct chart* cht,
-                                            size_t end_candle) {
-  struct candle* last_candle = NULL;
-  TRACE(chart_get_candle(cht, end_candle - 1, &last_candle));
-
-  int64_t o = candle_open(cnd);
-  int64_t h = candle_high(cnd);
-  int64_t l = candle_low(cnd);
-  int64_t c = candle_close(cnd);
-
+  *res = SINGLE_CANDLE_PATTERN_NONE;
   if (o == c && o == h && l < o) {
-    return SINGLE_CANDLE_PATTERN_DOJI_DRAGONFLY;
+    *res = SINGLE_CANDLE_PATTERN_DOJI_DRAGONFLY;
   }
-  return SINGLE_CANDLE_PATTERN_NONE;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum DOJI_ERROR_CODE perform_doji_gravestone(struct chart* cht,
-                                             size_t end_candle) {
-  int64_t o = candle_open(cnd);
-  int64_t h = candle_high(cnd);
-  int64_t l = candle_low(cnd);
-  int64_t c = candle_close(cnd);
+enum RISKI_ERROR_CODE perform_doji_gravestone(struct candle* cnd,
+                                             enum SINGLE_CANDLE_PATTERNS* res) {
+  int64_t o = 0;
+  TRACE(candle_open(cnd, &o));
+  int64_t h = 0;
+  TRACE(candle_high(cnd, &h));
+  int64_t l = 0;
+  TRACE(candle_low(cnd, &l));
+  int64_t c = 0;
+  TRACE(candle_close(cnd, &c));
+
+  *res = SINGLE_CANDLE_PATTERN_NONE;
 
   if (o == c && o == l && h > o) {
-    return SINGLE_CANDLE_PATTERN_DOJI_GRAVESTONE;
+    *res = SINGLE_CANDLE_PATTERN_DOJI_GRAVESTONE;
   }
-  return SINGLE_CANDLE_PATTERN_NONE;
+
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum DOJI_ERROR_CODE is_doji_generic(struct chart* cht, size_t end_candle) {
-  int64_t o = candle_open(cnd);
-  int64_t h = candle_high(cnd);
-  int64_t l = candle_low(cnd);
-  int64_t c = candle_close(cnd);
+enum RISKI_ERROR_CODE is_doji_generic(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res) {
+  int64_t o = 0;
+  TRACE(candle_open(cnd, &o));
+  int64_t h = 0;
+  TRACE(candle_high(cnd, &h));
+  int64_t l = 0;
+  TRACE(candle_low(cnd, &l));
+  int64_t c = 0;
+  TRACE(candle_close(cnd, &c));
+
+  *res = SINGLE_CANDLE_PATTERN_NONE;
 
   if (o == c && h != l) {
-    return SINGLE_CANDLE_PATTERN_DOJI_GENERIC;
+    *res = SINGLE_CANDLE_PATTERN_DOJI_GENERIC;
   }
-  return SINGLE_CANDLE_PATTERN_NONE;
+
+  return RISKI_ERROR_CODE_NONE;
 }

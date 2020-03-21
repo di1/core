@@ -75,7 +75,7 @@ pthread_t* threads;
     ret = ANALYSIS_FUNCTION(last_candle);                        \
     if (ret != SINGLE_CANDLE_PATTERN_NONE) {                     \
       chart_put_single_candle_pattern(cht, end_candle - 1, ret); \
-      return RISKI_ERROR_CODE_NONE;                                  \
+      return RISKI_ERROR_CODE_NONE;                              \
     }                                                            \
   } while (0);
 
@@ -221,8 +221,8 @@ enum RISKI_ERROR_CODE analysis_init() {
 }
 
 enum RISKI_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
-                                              size_t end,
-                                              struct analysis_info** inf) {
+                                           size_t end,
+                                           struct analysis_info** inf) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(inf, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -244,7 +244,7 @@ enum RISKI_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
 }
 
 enum RISKI_ERROR_CODE analysis_push(struct chart* cht, size_t start,
-                                       size_t end) {
+                                    size_t end) {
   while (!init_completed)
     ;
 
@@ -303,7 +303,7 @@ enum RISKI_ERROR_CODE analysis_push(struct chart* cht, size_t start,
 }
 
 enum RISKI_ERROR_CODE analysis_pop(struct analysis_list* bin,
-                                      struct analysis_info** inf) {
+                                   struct analysis_info** inf) {
   PTR_CHECK(bin, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct analysis_info* element = bin->head;

@@ -55,7 +55,7 @@ enum RISKI_ERROR_CODE analysis_init();
  * @return {enum RISKI_ERROR_CODE} The status
  */
 enum RISKI_ERROR_CODE analysis_push(struct chart* sec, size_t start,
-                                       size_t end);
+                                    size_t end);
 
 /*
  * Pops the very first element to the analysis and puts it inside (*inf).
@@ -64,7 +64,7 @@ enum RISKI_ERROR_CODE analysis_push(struct chart* sec, size_t start,
  * @return {enum RISKI_ERROR_CODE} The status
  */
 enum RISKI_ERROR_CODE analysis_pop(struct analysis_list* bin,
-                                      struct analysis_info** inf);
+                                   struct analysis_info** inf);
 
 /*
  * Joins the analysis threads together and cleans up loose memory
@@ -80,7 +80,7 @@ enum RISKI_ERROR_CODE analysis_cleanup();
  * @param {struct analysis_info**} inf Pointer to the resulting analysis info
  */
 enum RISKI_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
-                                              size_t end,
-                                              struct analysis_info** inf);
+                                           size_t end,
+                                           struct analysis_info** inf);
 
 #endif

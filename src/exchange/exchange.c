@@ -41,7 +41,8 @@ enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name, uint64_t interval) {
+enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
+                                   uint64_t interval) {
   struct security* s = NULL;
   TRACE(security_new(name, interval, &s));
 
@@ -71,8 +72,8 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name, uint64_t inte
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name, struct security** sec) {
-
+enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name,
+                                   struct security** sec) {
   PTR_CHECK(e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(sec, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -123,5 +124,4 @@ enum RISKI_ERROR_CODE exchange_free(struct exchange** e) {
   free(*e);
   *e = NULL;
   return RISKI_ERROR_CODE_NONE;
-
 }

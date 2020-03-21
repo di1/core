@@ -1,5 +1,6 @@
-#include "error_codes.h"
 #include <iex/iex.h>
+
+#include "error_codes.h"
 
 #define TIME(CODE, MESSAGE)                                     \
   do {                                                          \
@@ -77,7 +78,6 @@ bool is_iex_traffic(char* ip_src, char* ip_dst) {
  * Entry point to parsing an iex historical deep pcap file
  */
 enum RISKI_ERROR_CODE iex_parse_deep(char* file) {
-
   PTR_CHECK(file, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   log_trace("given pcap file: %s", file);
@@ -229,7 +229,8 @@ enum RISKI_ERROR_CODE parse_operational_hault_status_message(void* payload) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE parse_short_sale_price_test_status_message(void* payload) {
+enum RISKI_ERROR_CODE parse_short_sale_price_test_status_message(
+    void* payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct iex_short_sale_price_test_message* payload_data =
@@ -252,12 +253,10 @@ enum RISKI_ERROR_CODE parse_security_event_message(void* payload) {
 
   switch (payload_data->security_event) {
     case OPENING_PROCESS_COMPLETE:
-      log_trace("opening process complete %.8s",
-          payload_data->symbol);
+      log_trace("opening process complete %.8s", payload_data->symbol);
       break;
     case CLOSING_PROCESS_COMPLETE:
-      log_trace("closing process complete %.8s",
-          payload_data->symbol);
+      log_trace("closing process complete %.8s", payload_data->symbol);
       break;
     default:
       log_error("unknown security event message 0x%x symbol %.8s",
@@ -275,8 +274,8 @@ enum RISKI_ERROR_CODE parse_security_event_message(void* payload) {
  * The side was given in the message block and needs to be passed
  * though to this function.
  */
-enum RISKI_ERROR_CODE parse_price_level_update_message(iex_byte_t side, void* payload) {
-
+enum RISKI_ERROR_CODE parse_price_level_update_message(iex_byte_t side,
+                                                       void* payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct iex_price_level_update_message* payload_data =
@@ -290,11 +289,12 @@ reget_security:
 
   if (cur_sec == NULL) {
     TRACE(exchange_put(iex_exchange, (char*)payload_data->symbol,
-                 SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
     goto reget_security;
   }
 
-  TRACE(security_book_update(cur_sec, side, payload_data->price, payload_data->size));
+  TRACE(security_book_update(cur_sec, side, payload_data->price,
+                             payload_data->size));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -316,11 +316,12 @@ reget_security:
 
   if (cur_sec == NULL) {
     TRACE(exchange_put(iex_exchange, (char*)payload_data->symbol,
-                 SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
     goto reget_security;
   }
 
-  TRACE(security_chart_update(cur_sec, payload_data->price, payload_data->timestamp));
+  TRACE(security_chart_update(cur_sec, payload_data->price,
+                              payload_data->timestamp));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -358,7 +359,6 @@ enum RISKI_ERROR_CODE parse_trade_break_message(void* payload) {
 }
 
 enum RISKI_ERROR_CODE parse_auction_information_message(void* payload) {
-
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct iex_auction_information_message* payload_data =
@@ -380,7 +380,6 @@ enum RISKI_ERROR_CODE parse_auction_information_message(void* payload) {
  * function to do a task
  */
 enum RISKI_ERROR_CODE iex_tp_handler(u_char* data) {
-
   PTR_CHECK(data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // the header starts at position 0 of the data
@@ -441,7 +440,7 @@ enum RISKI_ERROR_CODE iex_tp_handler(u_char* data) {
       case PRICE_LEVEL_UPDATE_BUY_MESSAGE:
       case PRICE_LEVEL_UPDATE_SELL_MESSAGE:
         TRACE(parse_price_level_update_message(message_header->message_type,
-                                         payload_body));
+                                               payload_body));
         data = &data[sizeof(struct iex_price_level_update_message)];
         break;
       case TRADE_REPORT_MESSAGE:

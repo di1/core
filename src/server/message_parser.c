@@ -60,7 +60,6 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
 }
 
 enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
-
   PTR_CHECK(msg, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(msg, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -92,7 +91,7 @@ enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
   } else if (strcmp("analysis", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
-    TRACE(analysis_response(tokened,&response));
+    TRACE(analysis_response(tokened, &response));
     free(sanitized_msg);
   } else {
     free(sanitized_msg);
