@@ -26,6 +26,7 @@ typedef struct {
   char* pcap_feed_file;
   bool fxpig;
   char* fxpig_ini_file;
+  bool dev_web;
 } cli;
 
 /**
@@ -37,7 +38,7 @@ cli* cli_parse(int argc, char** argv) {
   options->pcap_feed_file = NULL;
   options->fxpig = false;
   options->fxpig_ini_file = NULL;
-
+  options->dev_web = false;
   for (int i = 0; i < argc; ++i) {
     if (strcmp("-pcap_feed", argv[i]) == 0) {
       if (i + 1 < argc) {
@@ -56,6 +57,8 @@ cli* cli_parse(int argc, char** argv) {
       } else {
         log_error("%s", "-fxpig must  be followed by a .ini file");
       }
+    } else if (strcmp("-dev-web", argv[i]) == 0) {
+      options->dev_web = true;
     }
   }
 
@@ -73,7 +76,7 @@ void valid_working_directory() {
 }
 
 void usage(char* path) {
-  printf("%s [-pcap_feed FILE][-pcap_list FILE1 FILE2 ...]\n", path);
+  printf("%s [-pcap_feed FILE][-fxpig FILE]\n", path);
   exit(1);
 }
 
@@ -87,18 +90,21 @@ int main(int argc, char** argv) {
   pthread_t id;
   pthread_create(&id, NULL, server_start, NULL);
 
-  if (options->pcap_feed) {
-    analysis_init();
-    iex_parse_deep(options->pcap_feed_file);
-  } else if (options->fxpig) {
-    struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
-    fxpig_live(cfg);
-    fxpig_ini_free(&cfg);
+  if (!options->dev_web) {
+    if (options->pcap_feed) {
+      analysis_init();
+      iex_parse_deep(options->pcap_feed_file);
+    } else if (options->fxpig) {
+      struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
+      fxpig_live(cfg);
+      fxpig_ini_free(&cfg);
+    }
+    analysis_cleanup();
+    SERVER_INTERRUPTED = 1;
+    pthread_join(id, NULL);
   }
 
   free(options);
-  analysis_cleanup();
-  SERVER_INTERRUPTED = 1;
   pthread_join(id, NULL);
   return 0;
 }
