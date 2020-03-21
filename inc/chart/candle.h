@@ -1,12 +1,12 @@
 #ifndef CANDLE_
 #define CANDLE_
 
+#include <error_codes.h>
 #include <log/log.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <error_codes.h>
 #include <tracer.h>
 
 #define JSON_CANDLE_MAX_LEN 200
@@ -24,7 +24,8 @@ struct candle;
  * @param {struct candle**} cnd Sets *cnd to the newly created candle
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time, struct candle** cnd);
+enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
+                                 struct candle** cnd);
 
 /**
  * Updates the given candle
@@ -33,7 +34,8 @@ enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time, struct candle** c
  * @param {uint64_t} time The timestamp this price happened at
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price, uint64_t time);
+enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price,
+                                    uint64_t time);
 
 /**
  * Frees the given candle

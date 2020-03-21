@@ -130,7 +130,7 @@ enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart* cht) {
 enum RISKI_ERROR_CODE chart_put_single_candle_pattern(
     struct chart* cht, size_t index, enum SINGLE_CANDLE_PATTERNS identifier) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_INVALID_RANGE,
+  RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
               RISKI_ERROR_TEXT);
   cht->analysis->scp[index] = identifier;
   return RISKI_ERROR_CODE_NONE;
@@ -201,8 +201,8 @@ enum RISKI_ERROR_CODE chart_put_sloped_line_pattern(struct chart* cht,
 enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
     struct chart* cht, size_t start, size_t end, enum DIRECTION direction) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  RANGE_CHECK(start, 0, end, RISKI_ERROR_INVALID_RANGE, RISKI_ERROR_TEXT);
-  RANGE_CHECK(end, start + 1, cht->cur_candle, RISKI_ERROR_INVALID_RANGE,
+  RANGE_CHECK(start, 0, end, RISKI_ERROR_CODE_INVALID_RANGE, RISKI_ERROR_TEXT);
+  RANGE_CHECK(end, start + 1, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
               RISKI_ERROR_TEXT);
 
   struct chart_analysis* cur_analysis = cht->analysis;
@@ -265,7 +265,7 @@ enum RISKI_ERROR_CODE chart_new_candle(struct chart* cht, int64_t price) {
 enum RISKI_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
                                        struct candle** cnd) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_INVALID_RANGE,
+  RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
               RISKI_ERROR_TEXT);
 
   *cnd = cht->candles[index];

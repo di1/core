@@ -1,12 +1,6 @@
 #include <analysis/analysis.h>
 
 /*
- * String representations of the error codes
- */
-const char* ANALYSIS_ERROR_CODE_STR[3] = {
-    "ANALYSIS_NO_ERROR", "ANALYSIS_MALLOC_ERROR", "ANALYSIS_INVALID_PTR"};
-
-/*
  * The analysis info struct is the value of the linked list
  * created by analysis_list.
  *
@@ -81,7 +75,7 @@ pthread_t* threads;
     ret = ANALYSIS_FUNCTION(last_candle);                        \
     if (ret != SINGLE_CANDLE_PATTERN_NONE) {                     \
       chart_put_single_candle_pattern(cht, end_candle - 1, ret); \
-      return ANALYSIS_NO_ERROR;                                  \
+      return RISKI_ERROR_CODE_NONE;                                  \
     }                                                            \
   } while (0);
 
@@ -94,7 +88,7 @@ pthread_t* threads;
  * index, which since is 1 indexed will be end_candle-1 in the
  * array.
  */
-enum ANALYSIS_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
+enum RISKI_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   struct candle* last_candle = chart_get_candle(cht, end_candle - 1);
 
   if (!last_candle) {
@@ -104,7 +98,7 @@ enum ANALYSIS_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
 
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
-  if (candle_volume(last_candle) == 0) return ANALYSIS_NO_ERROR;
+  if (candle_volume(last_candle) == 0) return RISKI_ERROR_CODE_NONE;
 
   // Now that we have a valid candle perform all single candle
   // analysis
@@ -116,11 +110,11 @@ enum ANALYSIS_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
   SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_dragonfly);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_gravestone);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_doji_generic);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_dragonfly);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_gravestone);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_generic);
 
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }
 
 // Set to 1 if the threads need to be joined
@@ -172,7 +166,7 @@ void* analysis_thread_func(void* index) {
   return NULL;
 }
 
-enum ANALYSIS_ERROR_CODE analysis_init() {
+enum RISKI_ERROR_CODE analysis_init() {
   int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
   log_info("processor has %d processing threads", numCPU);
   log_trace("creating %d processing units", numCPU);
@@ -190,7 +184,7 @@ enum ANALYSIS_ERROR_CODE analysis_init() {
       num_analysis_threads * sizeof(struct analysis_list*));
 
   // make sure malloc was correct
-  PTR_CHECK(thread_operations, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(thread_operations, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
   // create the lists
   for (size_t i = 0; i < num_analysis_threads; ++i) {
@@ -198,8 +192,8 @@ enum ANALYSIS_ERROR_CODE analysis_init() {
         (struct analysis_list*)malloc(1 * sizeof(struct analysis_list));
 
     // make sure malloc was correct
-    PTR_CHECK(thread_operations, ANALYSIS_MALLOC_ERROR,
-              ANALYSIS_ERROR_CODE_STR);
+    PTR_CHECK(thread_operations, RISKI_ERROR_CODE_MALLOC_ERROR,
+              RISKI_ERROR_TEXT);
 
     pthread_mutex_init(&(thread_operations[i]->can_remove), NULL);
 
@@ -211,31 +205,31 @@ enum ANALYSIS_ERROR_CODE analysis_init() {
 
   threads = (pthread_t*)calloc(num_analysis_threads, sizeof(pthread_t));
 
-  PTR_CHECK(threads, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(threads, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     size_t* id = (size_t*)malloc(1 * sizeof(size_t));
 
-    PTR_CHECK(id, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+    PTR_CHECK(id, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
     *id = i;
     pthread_create(&(threads[i]), NULL, analysis_thread_func, (void*)id);
   }
   init_completed = true;
 
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum ANALYSIS_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
+enum RISKI_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
                                               size_t end,
                                               struct analysis_info** inf) {
-  PTR_CHECK(cht, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
-  PTR_CHECK(inf, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(inf, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct analysis_info* element =
       (struct analysis_info*)malloc(1 * sizeof(struct analysis_info));
 
-  PTR_CHECK(element, ANALYSIS_MALLOC_ERROR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(element, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
   element->cht = cht;
   element->start_candle = start;
@@ -246,16 +240,16 @@ enum ANALYSIS_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
 
   *inf = element;
 
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum ANALYSIS_ERROR_CODE analysis_push(struct chart* cht, size_t start,
+enum RISKI_ERROR_CODE analysis_push(struct chart* cht, size_t start,
                                        size_t end) {
   while (!init_completed)
     ;
 
-  PTR_CHECK(cht, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
-  PTR_CHECK(thread_operations, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(thread_operations, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // what bin the analysis will go into
   size_t thread_bin = current_analysis_index % num_analysis_threads;
@@ -270,7 +264,7 @@ enum ANALYSIS_ERROR_CODE analysis_push(struct chart* cht, size_t start,
   TRACE(analysis_create_info(cht, start, end, &element));
 
   // Make sure the info object was set correctly
-  PTR_CHECK(element, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(element, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // The number of elements
   size_t ne = 0;
@@ -305,12 +299,12 @@ enum ANALYSIS_ERROR_CODE analysis_push(struct chart* cht, size_t start,
   }
 
   current_analysis_index += 1;
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum ANALYSIS_ERROR_CODE analysis_pop(struct analysis_list* bin,
+enum RISKI_ERROR_CODE analysis_pop(struct analysis_list* bin,
                                       struct analysis_info** inf) {
-  PTR_CHECK(bin, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(bin, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct analysis_info* element = bin->head;
 
@@ -329,16 +323,16 @@ enum ANALYSIS_ERROR_CODE analysis_pop(struct analysis_list* bin,
     bin->tail = NULL;
   }
 
-  PTR_CHECK(inf, ANALYSIS_INVALID_PTR, ANALYSIS_ERROR_CODE_STR);
+  PTR_CHECK(inf, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   *inf = element;
 
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-enum ANALYSIS_ERROR_CODE analysis_cleanup() {
+enum RISKI_ERROR_CODE analysis_cleanup() {
   ANALYSIS_INTERRUPED = 1;
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     pthread_join(threads[i], NULL);
   }
-  return ANALYSIS_NO_ERROR;
+  return RISKI_ERROR_CODE_NONE;
 }

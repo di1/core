@@ -1,36 +1,52 @@
 #include <exchange/exchange.h>
 
+/*
+ * The number of securities that have been added to the exchange
+ */
 size_t num_securities = 0;
 
-char** security_names = NULL;
-
-// linked list prototype
+/*
+ * Linked list for the hash bins
+ * @param {struct security*} val The value of the bin
+ * @param {struct ll*} next The next element in the list
+ */
 struct ll {
-  // current security value
   struct security* val;
-
-  // next value
   struct ll* next;
 };
 
+/*
+ * Holds the exchange information
+ * @param {char*} name The name of the exchange
+ * @param {struct ll} A fixed number of bins for the hashmap
+ */
 struct exchange {
   char* name;
   struct ll entries[SECURITY_HASH_MODULE_VAL];
 };
 
-struct exchange* exchange_new(char* name) {
+enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange) {
+  PTR_CHECK(name, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(exchange, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
   char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
+  PTR_CHECK(n, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   strcpy(n, name);
 
   struct exchange* e = (struct exchange*)calloc(1, sizeof(struct exchange));
+  PTR_CHECK(e, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   e->name = n;
 
-  return e;
+  *exchange = e;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-void exchange_put(struct exchange* e, char* name, uint64_t interval) {
-  struct security* s = security_new(name, interval);
-  size_t index = security_get_hash(s);
+enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name, uint64_t interval) {
+  struct security* s = NULL;
+  TRACE(security_new(name, interval, &s));
+
+  size_t index = 0;
+  TRACE(security_get_hash(s, &index));
 
   struct ll* val = &e->entries[index];
   if (val->val == NULL) {
@@ -41,6 +57,7 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
     }
 
     struct ll* next_entry = (struct ll*)malloc(1 * sizeof(struct ll));
+    PTR_CHECK(next_entry, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
     next_entry->next = NULL;
     next_entry->val = s;
 
@@ -50,42 +67,54 @@ void exchange_put(struct exchange* e, char* name, uint64_t interval) {
   num_securities += 1;
   if (num_securities % 200 == 0)
     log_debug("~%lu securities monitored", num_securities);
-  security_names =
-      (char**)realloc(security_names, num_securities * sizeof(char*));
 
-  char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
-  strcpy(n, name);
-
-  security_names[num_securities - 1] = n;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-struct security* exchange_get(struct exchange* e, char* name) {
-  size_t hash = security_hash(name);
+enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name, struct security** sec) {
+
+  PTR_CHECK(e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(sec, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  size_t hash = 0;
+  TRACE(security_hash(name, &hash));
+
   struct ll* bin_list = &e->entries[hash];
 
   while (bin_list != NULL) {
-    if (bin_list->val == NULL) return NULL;
-    if (security_cmp(name, bin_list->val)) {
-      return bin_list->val;
+    if (bin_list->val == NULL) {
+      *sec = NULL;
+      return RISKI_ERROR_CODE_NONE;
+    }
+    bool isequal = false;
+    TRACE(security_cmp(name, bin_list->val, &isequal));
+
+    if (isequal) {
+      *sec = bin_list->val;
+      return RISKI_ERROR_CODE_NONE;
     }
     bin_list = bin_list->next;
   }
 
-  return NULL;
+  *sec = NULL;
+  return RISKI_ERROR_CODE_NONE;
 }
 
-void exchange_free(struct exchange** e) {
+enum RISKI_ERROR_CODE exchange_free(struct exchange** e) {
+  PTR_CHECK(e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(*e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
   free((*e)->name);
   for (size_t i = 0; i < SECURITY_HASH_MODULE_VAL; ++i) {
     // free the ll entries
     if ((*e)->entries[i].val != NULL) {
-      security_free(&((*e)->entries[i].val));
+      TRACE(security_free(&((*e)->entries[i].val)));
       if ((*e)->entries[i].next != NULL) {
         struct ll* cur = (*e)->entries[i].next;
         while (cur != NULL) {
           struct ll* tmp = cur;
           cur = cur->next;
-          security_free(&tmp->val);
+          TRACE(security_free(&tmp->val));
           free(tmp);
         }
       }
@@ -93,27 +122,6 @@ void exchange_free(struct exchange** e) {
   }
   free(*e);
   *e = NULL;
+  return RISKI_ERROR_CODE_NONE;
 
-  for (size_t i = 0; i < num_securities; ++i) {
-    free(security_names[i]);
-  }
-  free(security_names);
-}
-
-void test_exchange() {
-  struct exchange* ex = exchange_new("test");
-  ASSERT_TEST(ex != NULL);
-
-  exchange_put(ex, "test    ", 1000);
-
-  struct security* sec = exchange_get(ex, "test    ");
-  ASSERT_TEST(security_get_hash(sec) == security_hash("test    "));
-
-  exchange_put(ex, "test1234", 10000);
-
-  sec = exchange_get(ex, "test1234");
-  ASSERT_TEST(security_get_hash(sec) == security_hash("test1234"));
-
-  exchange_free(&ex);
-  ASSERT_TEST(ex == NULL);
 }

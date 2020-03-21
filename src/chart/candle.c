@@ -1,5 +1,6 @@
-#include "error_codes.h"
 #include <chart/candle.h>
+
+#include "error_codes.h"
 
 /*
  * Represents a candle
@@ -21,7 +22,8 @@ struct candle {
   uint64_t volume;
 };
 
-enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time, struct candle** cnd) {
+enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
+                                 struct candle** cnd) {
   struct candle* c = (struct candle*)malloc(1 * sizeof(struct candle));
   PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
@@ -37,11 +39,11 @@ enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time, struct candle** c
   return RISKI_ERROR_CODE_NONE;
 }
 
-#define CREATE_CANDLE_GET_FUNCTION(NAME, TYPE, ELEMENT) \
-  enum RISKI_ERROR_CODE NAME(struct candle* c, TYPE* t) {\
-    PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);\
-    *t = c->ELEMENT;\
-    return RISKI_ERROR_CODE_NONE;\
+#define CREATE_CANDLE_GET_FUNCTION(NAME, TYPE, ELEMENT)            \
+  enum RISKI_ERROR_CODE NAME(struct candle* c, TYPE* t) {          \
+    PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT); \
+    *t = c->ELEMENT;                                               \
+    return RISKI_ERROR_CODE_NONE;                                  \
   }
 CREATE_CANDLE_GET_FUNCTION(candle_volume, uint64_t, volume)
 CREATE_CANDLE_GET_FUNCTION(candle_open, int64_t, open)
@@ -52,7 +54,8 @@ CREATE_CANDLE_GET_FUNCTION(candle_start, uint64_t, start_time)
 CREATE_CANDLE_GET_FUNCTION(candle_end, uint64_t, end_time)
 #undef CREATE_CANDLE_GET_FUNCTION
 
-enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price, uint64_t time) {
+enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price,
+                                    uint64_t time) {
   PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   c->volume += 1;
