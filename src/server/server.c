@@ -104,7 +104,8 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
         msg->len = 0;
       }
 
-      char *response = parse_message(in, len);
+      char* response = NULL;
+      TRACE_HAULT(parse_message(in, len, &response));
       if (!response) break;
       size_t response_len = strlen(response);
 
