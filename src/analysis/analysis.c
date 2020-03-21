@@ -70,13 +70,14 @@ bool init_completed = false;
  */
 pthread_t* threads;
 
-#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)         \
-  do {                                                           \
-    ret = ANALYSIS_FUNCTION(last_candle);                        \
-    if (ret != SINGLE_CANDLE_PATTERN_NONE) {                     \
-      chart_put_single_candle_pattern(cht, end_candle - 1, ret); \
-      return RISKI_ERROR_CODE_NONE;                              \
-    }                                                            \
+#define SINGLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)              \
+  do {                                                                \
+    enum SINGLE_CANDLE_PATTERNS res = SINGLE_CANDLE_PATTERN_NONE;     \
+    TRACE(ANALYSIS_FUNCTION(last_candle, &res));                      \
+    TRACE(chart_put_single_candle_pattern(cht, end_candle - 1, res)); \
+    if (res != SINGLE_CANDLE_PATTERN_NONE) {                          \
+      return RISKI_ERROR_CODE_NONE;                                   \
+    }                                                                 \
   } while (0);
 
 /*
@@ -89,22 +90,21 @@ pthread_t* threads;
  * array.
  */
 enum RISKI_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
-  struct candle* last_candle = chart_get_candle(cht, end_candle - 1);
+  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  if (!last_candle) {
-    log_error("%lu end_candle", end_candle);
-    exit(1);
-  }
+  struct candle* last_candle = NULL;
+  TRACE(chart_get_candle(cht, end_candle - 1, &last_candle));
 
   // Make sure this is a valid candle, fill in candles will have the same
   // start and end time
-  if (candle_volume(last_candle) == 0) return RISKI_ERROR_CODE_NONE;
+  uint64_t last_candle_volume = 0;
+  TRACE(candle_volume(last_candle, &last_candle_volume));
+  if (last_candle_volume == 0) return RISKI_ERROR_CODE_NONE;
 
   // Now that we have a valid candle perform all single candle
   // analysis
 
   // return value of each single analysis
-  enum SINGLE_CANDLE_PATTERNS ret;
 
   SINGLE_CANDLE_PATTERN_PERFORM(is_white_marubozu);
   SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);

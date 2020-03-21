@@ -77,7 +77,6 @@ enum RISKI_ERROR_CODE security_get_latest_candle(struct security* sec,
   char* dat = NULL;
   TRACE(chart_latest_candle(sec->cht, &dat));
   pthread_mutex_unlock(&(sec->m_chart_update));
-
   *json = dat;
   return RISKI_ERROR_CODE_NONE;
 }

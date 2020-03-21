@@ -1,12 +1,10 @@
 #ifndef MARUBOZU_
 #define MARUBOZU_
 
-#include <chart/candle.h>
-#include <stdbool.h>
-
 #include <analysis/enumations.h>
-
+#include <chart/candle.h>
 #include <error_codes.h>
+#include <stdbool.h>
 #include <tracer.h>
 
 /*
@@ -15,7 +13,8 @@
  * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE is_black_marubozu(struct candle* c, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE is_black_marubozu(struct candle* c,
+                                        enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Checks if the given candle is a white marubozu
@@ -24,6 +23,7 @@ enum RISKI_ERROR_CODE is_black_marubozu(struct candle* c, enum SINGLE_CANDLE_PAT
  * @return {enum RISKI_ERROR_CODE} The status
  */
 
-enum RISKI_ERROR_CODE is_white_marubozu(struct candle* c, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE is_white_marubozu(struct candle* c,
+                                        enum SINGLE_CANDLE_PATTERNS* res);
 
 #endif

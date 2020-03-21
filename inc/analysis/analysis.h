@@ -3,7 +3,7 @@
 
 // riski error codes to enable stack tracing
 #include <error_codes.h>
-
+#include <tracer.h>
 // used for candle interface
 #include <chart/candle.h>
 

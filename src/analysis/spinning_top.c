@@ -1,8 +1,9 @@
-#include "analysis/enumations.h"
 #include <analysis/spinning_top.h>
 
-enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res) {
+#include "analysis/enumations.h"
 
+enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res) {
   PTR_CHECK(cnd, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -23,8 +24,8 @@ enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd, enum SINGLE_CAND
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE is_black_spinning_top(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res) {
-
+enum RISKI_ERROR_CODE is_black_spinning_top(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res) {
   PTR_CHECK(cnd, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 

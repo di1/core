@@ -83,19 +83,17 @@ enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
 
     TRACE(init_response(tokened, &response));
     free(sanitized_msg);
-  } else if (strcmp("latest", tokened) == 0) {
+  }
+  if (strcmp("latest", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(latest_response(tokened, &response));
     free(sanitized_msg);
-  } else if (strcmp("analysis", tokened) == 0) {
+  }
+  if (strcmp("analysis", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(analysis_response(tokened, &response));
-    free(sanitized_msg);
-  } else {
-    free(sanitized_msg);
-    return RISKI_ERROR_CODE_INVALID_REQUEST;
     free(sanitized_msg);
   }
 

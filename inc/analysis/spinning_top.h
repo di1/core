@@ -10,7 +10,8 @@
  * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Checks if the given candle is a black marubozu
@@ -18,6 +19,7 @@ enum RISKI_ERROR_CODE is_white_spinning_top(struct candle* cnd, enum SINGLE_CAND
  * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE is_black_spinning_top(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE is_black_spinning_top(struct candle* cnd,
+                                            enum SINGLE_CANDLE_PATTERNS* res);
 
 #endif

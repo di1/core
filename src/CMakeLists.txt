@@ -10,6 +10,7 @@ ADD_SUBDIRECTORY(fxpig)
 ADD_SUBDIRECTORY(math)
 
 ADD_LIBRARY(string_builder string_builder.c)
+ADD_LIBRARY(error_codes error_codes.c)
 
 ADD_EXECUTABLE(riski main.c)
 TARGET_LINK_LIBRARIES(riski

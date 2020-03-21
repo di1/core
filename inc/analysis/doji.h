@@ -26,7 +26,7 @@ struct chart;
  * @return {enum RISKI_ERROR_CODE} The status
  */
 enum RISKI_ERROR_CODE perform_doji_dragonfly(struct candle* cnd,
-                                            enum SINGLE_CANDLE_PATTERNS* res);
+                                             enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Attempts to find a gravestone doji pattern on the last confirmed candle.
@@ -34,7 +34,8 @@ enum RISKI_ERROR_CODE perform_doji_dragonfly(struct candle* cnd,
  * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE perform_doji_gravestone(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE perform_doji_gravestone(struct candle* cnd,
+                                              enum SINGLE_CANDLE_PATTERNS* res);
 
 /*
  * Attempts to find a gravestone doji pattern on the last confirmed candle.
@@ -42,6 +43,7 @@ enum RISKI_ERROR_CODE perform_doji_gravestone(struct candle* cnd, enum SINGLE_CA
  * @param {enum SINGLE_CANDLE_PATTERN*} res Sets it to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE perform_doji_generic(struct candle* cnd, enum SINGLE_CANDLE_PATTERNS* res);
+enum RISKI_ERROR_CODE perform_doji_generic(struct candle* cnd,
+                                           enum SINGLE_CANDLE_PATTERNS* res);
 
 #endif

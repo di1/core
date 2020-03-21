@@ -364,7 +364,7 @@ enum RISKI_ERROR_CODE chart_json(struct chart* cht, char** json) {
 
 enum RISKI_ERROR_CODE chart_analysis_json(struct chart* cht, char** json) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  PTR_CHECK(*json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct chart_analysis* chta = cht->analysis;
 
@@ -451,7 +451,7 @@ enum RISKI_ERROR_CODE chart_latest_candle(struct chart* cht, char** json) {
 
   free(tmp_candle_json);
 
-  *json = NULL;
+  *json = buf;
 
   return RISKI_ERROR_CODE_NONE;
 }
