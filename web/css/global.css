@@ -123,3 +123,35 @@ input {
   padding-left: calc(50% - 800px);
   width: 200px;
 }
+
+input {
+  border: 1px solid black;
+  font-size: 1em;
+}
+
+#search-results {
+  position: absolute;
+  display: none;
+  z-index: 99999;
+  background-color: gray;
+  color: white;
+  overflow: auto;
+}
+
+.search-row {
+  display: flex;
+}
+
+.search-row > span:nth-child(1) {
+  flex: 1;
+  text-align: middle;
+}
+
+.search-row > span:nth-child(2) {
+  flex: 2;
+  text-align: middle;
+}
+
+#stock-search-input {
+  width: calc(200% + 50%);
+}

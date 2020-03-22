@@ -65,10 +65,10 @@ enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
   for (size_t i = 0; i < db_search.n; ++i) {
     if (strncmp(seq, db_search.data[i].symbol, strlen(seq)) == 0) {
       printf("%s->?\t%s\n", db_search.data[i].symbol, db_search.data[i].symbol);
-      TRACE(string_builder_append(sb, "{symbol:\"", 9));
+      TRACE(string_builder_append(sb, "{\"symbol\":\"", 9));
       TRACE(string_builder_append(sb, db_search.data[i].symbol,
                                   strlen(db_search.data[i].symbol)));
-      TRACE(string_builder_append(sb, "\",fullName:\"", 12));
+      TRACE(string_builder_append(sb, "\",\"fullName\":\"", 12));
       TRACE(string_builder_append(sb, db_search.data[i].full_name,
                                   strlen(db_search.data[i].full_name)));
       TRACE(string_builder_append(sb, "\"},", 3));
