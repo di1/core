@@ -32,10 +32,11 @@ struct per_session_data__minimal {
   struct per_session_data__minimal *pss_list;
   struct lws *wsi;
   int last; /* the last message number we sent */
+  struct msg amsg;
+
 };
 
 /* one of these is created for each vhost our protocol is used with */
-
 struct per_vhost_data__minimal {
   struct lws_context *context;
   struct lws_vhost *vhost;

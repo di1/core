@@ -19,8 +19,28 @@ static struct lws_protocols protocols[] = {
     {NULL, NULL, 0, 0} /* terminator */
 };
 
-static const struct lws_http_mount mount = {
+static const struct lws_http_mount mount_search = {
     /* .mount_next */ NULL,  /* linked-list "next" */
+    /* .mountpoint */ "/search",   /* mountpoint URL */
+    /* .origin */ "./web",   /* serve from dir */
+    /* .def */ "index.html", /* default filename */
+    /* .protocol */ NULL,
+    /* .cgienv */ NULL,
+    /* .extra_mimetypes */ NULL,
+    /* .interpret */ NULL,
+    /* .cgi_timeout */ 0,
+    /* .cache_max_age */ 0,
+    /* .auth_mask */ 0,
+    /* .cache_reusable */ 0,
+    /* .cache_revalidate */ 0,
+    /* .cache_intermediaries */ 0,
+    /* .origin_protocol */ LWSMPRO_FILE, /* files in a dir */
+    /* .mountpoint_len */ 1,             /* char count */
+    /* .basic_auth_login_file */ NULL,
+};
+
+static const struct lws_http_mount mount = {
+    /* .mount_next */ &mount_search,  /* linked-list "next" */
     /* .mountpoint */ "/",   /* mountpoint URL */
     /* .origin */ "./web",   /* serve from dir */
     /* .def */ "index.html", /* default filename */
@@ -81,17 +101,18 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     case LWS_CALLBACK_SERVER_WRITEABLE:
 
-      if (!vhd->amsg.payload) break;
+      if (!pss->amsg.payload) break;
 
       if (pss->last == vhd->current) break;
 
       /* notice we allowed for LWS_PRE in the payload already */
-      m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) + LWS_PRE,
-                    vhd->amsg.len, LWS_WRITE_TEXT);
+      m = lws_write(pss->wsi, ((unsigned char *)pss->amsg.payload) + LWS_PRE,
+                    pss->amsg.len, LWS_WRITE_TEXT);
       if (m < (int)vhd->amsg.len) {
         lwsl_err("ERROR %d writing to ws\n", m);
         return -1;
       }
+      printf("client ptr: %p\n", (void*)pss->wsi);
       pss->last = vhd->current;
 
       break;
@@ -109,20 +130,21 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       if (!response) break;
       size_t response_len = strlen(response);
 
-      vhd->amsg.len = response_len;
+      pss->amsg.len = response_len;
       /* notice we over-allocate by LWS_PRE */
-      vhd->amsg.payload = malloc((LWS_PRE * 2) + response_len);
-      if (!vhd->amsg.payload) {
+      pss->amsg.payload = malloc((LWS_PRE * 2) + response_len);
+      if (!pss->amsg.payload) {
         lwsl_user("OOM: dropping\n");
         break;
       }
 
-      memcpy((char *)vhd->amsg.payload + LWS_PRE, response, response_len);
-      vhd->current++;
+      memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
+      //pss->last ++;
+      vhd->current ++;
 
       free(response);
 
-      lws_callback_on_writable(wsi);
+      lws_callback_on_writable(pss->wsi);
       break;
 
     default:
