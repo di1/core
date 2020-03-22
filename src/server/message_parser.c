@@ -1,6 +1,7 @@
 #include <server/message_parser.h>
 
 #include "error_codes.h"
+#include "security/search.h"
 #include "security/security.h"
 
 enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
@@ -59,6 +60,15 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
   return RISKI_ERROR_CODE_NONE;
 }
 
+enum RISKI_ERROR_CODE search_response(char* query, char** resp) {
+  char* dat = NULL;
+  TRACE(search_search(query, &dat));
+
+  *resp = dat;
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
 enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
   PTR_CHECK(msg, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(msg, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -83,17 +93,20 @@ enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
 
     TRACE(init_response(tokened, &response));
     free(sanitized_msg);
-  }
-  if (strcmp("latest", tokened) == 0) {
+  } else if (strcmp("latest", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(latest_response(tokened, &response));
     free(sanitized_msg);
-  }
-  if (strcmp("analysis", tokened) == 0) {
+  } else if (strcmp("analysis", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(analysis_response(tokened, &response));
+    free(sanitized_msg);
+  } else if (strcmp("search", tokened) == 0) {
+    tokened = strtok(NULL, "|");
+
+    TRACE(search_response(tokened, &response));
     free(sanitized_msg);
   }
 

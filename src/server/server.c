@@ -91,6 +91,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
       pss->wsi = wsi;
       pss->last = vhd->current;
+      pss->current = pss->last;
       break;
 
     case LWS_CALLBACK_CLOSED:
@@ -103,7 +104,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
       if (!pss->amsg.payload) break;
 
-      if (pss->last == vhd->current) break;
+      if (pss->last == pss->current) break;
 
       /* notice we allowed for LWS_PRE in the payload already */
       m = lws_write(pss->wsi, ((unsigned char *)pss->amsg.payload) + LWS_PRE,
@@ -112,9 +113,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
         lwsl_err("ERROR %d writing to ws\n", m);
         return -1;
       }
-      printf("client ptr: %p\n", (void*)pss->wsi);
-      pss->last = vhd->current;
-
+      pss->current = pss->last;
       break;
 
     case LWS_CALLBACK_RECEIVE:
@@ -139,7 +138,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       }
 
       memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
-      //pss->last ++;
+      pss->last ++;
       vhd->current ++;
 
       free(response);

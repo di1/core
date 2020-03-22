@@ -3,6 +3,7 @@
 
 #include <exchange/exchange.h>
 #include <iex/iex.h>
+#include <security/search.h>
 #include <log/log.h>
 #include <stdlib.h>
 #include <string.h>

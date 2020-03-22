@@ -32,6 +32,7 @@ struct per_session_data__minimal {
   struct per_session_data__minimal *pss_list;
   struct lws *wsi;
   int last; /* the last message number we sent */
+  int current;
   struct msg amsg;
 
 };
