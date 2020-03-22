@@ -1,3 +1,3 @@
-ADD_LIBRARY(security security.c)
+ADD_LIBRARY(security security.c search.c)
 
-TARGET_LINK_LIBRARIES(security book)
+TARGET_LINK_LIBRARIES(security book string_builder)

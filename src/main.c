@@ -8,6 +8,7 @@
 #include <iex/iex.h>
 #include <log/log.h>
 #include <pthread.h>
+#include <security/search.h>
 #include <security/security.h>
 #include <server/server.h>
 #include <stdbool.h>
@@ -87,6 +88,15 @@ int main(int argc, char** argv) {
 
   cli* options = cli_parse(argc, argv);
 
+  TRACE(search_init("./symbols.csv"));
+  char* a = NULL;
+  
+  TRACE(search_search("AA", &a));
+  printf("%s\n", a);
+  free(a);
+  TRACE(search_free());
+  free(options);
+  exit(0);
   pthread_t id;
   pthread_create(&id, NULL, server_start, NULL);
 

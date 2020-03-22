@@ -108,3 +108,19 @@ input {
   display: flex;
   align-items: center;
 }
+
+.chart-container {
+  padding-left: calc(50% - 600px);
+  padding-right: calc(50% - 800px);
+  height: calc(100vh - 30em);
+}
+
+#chart {
+  width: 100%;
+  height: 100%;
+}
+
+#analysis-details {
+  padding-left: calc(50% - 800px);
+  width: 200px;
+}
