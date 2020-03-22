@@ -154,10 +154,10 @@ void* analysis_thread_func(void* index) {
     chart_analysis_lock(cht);
 
     // group the analysis into sections from simplest to hardest
-    simple_analysis(cht, end_candle);
-    chart_invalidate_trends(cht);
-    find_horizontal_line(cht, end_candle);
-    find_trend_line(cht, end_candle);
+    TRACE_HAULT(simple_analysis(cht, end_candle));
+    TRACE_HAULT(chart_invalidate_trends(cht));
+    TRACE_HAULT(find_horizontal_line(cht, end_candle));
+    TRACE_HAULT(find_trend_line(cht, end_candle));
 
     // release the analysis struct lock
     chart_analysis_unlock(cht);

@@ -89,14 +89,7 @@ int main(int argc, char** argv) {
   cli* options = cli_parse(argc, argv);
 
   TRACE(search_init("./symbols.csv"));
-  char* a = NULL;
-  
-  TRACE(search_search("AA", &a));
-  printf("%s\n", a);
-  free(a);
-  TRACE(search_free());
-  free(options);
-  exit(0);
+
   pthread_t id;
   pthread_create(&id, NULL, server_start, NULL);
 
@@ -114,6 +107,7 @@ int main(int argc, char** argv) {
     pthread_join(id, NULL);
   }
 
+  TRACE(search_free());
   free(options);
   pthread_join(id, NULL);
   return 0;

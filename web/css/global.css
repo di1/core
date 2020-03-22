@@ -112,7 +112,6 @@ input {
 .chart-container {
   padding-left: calc(50% - 600px);
   padding-right: calc(50% - 800px);
-  height: calc(100vh - 30em);
 }
 
 #chart {
