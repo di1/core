@@ -26,10 +26,6 @@ function searchInputKeyPress(evt: KeyboardEvent) {
       return;
     }
     largeDisplayChart.setSymbol(wantedStock);
-
-    const currentStockTextDisplay =
-      <HTMLSpanElement> document.querySelector('#path > span:nth-child(2)');
-    currentStockTextDisplay.innerHTML = '&nbsp;' + wantedStock;
   } else {
     if (searchSocket && wantedStock !== '') {
       searchSocket.send('search|' + wantedStock);

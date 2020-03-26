@@ -100,11 +100,6 @@ input {
   align-items: center;
 }
 
-#chart {
-  display: flex;
-  flex-grow: 1;
-}
-
 #dash-group {
   padding-left: calc(50% - 800px);
   padding-right: calc(50% - 800px);
@@ -113,8 +108,9 @@ input {
 }
 
 .chart-container {
-  padding-left: calc(50% - 600px);
-  padding-right: calc(50% - 800px);
+  float: right;
+  width: 75%;
+  height: 75%;
 }
 
 #chart {
