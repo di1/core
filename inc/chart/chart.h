@@ -10,7 +10,7 @@
 #endif
 
 #include <chart/candle.h>
-#include <log/log.h>
+#include <logger.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>

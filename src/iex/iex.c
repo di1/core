@@ -2,12 +2,12 @@
 
 #include "error_codes.h"
 
-#define TIME(CODE, MESSAGE)                                     \
-  do {                                                          \
-    clock_t begin = clock();                                    \
-    CODE clock_t end = clock();                                 \
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC; \
-    log_trace("%s %lf", MESSAGE, time_spent);                   \
+#define TIME(CODE, MESSAGE)                                                             \
+  do {                                                                                  \
+    clock_t begin = clock();                                                            \
+    CODE clock_t end = clock();                                                         \
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;                         \
+    TRACE(logger_info(__func__, __FILENAME__, __LINE__, "%s %lf", MESSAGE, time_spent); \
   } while (0);
 
 int IEX_SIGNAL_INTER = 0;
@@ -29,8 +29,10 @@ enum RISKI_ERROR_CODE symbol_sanitize(char* s, size_t n) {
       return RISKI_ERROR_CODE_NONE;
     }
   }
-  log_error("%.*s must have (nil) appened", n, s);
-  return RISKI_ERROR_CODE_INSUFFITIENT_SPACE;
+  TRACE(logger_error(RISKI_ERROR_CODE_INSUFFITIENT_SPACE, __func__,
+                     __FILENAME__, __LINE__, "%.*s must have (nil) appened", n,
+                     s));
+  return RISKI_ERROR_CODE_UNKNOWN;
 }
 
 /**
@@ -49,20 +51,34 @@ enum RISKI_ERROR_CODE iex_tp_handler(u_char* data);
 /**
  * Prints the packet header for debug information
  */
-void print_iex_tp_header(struct iex_tp_header* header) {
-  log_debug(" === iex_tp_header ===");
-  log_debug("version: 0x%x", header->version);
-  log_debug("reserved: 0x%x", header->reserved);
-  log_debug("message_protocol_id: %u", header->message_protocol_id);
-  log_debug("channel_id: %u", header->channel_id);
-  log_debug("session_id: %u", header->session_id);
-  log_debug("payload_length: %u", header->payload_length);
-  log_debug("message_count: %u", header->message_count);
-  log_debug("stream_offset: %ld", header->stream_offset);
-  log_debug("first_message_sequence_number: %ld",
-            header->first_message_sequence_number);
-  log_debug("send_time: %lu", header->send_time);
-  log_debug(" === iex_tp_header ===");
+enum RISKI_ERROR_CODE print_iex_tp_header(struct iex_tp_header* header) {
+  PTR_CHECK(header, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  TRACE(
+      logger_info(__func__, __FILENAME__, __LINE__, " === iex_tp_header ==="));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "version: 0x%x",
+                    header->version));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "reserved: 0x%x",
+                    header->reserved));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "message_protocol_id: %u",
+                    header->message_protocol_id));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "channel_id: %u",
+                    header->channel_id));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "session_id: %u",
+                    header->session_id));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "payload_length: %u",
+                    header->payload_length));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "message_count: %u",
+                    header->message_count));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "stream_offset: %ld",
+                    header->stream_offset));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "first_message_sequence_number: %ld",
+                    header->first_message_sequence_number));
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "send_time: %lu",
+                    header->send_time));
+  TRACE(
+      logger_info(__func__, __FILENAME__, __LINE__, " === iex_tp_header ==="));
+  return RISKI_ERROR_CODE_NONE;
 }
 
 bool is_iex_traffic(char* ip_src, char* ip_dst) {
@@ -80,8 +96,8 @@ bool is_iex_traffic(char* ip_src, char* ip_dst) {
 enum RISKI_ERROR_CODE iex_parse_deep(char* file) {
   PTR_CHECK(file, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  log_trace("given pcap file: %s", file);
-  log_trace("offline iex deep");
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "parsing pcap file: %s",
+                    file));
 
   // create a file descriptor for the pcap file
   char errbuff[PCAP_ERRBUF_SIZE];
@@ -90,16 +106,19 @@ enum RISKI_ERROR_CODE iex_parse_deep(char* file) {
   // exit with error if troubles happened during
   // opening
   if (!desc) {
-    log_error("%s", errbuff);
+    TRACE(logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__,
+                       __LINE__, "%s", errbuff));
     exit(1);
   }
 
-  log_trace("creating exchange with name IEX");
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "creating exchange with name IEX"));
   TRACE(exchange_new("IEX", &iex_exchange));
 
   if (pcap_loop(desc, 0, packet_handler, NULL) < 0) {
     if (IEX_SIGNAL_INTER != 1) {
-      log_error("%s", pcap_geterr(desc));
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__, "%s",
+                        pcap_geterr(desc)));
       exit(1);
     }
   }
@@ -156,22 +175,26 @@ enum RISKI_ERROR_CODE parse_system_event_message(void* payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   switch (((struct iex_system_event_message*)payload)->system_event) {
     case START_OF_MESSAGES:
-      log_trace("start of messages");
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__, "start of messages"));
       break;
     case START_OF_SYSTEM_HOURS:
-      log_trace("start of system hours");
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                        "start of system hours"));
       break;
     case START_OF_REGULAR_MARKET_HOURS:
-      log_trace("start of regular market hours");
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                        "start of regular market hours"));
       break;
     case END_OF_REGULAR_MARKET_HOURS:
-      log_trace("end of regular market hours");
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                        "end of regular market hours"));
       break;
     case END_OF_SYSTEM_HOURS:
-      log_trace("end of system hours");
+      TRACE(
+          logger_info(__func__, __FILENAME__, __LINE__, "end of system hours"));
       break;
     case END_OF_MESSAGES:
-      log_trace("end of messages");
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__, "end of messages"));
       break;
   }
   return RISKI_ERROR_CODE_NONE;
@@ -188,7 +211,8 @@ enum RISKI_ERROR_CODE parse_security_directory_message(void* payload) {
       (struct iex_security_directory_message*)(payload);
 
   TRACE(symbol_sanitize((char*)payload_data->symbol, 8));
-  log_trace("security directory message for %s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "security directory message for %s", payload_data->symbol));
 
   // TODO do something with this information
   // TODO https://iextrading.com/docs/IEX%20DEEP%20Specification.pdf
@@ -208,7 +232,8 @@ enum RISKI_ERROR_CODE parse_trading_status_message(void* payload) {
   (void)payload_data;
 
   /*
-  log_trace("trading status message for %.8s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "trading status message
+  for %.8s", payload_data->symbol);
   */
   // TODO do something with this information
   //
@@ -223,7 +248,8 @@ enum RISKI_ERROR_CODE parse_operational_hault_status_message(void* payload) {
       (struct iex_operational_halt_status_message*)(payload);
   (void)payload_data;
 
-  log_trace("operation hault message for %.8s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "operation hault message for %.8s", payload_data->symbol));
 
   // TODO do something with this information
   return RISKI_ERROR_CODE_NONE;
@@ -237,7 +263,8 @@ enum RISKI_ERROR_CODE parse_short_sale_price_test_status_message(
       (struct iex_short_sale_price_test_message*)(payload);
   (void)payload_data;
   /*
-  log_trace("short sale price test message for %.8s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "short sale price test
+  message for %.8s", payload_data->symbol);
   */
 
   // TODO do something with this information
@@ -253,14 +280,18 @@ enum RISKI_ERROR_CODE parse_security_event_message(void* payload) {
 
   switch (payload_data->security_event) {
     case OPENING_PROCESS_COMPLETE:
-      log_trace("opening process complete %.8s", payload_data->symbol);
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                        "opening process complete %.8s", payload_data->symbol));
       break;
     case CLOSING_PROCESS_COMPLETE:
-      log_trace("closing process complete %.8s", payload_data->symbol);
+      TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                        "closing process complete %.8s", payload_data->symbol));
       break;
     default:
-      log_error("unknown security event message 0x%x symbol %.8s",
-                payload_data->security_event, payload_data->symbol);
+      TRACE(logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__,
+                         __LINE__,
+                         "unknown security event message 0x%x symbol %.8s",
+                         payload_data->security_event, payload_data->symbol));
       return RISKI_ERROR_CODE_INVALID_MESSAGE;
       exit(1);
   }
@@ -338,7 +369,8 @@ enum RISKI_ERROR_CODE parse_official_price_message(void* payload) {
   // TODO pass the information to the market about
   // the official opening and closing prices
 
-  log_trace("official price message for %.8s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "official price message for %.8s", payload_data->symbol));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -354,7 +386,8 @@ enum RISKI_ERROR_CODE parse_trade_break_message(void* payload) {
   // TODO this is IEX specific and is considered "rare"
   // TODO I'm unsure what to do with this
 
-  log_trace("trade break message %.8s", payload_data->symbol);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "trade break message %.8s", payload_data->symbol));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -368,8 +401,8 @@ enum RISKI_ERROR_CODE parse_auction_information_message(void* payload) {
   // TODO is should not affect the order book or last
   // TODO traded prices and I think can be left alone for now
 
-  log_trace("auction information for %.8s", payload_data->symbol);
-  (void)payload_data;
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "auction information for %.8s", payload_data->symbol));
 
   return RISKI_ERROR_CODE_NONE;
 }
@@ -386,8 +419,9 @@ enum RISKI_ERROR_CODE iex_tp_handler(u_char* data) {
   struct iex_tp_header* header = (struct iex_tp_header*)&data[0];
 
   if (!(header->message_protocol_id == 0x8004 && header->channel_id == 1)) {
-    log_trace("unknown protocol\n");
-    return RISKI_ERROR_CODE_INVALID_PROTOCOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_PROTOCOL, __func__,
+                       __FILENAME__, __LINE__, "unknown protocol\n"));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
 
   if (header->payload_length == 0 && header->message_count == 0) {

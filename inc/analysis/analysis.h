@@ -25,7 +25,7 @@ struct chart;
 #include <tracer.h>
 
 // standard inputs
-#include <log/log.h>
+#include <logger.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>

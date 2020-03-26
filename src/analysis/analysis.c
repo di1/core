@@ -129,7 +129,9 @@ void* analysis_thread_func(void* index) {
 
   // this thread will only monitor this bin of analysis requests
   struct analysis_list* bin = thread_operations[assigned_bin];
-  log_trace("thread was assigned bin id %lu %p", assigned_bin, bin);
+  // logger_info("thread was assigned bin id %lu %p", assigned_bin, bin);
+  logger_info(__func__, __FILENAME__, __LINE__, "assigned thread bin #%d",
+              assigned_bin);
 
   while (ANALYSIS_INTERRUPED == 0) {
     // get the next analysis in the queue
@@ -154,10 +156,10 @@ void* analysis_thread_func(void* index) {
     chart_analysis_lock(cht);
 
     // group the analysis into sections from simplest to hardest
-    simple_analysis(cht, end_candle);
-    chart_invalidate_trends(cht);
-    find_horizontal_line(cht, end_candle);
-    find_trend_line(cht, end_candle);
+    TRACE_HAULT(simple_analysis(cht, end_candle));
+    TRACE_HAULT(chart_invalidate_trends(cht));
+    TRACE_HAULT(find_horizontal_line(cht, end_candle));
+    TRACE_HAULT(find_trend_line(cht, end_candle));
 
     // release the analysis struct lock
     chart_analysis_unlock(cht);
@@ -168,16 +170,22 @@ void* analysis_thread_func(void* index) {
 
 enum RISKI_ERROR_CODE analysis_init() {
   int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
-  log_info("processor has %d processing threads", numCPU);
-  log_trace("creating %d processing units", numCPU);
+  // log_info("processor has %d processing threads", numCPU);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__, "machine has %d threads",
+                    numCPU));
+  // log_trace("creating %d processing units", numCPU);
 
   num_analysis_threads = numCPU;
 
   if (numCPU - 3 > 0) {
     num_analysis_threads = numCPU - 3;
+  } else {
+    logger_warning(__func__, __FILENAME__, __LINE__,
+                   "machine has less than 4 cores");
   }
 
-  log_trace("creating %d processing units", numCPU);
+  TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                    "creating %d analysis threads", numCPU));
 
   // create the list container
   thread_operations = (struct analysis_list**)malloc(
@@ -295,7 +303,9 @@ enum RISKI_ERROR_CODE analysis_push(struct chart* cht, size_t start,
   }
 
   if (ne > 5) {
-    log_warn("thread id %lu analysis is %lu charts behind", thread_bin, ne);
+    TRACE(logger_warning(__func__, __FILENAME__, __LINE__,
+                         "thread id #%lu has fallen behind by %lu charts",
+                         thread_bin, ne));
   }
 
   current_analysis_index += 1;

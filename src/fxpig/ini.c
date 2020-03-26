@@ -53,7 +53,7 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
   FILE* fp = fopen(file, "r");
 
   if (fp == NULL) {
-    log_error("%s does not exist", file);
+    logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "%s does not exist", file);
   }
 
   // initalize the config
@@ -118,7 +118,7 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
       } else if (strcmp(id, "DataDictionary") == 0) {
         config->defaults.data_dictionary = value;
       } else {
-        log_error("unknown id=%s with value=%s", id, value);
+        logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "unknown id=%s with value=%s", id, value);
         exit(1);
       }
       free(id);
@@ -143,7 +143,7 @@ struct fxpig_ini_config* fxpig_ini_parse(char* file) {
             atoi(value);
         free(value);
       } else {
-        log_error("unknown id=%s with value=%s", id, value);
+        logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "unknown id=%s with value=%s", id, value);
         exit(1);
       }
       free(id);

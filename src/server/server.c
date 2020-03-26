@@ -1,7 +1,5 @@
 #include <server/server.h>
 
-#include "iex/iex.h"
-
 #define LWS_PLUGIN_STATIC
 #include "protocol_lws_minimal.c"
 
@@ -19,11 +17,31 @@ static struct lws_protocols protocols[] = {
     {NULL, NULL, 0, 0} /* terminator */
 };
 
+static const struct lws_http_mount mount_search = {
+    /* .mount_next */ NULL,      /* linked-list "next" */
+    /* .mountpoint */ "/search", /* mountpoint URL */
+    /* .origin */ "./web",       /* serve from dir */
+    /* .def */ "index.html",     /* default filename */
+    /* .protocol */ NULL,
+    /* .cgienv */ NULL,
+    /* .extra_mimetypes */ NULL,
+    /* .interpret */ NULL,
+    /* .cgi_timeout */ 0,
+    /* .cache_max_age */ 0,
+    /* .auth_mask */ 0,
+    /* .cache_reusable */ 0,
+    /* .cache_revalidate */ 0,
+    /* .cache_intermediaries */ 0,
+    /* .origin_protocol */ LWSMPRO_FILE, /* files in a dir */
+    /* .mountpoint_len */ 1,             /* char count */
+    /* .basic_auth_login_file */ NULL,
+};
+
 static const struct lws_http_mount mount = {
-    /* .mount_next */ NULL,  /* linked-list "next" */
-    /* .mountpoint */ "/",   /* mountpoint URL */
-    /* .origin */ "./web",   /* serve from dir */
-    /* .def */ "index.html", /* default filename */
+    /* .mount_next */ &mount_search, /* linked-list "next" */
+    /* .mountpoint */ "/",           /* mountpoint URL */
+    /* .origin */ "./web",           /* serve from dir */
+    /* .def */ "index.html",         /* default filename */
     /* .protocol */ NULL,
     /* .cgienv */ NULL,
     /* .extra_mimetypes */ NULL,
@@ -71,6 +89,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
       pss->wsi = wsi;
       pss->last = vhd->current;
+      pss->current = pss->last;
       break;
 
     case LWS_CALLBACK_CLOSED:
@@ -81,19 +100,18 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     case LWS_CALLBACK_SERVER_WRITEABLE:
 
-      if (!vhd->amsg.payload) break;
+      if (!pss->amsg.payload) break;
 
-      if (pss->last == vhd->current) break;
+      if (pss->last == pss->current) break;
 
       /* notice we allowed for LWS_PRE in the payload already */
-      m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) + LWS_PRE,
-                    vhd->amsg.len, LWS_WRITE_TEXT);
+      m = lws_write(pss->wsi, ((unsigned char *)pss->amsg.payload) + LWS_PRE,
+                    pss->amsg.len, LWS_WRITE_TEXT);
       if (m < (int)vhd->amsg.len) {
         lwsl_err("ERROR %d writing to ws\n", m);
         return -1;
       }
-      pss->last = vhd->current;
-
+      pss->current = pss->last;
       break;
 
     case LWS_CALLBACK_RECEIVE:
@@ -105,24 +123,25 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       }
 
       char *response = NULL;
-      TRACE_HAULT(parse_message(in, len, &response));
+      TRACE(parse_message(in, len, &response));
       if (!response) break;
       size_t response_len = strlen(response);
 
-      vhd->amsg.len = response_len;
+      pss->amsg.len = response_len;
       /* notice we over-allocate by LWS_PRE */
-      vhd->amsg.payload = malloc((LWS_PRE * 2) + response_len);
-      if (!vhd->amsg.payload) {
+      pss->amsg.payload = malloc((LWS_PRE * 2) + response_len);
+      if (!pss->amsg.payload) {
         lwsl_user("OOM: dropping\n");
         break;
       }
 
-      memcpy((char *)vhd->amsg.payload + LWS_PRE, response, response_len);
+      memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
+      pss->last++;
       vhd->current++;
 
       free(response);
 
-      lws_callback_on_writable(wsi);
+      lws_callback_on_writable(pss->wsi);
       break;
 
     default:
@@ -150,16 +169,16 @@ void *server_start(void *s) {
   lws_set_log_level(logs, NULL);
   // lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use
   // TLS / https)\n");
-  log_trace("start http & ws server");
+  TRACE_HAULT(logger_info(__func__, __FILENAME__, __LINE__, "start http & ws server"));
 
   memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
   info.port = 7681;
   info.mounts = &mount;
   info.protocols = protocols;
-  info.vhost_name = "localhost";
+  info.vhost_name = "0.0.0.0";
   info.ws_ping_pong_interval = 20;
-  info.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
-
+  // info.options =
+  // LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
   context = lws_create_context(&info);
   if (!context) {
     lwsl_err("lws init failed\n");

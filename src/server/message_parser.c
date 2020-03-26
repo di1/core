@@ -1,6 +1,7 @@
 #include <server/message_parser.h>
 
 #include "error_codes.h"
+#include "security/search.h"
 #include "security/security.h"
 
 enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
@@ -11,8 +12,10 @@ enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid security traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
   char* cht = NULL;
   TRACE(security_get_chart(sec, &cht));
@@ -28,8 +31,10 @@ enum RISKI_ERROR_CODE latest_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid security traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
 
   char* cht = NULL;
@@ -48,14 +53,25 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid secuiryt traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
 
   char* analysis_json = NULL;
   TRACE(security_get_analysis(sec, &analysis_json));
 
   *resp = analysis_json;
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE search_response(char* query, char** resp) {
+  char* dat = NULL;
+  TRACE(search_search(query, &dat));
+
+  *resp = dat;
+
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -83,17 +99,20 @@ enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp) {
 
     TRACE(init_response(tokened, &response));
     free(sanitized_msg);
-  }
-  if (strcmp("latest", tokened) == 0) {
+  } else if (strcmp("latest", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(latest_response(tokened, &response));
     free(sanitized_msg);
-  }
-  if (strcmp("analysis", tokened) == 0) {
+  } else if (strcmp("analysis", tokened) == 0) {
     tokened = strtok(NULL, "|");
 
     TRACE(analysis_response(tokened, &response));
+    free(sanitized_msg);
+  } else if (strcmp("search", tokened) == 0) {
+    tokened = strtok(NULL, "|");
+
+    TRACE(search_response(tokened, &response));
     free(sanitized_msg);
   }
 

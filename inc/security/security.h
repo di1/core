@@ -4,7 +4,7 @@
 #include <book/book.h>
 #include <chart/chart.h>
 #include <error_codes.h>
-#include <log/log.h>
+#include <logger.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>

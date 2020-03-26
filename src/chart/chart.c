@@ -158,7 +158,7 @@ enum RISKI_ERROR_CODE chart_invalidate_trends(struct chart* cht) {
       // get the candle close and low
       TRACE(candle_close(cht->candles[cht->cur_candle - 1], &close));
       int64_t low = 0;
-      TRACE(candle_low(cht->candles[cht->cur_candle - 1], &low));
+      TRACE(candle_low(cht->candles[t->start_index], &low));
       if (close < low) {
         t->direction = DIRECTION_INVALIDATED_SUPPORT;
         break;
@@ -166,7 +166,7 @@ enum RISKI_ERROR_CODE chart_invalidate_trends(struct chart* cht) {
     } else if (t->direction == DIRECTION_RESISTANCE) {
       TRACE(candle_close(cht->candles[cht->cur_candle - 1], &close));
       int64_t high = 0;
-      TRACE(candle_high(cht->candles[cht->cur_candle - 1], &high));
+      TRACE(candle_high(cht->candles[t->start_index], &high));
       if (close > high) {
         t->direction = DIRECTION_INVALIDATED_RESISTANCE;
         break;
@@ -221,8 +221,9 @@ enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
       break;
     default:
       (void)current_trend_start_price;
-      log_error("DIRECTION_INVALIDATED is not a valid direction");
-      exit(1);
+      TRACE(logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__,
+                         __LINE__,
+                         "DIRECTION_INVALIDATED is not a valid direction"));
   }
 
   for (size_t i = 0; i < cur_analysis->num_trend_lines_horizontal; ++i) {

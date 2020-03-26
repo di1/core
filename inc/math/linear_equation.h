@@ -1,7 +1,6 @@
 #ifndef LINEAR_EQUATION_
 #define LINEAR_EQUATION_
 
-#include <log/log.h>
 #include <math.h>
 #include <stdlib.h>
 

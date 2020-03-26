@@ -113,7 +113,7 @@ void fxpig_live(struct fxpig_ini_config* cfg) {
   int sock = 0;
   struct sockaddr_in serv_addr;
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    log_error("Socket creation error");
+    logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "Socket creation error");
     exit(1);
   }
 
@@ -125,12 +125,12 @@ void fxpig_live(struct fxpig_ini_config* cfg) {
   if (inet_pton(AF_INET,
                 cfg->sessions[FXPIG_SESSION_INDEX].socket_connection_host,
                 &serv_addr.sin_addr) <= 0) {
-    log_error("Invalid address/ Address not supported");
+    logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__,"Invalid address/ Address not supported");
     exit(1);
   }
 
   if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    log_error("Connection Failed");
+    logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "Connection Failed");
     exit(1);
   }
 
@@ -152,7 +152,7 @@ void fxpig_live(struct fxpig_ini_config* cfg) {
     int numread;
 
     if ((numread = read(sock, buff, sizeof(buff) - 1)) == -1) {
-      log_error("reading error");
+      logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__, __LINE__, "reading error");
       exit(1);
     }
 

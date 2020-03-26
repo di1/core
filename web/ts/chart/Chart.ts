@@ -50,7 +50,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
 
     this.symbol = symbol;
-    this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
+    this.conn = new WebSocket('ws://riski.local:7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);
@@ -731,11 +731,11 @@ class CandleChart { // eslint-disable-line no-unused-vars
                  ' H:' + (candles[mouseCandleIndex].candle.h/10000).toFixed(4) +
                  ' L:' + (candles[mouseCandleIndex].candle.l/10000).toFixed(4) +
                  ' C:' + (candles[mouseCandleIndex].candle.c/10000).toFixed(4),
-    ctx.measureText(this.symbol).width + this.PADDING_TOP+1, 2);
+    ctx.measureText(this.symbol).width + this.PADDING_TOP+10, 4);
 
 
     // Draw the symbol ticker
-    ctx.fillText(this.symbol.toUpperCase(), 0, 0);
+    ctx.fillText(this.symbol.toUpperCase(), this.PADDING_TOP / 2.0, 4);
     ctx.restore();
 
 

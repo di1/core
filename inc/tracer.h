@@ -1,5 +1,10 @@
 #include <stdlib.h>
 
+#ifndef TRACER_
+#define TRACER_
+
+#include <stdio.h>
+
 #ifndef __FILENAME__
 #define __FILENAME__ \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -48,4 +53,6 @@
       return ERROR_CODE;                                             \
     }                                                                \
   } while (0)
+#endif
+
 #endif
