@@ -2,7 +2,6 @@
 #define CANDLE_
 
 #include <error_codes.h>
-#include <log/log.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

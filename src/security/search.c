@@ -37,8 +37,8 @@ enum RISKI_ERROR_CODE search_init(char* csv_db) {
   while (fgets(line, 1024, fp)) {
     char* tok = NULL;
     db_search.n += 1;
-    db_search.data =
-        (struct csv_data*)(realloc(db_search.data, sizeof(struct csv_data) * db_search.n));
+    db_search.data = (struct csv_data*)(realloc(
+        db_search.data, sizeof(struct csv_data) * db_search.n));
 
     PTR_CHECK(db_search.data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -64,7 +64,6 @@ enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
 
   for (size_t i = 0; i < db_search.n; ++i) {
     if (strncmp(seq, db_search.data[i].symbol, strlen(seq)) == 0) {
-      printf("%s->?\t%s\n", db_search.data[i].symbol, db_search.data[i].symbol);
       TRACE(string_builder_append(sb, "{\"symbol\":\"", 9));
       TRACE(string_builder_append(sb, db_search.data[i].symbol,
                                   strlen(db_search.data[i].symbol)));
@@ -82,8 +81,8 @@ enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
   TRACE(string_builder_free(&sb));
 
   size_t len = strlen(dat);
-  dat[len-2] = ']';
-  dat[len-1] = '\x0';
+  dat[len - 2] = ']';
+  dat[len - 1] = '\x0';
 
   *json = dat;
 

@@ -1,7 +1,5 @@
 #include <server/server.h>
 
-#include "iex/iex.h"
-
 #define LWS_PLUGIN_STATIC
 #include "protocol_lws_minimal.c"
 
@@ -20,10 +18,10 @@ static struct lws_protocols protocols[] = {
 };
 
 static const struct lws_http_mount mount_search = {
-    /* .mount_next */ NULL,  /* linked-list "next" */
-    /* .mountpoint */ "/search",   /* mountpoint URL */
-    /* .origin */ "./web",   /* serve from dir */
-    /* .def */ "index.html", /* default filename */
+    /* .mount_next */ NULL,      /* linked-list "next" */
+    /* .mountpoint */ "/search", /* mountpoint URL */
+    /* .origin */ "./web",       /* serve from dir */
+    /* .def */ "index.html",     /* default filename */
     /* .protocol */ NULL,
     /* .cgienv */ NULL,
     /* .extra_mimetypes */ NULL,
@@ -40,10 +38,10 @@ static const struct lws_http_mount mount_search = {
 };
 
 static const struct lws_http_mount mount = {
-    /* .mount_next */ &mount_search,  /* linked-list "next" */
-    /* .mountpoint */ "/",   /* mountpoint URL */
-    /* .origin */ "./web",   /* serve from dir */
-    /* .def */ "index.html", /* default filename */
+    /* .mount_next */ &mount_search, /* linked-list "next" */
+    /* .mountpoint */ "/",           /* mountpoint URL */
+    /* .origin */ "./web",           /* serve from dir */
+    /* .def */ "index.html",         /* default filename */
     /* .protocol */ NULL,
     /* .cgienv */ NULL,
     /* .extra_mimetypes */ NULL,
@@ -138,8 +136,8 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
       }
 
       memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
-      pss->last ++;
-      vhd->current ++;
+      pss->last++;
+      vhd->current++;
 
       free(response);
 
@@ -171,7 +169,7 @@ void *server_start(void *s) {
   lws_set_log_level(logs, NULL);
   // lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use
   // TLS / https)\n");
-  log_trace("start http & ws server");
+  TRACE_HAULT(logger_info(__func__, __FILENAME__, __LINE__, "start http & ws server"));
 
   memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
   info.port = 7681;

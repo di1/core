@@ -28,7 +28,7 @@ enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb) {
 
 enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb, char* c,
                                             size_t n) {
-  (void) n;
+  (void)n;
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);

@@ -3,7 +3,6 @@
 
 // tcp ip / wireshark / packet analyzer
 #include <arpa/inet.h>
-#include <log/log.h>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
@@ -26,6 +25,7 @@
 
 // the error codes and stack tracer
 #include <error_codes.h>
+#include <logger.h>
 #include <tracer.h>
 
 /**

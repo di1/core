@@ -221,8 +221,9 @@ enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
       break;
     default:
       (void)current_trend_start_price;
-      log_error("DIRECTION_INVALIDATED is not a valid direction");
-      exit(1);
+      TRACE(logger_error(RISKI_ERROR_CODE_UNKNOWN, __func__, __FILENAME__,
+                         __LINE__,
+                         "DIRECTION_INVALIDATED is not a valid direction"));
   }
 
   for (size_t i = 0; i < cur_analysis->num_trend_lines_horizontal; ++i) {

@@ -67,7 +67,8 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
 
   num_securities += 1;
   if (num_securities % 200 == 0)
-    log_debug("~%lu securities monitored", num_securities);
+    TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+                      "~%lu securities monitored", num_securities));
 
   return RISKI_ERROR_CODE_NONE;
 }

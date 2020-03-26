@@ -12,8 +12,10 @@ enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid security traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
   char* cht = NULL;
   TRACE(security_get_chart(sec, &cht));
@@ -29,8 +31,10 @@ enum RISKI_ERROR_CODE latest_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid security traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
 
   char* cht = NULL;
@@ -49,8 +53,10 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
   TRACE(exchange_get(iex_exchange, security, &sec));
 
   if (!sec) {
-    log_error("%s is not a valid secuiryt traded on IEX", security);
-    return RISKI_ERROR_CODE_INVALID_SYMBOL;
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
+                       __LINE__, "%s is not a valid security traded on IEX",
+                       security));
+    return RISKI_ERROR_CODE_UNKNOWN;
   }
 
   char* analysis_json = NULL;

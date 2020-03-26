@@ -11,7 +11,6 @@
 
 // stack tracer
 #include <error_codes.h>
-#include <log/log.h>
 #include <tracer.h>
 
 /*

@@ -4,8 +4,8 @@
 #include <libwebsockets.h>
 #include <signal.h>
 #include <string.h>
-
-#include "message_parser.h"
+#include <iex/iex.h>
+#include <server/message_parser.h>
 
 extern int SERVER_INTERRUPTED;
 

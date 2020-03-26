@@ -34,7 +34,6 @@ struct per_session_data__minimal {
   int last; /* the last message number we sent */
   int current;
   struct msg amsg;
-
 };
 
 /* one of these is created for each vhost our protocol is used with */
