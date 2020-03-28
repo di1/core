@@ -50,8 +50,8 @@ function onSearchReceived(evt: MessageEvent) {
 
     const inputRect: DOMRect = searchInput.getBoundingClientRect();
 
-    searchResultDiv.style.top = (inputRect.bottom).toString() + 'px';
-    searchResultDiv.style.left = (inputRect.left).toString() + 'px';
+    // searchResultDiv.style.top = '1px';
+    // searchResultDiv.style.left = (inputRect.left).toString() + 'px';
     searchResultDiv.style.width = (inputRect.width).toString() + 'px';
     searchResultDiv.style.height = '200px';
     searchResultDiv.style.display = 'block';

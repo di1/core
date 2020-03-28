@@ -11,7 +11,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private NUM_TICKS: number = 20;
   private PADDING_BOT: number = 50;
   private PADDING_TOP: number = 20;
-  private CANDLE_WIDTH: number = 10;
+  private CANDLE_WIDTH: number = 8;
 
 
   private ROOT_CHART: RootChartObject;
@@ -25,9 +25,10 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
   private ANALYSIS_RESULTS: RootAnalysisJSON;
 
-  private CHART_STYLE_BACKGROUND_COLOR = '#131722';
-  private CHART_STYLE_CANDLE_FALLING = '#EF5350';
-  private CHART_STYLE_CANDLE_RISING = '#26A69A';
+  private CHART_STYLE_BACKGROUND_COLOR = '#212733';
+  private CHART_STYLE_CANDLE_FALLING = '#ff3333';
+  private CHART_STYLE_CANDLE_RISING = '#49796B';
+  private CHART_STYLE_TEXT_COLOR = '#80D4FF';
 
   /**
     Resets all the top level data that determines the chart
@@ -251,13 +252,13 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.translate(0.5, 0.5);
 
     // Set font
-    ctx.font = 'normal 1.4em Hack';
+    ctx.font = 'normal 1.1em Hack';
 
     // Most drawing of text has a baseline of middle and drawing text is
     // mainly of white text
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = 'white';
-    ctx.fillStyle = 'white';
+    ctx.strokeStyle = this.CHART_STYLE_TEXT_COLOR;
+    ctx.fillStyle = this.CHART_STYLE_TEXT_COLOR;
 
     // Clear the drawing area
     ctx.save();

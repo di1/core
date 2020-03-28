@@ -1,30 +1,26 @@
 <!DOCTYPE html>
-
 <html>
-
   <head>
     <meta charset="UTF-8">
     <meta lang="EN">
-
     <link rel="stylesheet" type="text/css" href="/css/global.css">
     <script type="text/javascript" src="/main.min.js"></script>
-
   </head>
 
   <body>
-    <div class="bar">
-      <img src="/img/riski_logo.svg" height="75%"/>
-        <div id="search-area">
-          <label for="stock-search-input">Search</label>
-          <input id="stock-search-input"></input>
-          <div id="search-results">
-          </div>
-        </div>
+    <div id="search-area">
+      <input type="text" placeholder="Search..." id="stock-search-input"
+        autocomplete="off" required>
+      <div id="search-results"></div>
     </div>
     <br/>
     <div class="chart-container">
       <canvas id="chart"></canvas>
     </div>
+
+    <div class="analysis-results">
+
     </div>
+
   </body>
 </html>
