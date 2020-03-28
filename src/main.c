@@ -50,8 +50,8 @@ cli* cli_parse(int argc, char** argv) {
         options->pcap_feed_file = argv[i + 1];
       } else {
         printf("%s",
-                  "-pcap_feed must be followed "
-                  "by a file location");
+               "-pcap_feed must be followed "
+               "by a file location");
         exit(1);
       }
     } else if (strcmp("-fxpig", argv[i]) == 0) {

@@ -14,6 +14,7 @@ struct chart;
 #endif
 
 #include <error_codes.h>
+#include <logger.h>
 #include <math/linear_equation.h>
 #include <tracer.h>
 

@@ -26,8 +26,7 @@ enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb);
  * @param {size_t} n The length of c
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb, char* c,
-                                            size_t n);
+enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb, char* c);
 
 /*
  * Gets the string built by the string builder. The *c pointer is

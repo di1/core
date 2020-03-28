@@ -370,51 +370,18 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart* cht, char** json) {
   struct chart_analysis* chta = cht->analysis;
 
   pthread_mutex_lock(&(chta->lock));
-
   size_t num_candles = cht->cur_candle + 1;
-  // analysis proto {"analysis":
-  //                {"singleCandle":[000000000,000000000,000000000,...]},
-  //                {"trendLines":[{s:000000000,e:00000000,d:00000000}...]}}
 
-  // begining prototype length {"analy...[
-  size_t total_json_size = 30;
-  // commas
-  total_json_size += (num_candles - 1);
-
-  // integer for each candle
-  total_json_size += (num_candles * 8);
-
-  // ending ]},
-  total_json_size += 3;
-
-  // {"trend_lines":[
-  total_json_size += 16;
-
-  // each trend line {s:...}
-  total_json_size += (chta->num_trend_lines_horizontal * 36);
-
-  // commas between each trend json
-  total_json_size += (chta->num_trend_lines_horizontal - 1);
-
-  // ending ]}}
-  total_json_size += 3;
-
-  // build the single candle analysis json
-  char* buf = (char*)calloc(total_json_size, sizeof(char));
-  PTR_CHECK(buf, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
-
-  strcat(buf, "{\"analysis\":{\"singleCandle\":[\x0");
+  struct string_builder* sb = NULL;
+  TRACE(string_builder_new(&sb));
+  TRACE(string_builder_append(sb, "{\"analysis\":{\"singleCandle\":["));
   for (size_t i = 0; i < num_candles; ++i) {
     char resbuf[10] = {0};
     sprintf(resbuf, "%u", chta->scp[i]);
-    if (i != num_candles - 1) strcat(resbuf, ",\x0");
-    strcat(buf, resbuf);
+    if (i != num_candles - 1) strcat(resbuf, ",");
+    TRACE(string_builder_append(sb, resbuf));
   }
-
-  strcat(buf, "],\x0");
-
-  // build the trend_lines json
-  strcat(buf, "\"trendLines\":[\x0");
+  TRACE(string_builder_append(sb, "], \"trendLines\":["));
   for (size_t i = 0; i < chta->num_trend_lines_horizontal; ++i) {
     char trend_line_json_buf[34];
     sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%u}",
@@ -422,14 +389,28 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart* cht, char** json) {
             chta->trend_lines_horizontal[i].end_index,
             (chta->trend_lines_horizontal[i].direction));
     if (i != chta->num_trend_lines_horizontal - 1)
-      strcat(trend_line_json_buf, ",\x0");
-    strcat(buf, trend_line_json_buf);
+      strcat(trend_line_json_buf, ",");
+    TRACE(string_builder_append(sb, trend_line_json_buf));
   }
-
-  strcat(buf, "]}}\x0");
+  TRACE(string_builder_append(sb, "], \"slopedLines\": ["));
+  for (size_t i = 0; i < chta->num_trend_lines_sloped; ++i) {
+    char trend_line_json_buf[34];
+    sprintf(trend_line_json_buf, "{\"s\":%lu,\"e\":%lu,\"d\":%u}",
+            chta->trend_lines_sloped[i].start_index,
+            chta->trend_lines_sloped[i].end_index,
+            (chta->trend_lines_sloped[i].direction));
+    if (i != chta->num_trend_lines_sloped - 1) strcat(trend_line_json_buf, ",");
+    TRACE(string_builder_append(sb, trend_line_json_buf));
+  }
+  TRACE(string_builder_append(sb, "]}}"));
   pthread_mutex_unlock(&(chta->lock));
 
-  *json = buf;
+  char* str_rep = NULL;
+  TRACE(string_builder_str(sb, &str_rep));
+  TRACE(string_builder_free(&sb));
+
+  *json = str_rep;
+
   return RISKI_ERROR_CODE_NONE;
 }
 

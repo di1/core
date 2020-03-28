@@ -1,5 +1,7 @@
 #include <analysis/trend_line.h>
 
+#include "chart/chart.h"
+
 enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -9,6 +11,10 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
 
   struct candle* candle_first = NULL;
   TRACE(chart_get_candle(cht, slope_first_point, &candle_first));
+
+  size_t best_last_valid_confirmation = 0;
+  size_t best_last_valid_confirmation_coverage = 0;
+  size_t best_number_of_confirmations = 0;
 
   for (int i = (int)(num_candles)-2; i >= 0; --i) {
     size_t slope_second_point = i;
@@ -63,16 +69,47 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
     // Two confirmations at least from the two points that were used to
     // construct the line one more for it to be valid (thats what the great
     // economics said don't ask me why)
-    if (number_of_confirmations >= 3) {
+    if (number_of_confirmations >= 4) {
+      // check the length
+      size_t segment_coverage = slope_first_point - last_valid_confirmation;
+      if (segment_coverage > best_last_valid_confirmation) {
+        best_last_valid_confirmation_coverage = segment_coverage;
+        best_last_valid_confirmation = last_valid_confirmation;
+        best_number_of_confirmations = number_of_confirmations;
+      }
+
       // log_debug("number of confirmations %lu, %lu %lu",
       // number_of_confirmations,
       //          slope_second_point, last_valid_confirmation);
-      TRACE(chart_put_sloped_line_pattern(cht, last_valid_confirmation,
-                                          slope_first_point,
-                                          DIRECTION_RESISTANCE));
+      // char* n = NULL;
+      // TRACE(chart_get_name(cht, &n));
+
+      // TRACE(logger_analysis(n, "SLOPED_TREND", __func__, __FILENAME__,
+      // __LINE__,
+      //                      "confirmations=%lu first_point=%lu
+      //                      last_point=%lu", number_of_confirmations,
+      //                      slope_first_point, last_valid_confirmation));
+      // TRACE(chart_put_sloped_line_pattern(cht, last_valid_confirmation,
+      //                                   slope_first_point,
+      //                                   DIRECTION_RESISTANCE));
     }
   continue_outer_loop:
     linear_equation_free(&eq);
+  }
+
+  if (best_number_of_confirmations >= 4 &&
+      best_last_valid_confirmation_coverage > 3) {
+    char* n = NULL;
+    TRACE(chart_get_name(cht, &n));
+
+    TRACE(logger_analysis(
+        n, "SLOPED_TREND", __func__, __FILENAME__, __LINE__,
+        "confirmations=%lu first_point=%lu last_point=%lu coverage=%lu",
+        best_number_of_confirmations, slope_first_point,
+        best_last_valid_confirmation, best_last_valid_confirmation_coverage));
+    TRACE(chart_put_sloped_line_pattern(cht, best_last_valid_confirmation,
+                                        slope_first_point,
+                                        DIRECTION_RESISTANCE));
   }
 
   return RISKI_ERROR_CODE_NONE;

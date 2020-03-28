@@ -53,6 +53,8 @@ enum RISKI_ERROR_CODE search_init(char* csv_db) {
 }
 
 enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
+  // TODO use tree data structure instead (much faster)
+
   PTR_CHECK(seq, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(db_search.data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -60,21 +62,19 @@ enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
   struct string_builder* sb = NULL;
   TRACE(string_builder_new(&sb));
 
-  TRACE(string_builder_append(sb, "[", 1));
+  TRACE(string_builder_append(sb, "["));
 
   for (size_t i = 0; i < db_search.n; ++i) {
     if (strncmp(seq, db_search.data[i].symbol, strlen(seq)) == 0) {
-      TRACE(string_builder_append(sb, "{\"symbol\":\"", 9));
-      TRACE(string_builder_append(sb, db_search.data[i].symbol,
-                                  strlen(db_search.data[i].symbol)));
-      TRACE(string_builder_append(sb, "\",\"fullName\":\"", 12));
-      TRACE(string_builder_append(sb, db_search.data[i].full_name,
-                                  strlen(db_search.data[i].full_name)));
-      TRACE(string_builder_append(sb, "\"},", 3));
+      TRACE(string_builder_append(sb, "{\"symbol\":\""));
+      TRACE(string_builder_append(sb, db_search.data[i].symbol));
+      TRACE(string_builder_append(sb, "\",\"fullName\":\""));
+      TRACE(string_builder_append(sb, db_search.data[i].full_name));
+      TRACE(string_builder_append(sb, "\"},"));
     }
   }
 
-  TRACE(string_builder_append(sb, "]", 1));
+  TRACE(string_builder_append(sb, "]"));
 
   char* dat = NULL;
   TRACE(string_builder_str(sb, &dat));

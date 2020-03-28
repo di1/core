@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string_builder.h>
 #include <tracer.h>
 
 /*

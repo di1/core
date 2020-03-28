@@ -30,6 +30,12 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private CHART_STYLE_CANDLE_RISING = '#49796B';
   private CHART_STYLE_TEXT_COLOR = '#80D4FF';
 
+  private CHART_STYLE_ANALYSIS_TREND_LINE_SUPPORT = 'yellow';
+  private CHART_STYLE_ANALYSIS_TREND_LINE_RESISTANCE = '#6666ff';
+  private CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED = 'white';
+
+  private CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY = 1.0;
+
   /**
     Resets all the top level data that determines the chart
    */
@@ -39,7 +45,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
     };
 
     this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
-      analysis: <AnalysisJSON> {singleCandle: [], trendLines: []},
+      analysis: <AnalysisJSON> {singleCandle: [], trendLines: [],
+        slopedLines: []},
     };
   }
   /**
@@ -64,7 +71,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
     };
 
     this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
-      analysis: <AnalysisJSON> {singleCandle: [], trendLines: []},
+      analysis: <AnalysisJSON> {singleCandle: [], trendLines: [],
+        slopedLines: []},
     };
   }
 
@@ -506,7 +514,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
   }
 
   /**
-    Draws a trend line
+    Draws a horizontal trend line
 
     @param {CanvasRenderingContext2D} ctx The rendering context
     @param {Chart[]} candles The full list of candles
@@ -518,7 +526,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
     @param {number} rightBarPriceWidth The pixel location of the price bar
     @param {number} drawingWidth The entire drawing width
    */
-  private drawTrendLine(ctx: CanvasRenderingContext2D, candles: Chart[],
+  private drawHorizontalTrendLine(ctx: CanvasRenderingContext2D,
+      candles: Chart[],
       priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number,
       rightBarPriceWidth: number, drawingWidth: number) {
     // Make sure the trend line is in a visible range
@@ -530,21 +539,22 @@ class CandleChart { // eslint-disable-line no-unused-vars
     let height: number = 0;
     if (trendLine.d == 0) { // support
       height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = 'yellow';
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_SUPPORT;
     } else if (trendLine.d == 1) { // resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
-      ctx.strokeStyle = '#6666ff';
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_RESISTANCE;
     } else if (trendLine.d == 2) { // invalidated support
       height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = 'white';
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
       ctx.setLineDash([5, 5]);
     } else if (trendLine.d == 3) { // invalidated resistance
       height = priceToPixel.eval(candles[trendLine.e].candle.h);
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
       ctx.setLineDash([5, 5]);
     }
 
     ctx.fillStyle = ctx.strokeStyle;
-    ctx.lineWidth = 2.0;
+    ctx.lineWidth = this.CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY;
     const startingOffsetX: number =
       (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
@@ -552,6 +562,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
       (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING) +
       this.CANDLE_WIDTH;
 
+    // Draw the line with an arrow (45 degree)
     ctx.translate(startingOffsetX, height);
     ctx.moveTo(0, 0);
     ctx.lineTo(endingOffset, 0);
@@ -584,6 +595,64 @@ class CandleChart { // eslint-disable-line no-unused-vars
       ctx.stroke();
       ctx.restore();
     }
+  }
+
+  /**
+    Draws a sloped trend line
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {Chart[]} candles The full list of candles
+    @param {LinearEquation} priceToPixel An equation that converts a price
+          to a Y pixel coordiant
+    @param {TrendLine} trendLine The trend line object containing information
+          about the trend line to draw
+    @param {number} startIndex The left most draw candle index
+    @param {number} rightBarPriceWidth The pixel location of the price bar
+    @param {number} drawingWidth The entire drawing width
+   */
+  private drawSlopedTrendLine(ctx: CanvasRenderingContext2D, candles: Chart[],
+      priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number,
+      rightBarPriceWidth: number, drawingWidth: number) {
+    // Make sure the trend line is in a visible range
+    if (trendLine.s < startIndex) {
+      return;
+    }
+    ctx.save();
+    ctx.beginPath();
+    let height: number = 0;
+    if (trendLine.d == 0) { // support
+      height = priceToPixel.eval(candles[trendLine.e].candle.l);
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_SUPPORT;
+    } else if (trendLine.d == 1) { // resistance
+      height = priceToPixel.eval(candles[trendLine.e].candle.h);
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_RESISTANCE;
+    } else if (trendLine.d == 2) { // invalidated support
+      height = priceToPixel.eval(candles[trendLine.e].candle.l);
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
+      ctx.setLineDash([5, 5]);
+    } else if (trendLine.d == 3) { // invalidated resistance
+      height = priceToPixel.eval(candles[trendLine.e].candle.h);
+      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
+      ctx.setLineDash([5, 5]);
+    }
+
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.lineWidth = this.CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY;
+
+    const startingOffsetX: number =
+      ((trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING)) +
+      (this.CANDLE_WIDTH/2.0);
+
+    const endingOffset =
+      (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
+
+    ctx.strokeStyle = 'white';
+    ctx.translate(startingOffsetX, height);
+    ctx.moveTo(0, priceToPixel.eval(candles[trendLine.s].candle.h) -
+               priceToPixel.eval(candles[trendLine.e].candle.h));
+    ctx.lineTo(endingOffset, 0);
+    ctx.stroke();
+    ctx.restore();
   }
 
   /**
@@ -632,8 +701,15 @@ class CandleChart { // eslint-disable-line no-unused-vars
     // Draw the trend lines of the analysis
     for (let i: number = 0; i < analysisData.trendLines.length; ++i) {
       const trendLine: TrendLine = analysisData.trendLines[i];
-      this.drawTrendLine(ctx, candles, priceToPixel, trendLine, startIndex,
-          drawingWidth, rightBarPriceWidth);
+      this.drawHorizontalTrendLine(ctx, candles, priceToPixel, trendLine,
+          startIndex, drawingWidth, rightBarPriceWidth);
+    }
+
+    // Draw the trend lines that are sloped
+    for (let i: number = 0; i < analysisData.slopedLines.length; ++i) {
+      const trendLine: TrendLine = analysisData.slopedLines[i];
+      this.drawSlopedTrendLine(ctx, candles, priceToPixel, trendLine,
+          startIndex, drawingWidth, rightBarPriceWidth);
     }
 
     ctx.restore();

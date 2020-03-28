@@ -1,13 +1,13 @@
 #ifndef FXPIG_INI
 #define FXPIG_INI
 
+#include <error_codes.h>
 #include <logger.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tracer.h>
-#include <error_codes.h>
 
 // Represents the [DEFAULT] ini tag
 struct fxpig_ini_default {

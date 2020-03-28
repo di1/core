@@ -7,6 +7,7 @@ interface TrendLine {
 interface AnalysisJSON {
   singleCandle: number[];
   trendLines: TrendLine[];
+  slopedLines: TrendLine[];
 }
 
 interface RootAnalysisJSON {
