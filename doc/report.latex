@@ -3,6 +3,7 @@
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{float}
 \usepackage{tikz}
+\usepackage{pgfplots}
 
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
@@ -35,6 +36,7 @@
 \end{abstract}
 
 \section{Linear Equations in $\mathbb{Z}$}
+\label{linear equations in z}
 As said in the abstract, all math done is with integer arithmatic. This will
 generate a few challenges down the line because $\mathbb{Z}$ is not closed
 under division. A later more complicated analysis will require a linear equation
@@ -140,6 +142,95 @@ way of representing a linear equation to be stable under the integers.
   linear equations while staying in $\mathbb{Z}$ for analysing japanese candle stick charts.
 
 \end{proof}
+
+\section{Sloped Resistance and Support Lines}
+Sloped resistance and support lines are not at all
+easy to detect, Linear Equations in $\mathbb{Z}$ (\ref{linear equations in z})
+is only used to represent the line, now one must construct and somehow quantify 
+if it is a sloped resistance or support line. Throughout the remaining content
+of this section, downward sloped resistance lines will be used in mathematical and
+pseudocode representation, it will be easy to see how the same ideas and
+minimal code changes will result in generic sloped support lines.
+
+
+% Insert text on how to create trend line with pseudocode %
+
+Now that a trend line has been constructed we must find a way to quantify wheather
+or not the trend line is "good". We start with a theoretical model of a chart and trend line. Let us consider two
+functions, $t(x)$, representing a trend line and $s(x)$, representing a
+candle stick chart with
+$x \in \{[a, b] \vert a < b \vee a,b \in \mathbb{Z}\}$.
+Since $t(x)$ represents a resistance trend line, it is safe to assume $t(x) \ge s(x)$.
+Also, because $t(x)$ is downward sloping $max \text{\space} t(x) = t(a)$ and
+$min \text{\space} t(x) = t(b)$. Lastly $min \text{\space} s(x) = c$ where $c$
+is some constant. Below is a chart visualizing these theoretical constraints.
+
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = left,
+    xlabel = {time},
+    ylabel = {price},
+    ytick = {1.434, 2.712, 5.85},
+    yticklabels = {$c$, $t(b)$, $t(a)$},
+    xtick = {1.136, 4.3},
+    xticklabels = {$a$, $b$},
+    xtick style = {draw=none},
+    ytick style = {draw=none},
+    ymin = -3
+]
+%Below the red parabola is defined
+\addplot [
+    domain=0:7,
+    samples=1000, 
+    color=red,
+]
+  {-(x+sin(deg(4*x)))+6};
+  \addlegendentry{$s(x)$}
+%Here the blue parabloa is defined
+\addplot [
+    domain=0:7,
+    samples=100, 
+    color=blue,
+    ]
+    {-x + 7};
+  \addlegendentry{$t(x)$}
+  \addplot [
+    domain=0:7,
+    samples=100,
+    color=black,
+    style=dashed
+  ]{5.85};
+  \addplot [
+    domain=0:7,
+    samples=100,
+    color=black,
+    style=dashed
+  ]{2.712};
+  \addplot [
+    domain=0:7,
+    samples=100,
+    color=black,
+    style=dashed
+  ]{1.434};
+  \addplot [color=black, style=dashed] coordinates {(1.136, 7) (1.136, -3)};
+  \addplot [color=black, style=dashed] coordinates {(4.3, 7) (4.3, -3)};
+\end{axis}
+\end{tikzpicture}
+
+To measure how "good" or "bad" the trend is, it is not suffitient enough
+to just count the number of confirmations or spread the trend line covers,
+instead after building the trend line we will assign a score to the trend,
+the closer the number is to 0 the "better" the line. The closer it is to the
+upper bound, which will be derived below, will tell us its not the greatest
+line eventhough it meets the critiera to be a trend line.
+
+\** This idea came to mind while reading about the Lorenz curve and
+the Gini coefficient.
+
+The score will be defined as how close $s(x)$ is to $t(x)$ this will be done
+by taking the area between these curves. To start will make the wrong assumption
+that both these curves are continous in $\mathbb{Z}$ and then convert the
+integrals into their descrete equivilent.
 
 \section{Generic Candle Patterns}
 Before defining algorithms, we need to define mathematicaly the patterns traders
