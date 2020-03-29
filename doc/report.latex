@@ -157,8 +157,8 @@ minimal code changes will result in generic sloped support lines.
 
 Now that a trend line has been constructed we must find a way to quantify wheather
 or not the trend line is "good". We start with a theoretical model of a chart and trend line. Let us consider two
-functions, $t(x)$, representing a trend line and $s(x)$, representing a
-candle stick chart with
+functions, $t(x)$, representing a trend line and $s(x)$, representing the close
+values of a candle stick chart with
 $x \in \{[a, b] \vert a < b \vee a,b \in \mathbb{Z}\}$.
 Since $t(x)$ represents a resistance trend line, it is safe to assume $t(x) \ge s(x)$.
 Also, because $t(x)$ is downward sloping $max \text{\space} t(x) = t(a)$ and
@@ -228,9 +228,65 @@ line eventhough it meets the critiera to be a trend line.
 the Gini coefficient.
 
 The score will be defined as how close $s(x)$ is to $t(x)$ this will be done
-by taking the area between these curves. To start will make the wrong assumption
-that both these curves are continous in $\mathbb{Z}$ and then convert the
-integrals into their descrete equivilent.
+by taking the area between these curves. First will make the wrong assumption
+that both $t(x)$ and $s(x)$ are continous in $\mathbb{Z}$ and then convert the
+integrals into their descrete equivilent. Now we find the upper and lower
+bounds of the area.
+
+\begin{proof}
+  By definition $t(x) \ge s(x)$ therefore the area between $t(x)$ and $s(x)$ 
+  \begin{equation}
+    \int_{a}^{b} t(x) - s(x) \text{\space} dx
+  \end{equation}
+  The minimum area between these curves is when $t(x) = s(x)$.
+  \begin{equation}
+    0 \le \int_{a}^{b} t(x) - s(x) \text{\space} dx
+  \end{equation}
+  The upper bound is a little more involved. The maximum area is when $s(x) = c$.
+  In other words the minimum value of $s(x)$ is the entire curve. So,
+  \begin{equation}
+    0 \le \int_{a}^{b} t(x) - s(x) \text{\space} dx \le \int_{a}^{b} t(x) - c \text{\space} dx
+  \end{equation}
+  It will be easier to expand these integrals first before finding their discrete equivilent.
+  \begin{equation}
+    0 \le \int_{a}^{b} t(x) \text{\space} dx - \int_{a}^{b} s(x) \text{\space} dx \le
+    \int_{a}^{b} t(x) \text{\space} dx - \int_{a}^{b} c \text{\space} dx
+  \end{equation}
+  Taking it one integral at a time $\int_{a}^{b} c \text{\space} dx$ is just
+  the area of a rectangle therefore
+  \begin{equation}
+    \int_{a}^{b} c \text{\space} dx = c(b-a)
+  \end{equation}
+  In the theoretical representation above it is clear that $\int_{a}^{b} t(x) \text{\space} dx$
+  is the area of a trapezoid. Therefore
+  \begin{equation}
+    \int_{a}^{b} t(x) \text{\space} dx = t(b)(b-a) + \frac{1}{2}[t(a)-t(b)](b-a)
+  \end{equation}
+  Lastly by far the hardest integral, $\int_{a}^{b} s(x) \text{\space} dx$. If this
+  were a continouse the function the trapezoidal rule would not give an exact integral,
+  but since $s(x)$ is only defined in $\mathbb{Z}$ the trapezoidal rule applyed to $s(x)$
+  will give the exact integral. Therefore
+  \begin{equation}
+    \begin{aligned}
+      \int_{a}^{b} s(x) \text{\space} dx = & \frac{1}{2} [s(a) + \sum_{k=a+1}^{b-1}
+      (2s(k)) + s(b)]
+    \end{aligned}
+  \end{equation}
+  Putting it all together along with some simplification gives us bounds of
+  \begin{equation}
+    \begin{aligned}
+      &0 \le \\
+      &((b-a)(t(b) + \frac{1}{2}[t(a)-t(b)]) - (\frac{1}{2} [s(a) + \sum_{k=a+1}^{b-1}
+      (2s(k)) + s(b)]) \le \\
+      &(b-a)(t(b) + \frac{1}{2}[t(a)-t(b)] - c)
+    \end{aligned}
+  \end{equation}
+\end{proof}
+  Now that bounds have been established, the score of a trend line, defined as
+  $f = \int_{a}^{b} t(x) - s(x) \text{\space} dx$,
+  can be safly normalized between $[0,1]$ and a user defined threshold $g$ can
+  be used to filter unwanted trend lines only allowing trend lines when
+  $f \le g$ to be considered valid.
 
 \section{Generic Candle Patterns}
 Before defining algorithms, we need to define mathematicaly the patterns traders
