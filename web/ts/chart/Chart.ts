@@ -387,6 +387,10 @@ class CandleChart { // eslint-disable-line no-unused-vars
     const h: number =
       Math.abs(priceToPixel.eval(candle.o)-priceToPixel.eval(candle.c));
 
+    if (h == 0 && candle.v != 0) {
+      console.log('...' + h);
+    }
+
     // height from the low to the bottom of the candle body
     const lowToBottom : number = priceToPixel.eval(candle.l) - y;
 
@@ -400,7 +404,12 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.beginPath();
 
     // call the given rect function
-    draw.apply(ctx, [0, 0, this.CANDLE_WIDTH, h]);
+    if (h == 0 && candle.v != 0) {
+      ctx.moveTo(0, 0);
+      ctx.lineTo(this.CANDLE_WIDTH, 0);
+    } else {
+      draw.apply(ctx, [0, 0, this.CANDLE_WIDTH, h]);
+    }
 
     ctx.stroke();
 
@@ -646,7 +655,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
     const endingOffset =
       (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
-    ctx.strokeStyle = 'white';
     ctx.translate(startingOffsetX, height);
     ctx.moveTo(0, priceToPixel.eval(candles[trendLine.s].candle.h) -
                priceToPixel.eval(candles[trendLine.e].candle.h));
