@@ -15,9 +15,13 @@ struct chart;
 
 #include <error_codes.h>
 #include <logger.h>
+
+#ifndef INTEGRAL_
+#include <math/integral.h>
+#endif
+
 #include <math/linear_equation.h>
 #include <tracer.h>
-
 /*
  * Find trend lines that aren't horizontal lines
  * @param {struct char*} num_candles The chart

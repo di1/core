@@ -1,6 +1,6 @@
 #include <error_codes.h>
 
-const char* RISKI_ERROR_TEXT[11] = {"NONE",
+const char* RISKI_ERROR_TEXT[12] = {"NONE",
                                     "NULL_PTR",
                                     "MALLOC_ERROR",
                                     "JSON_CREATION",
@@ -10,4 +10,5 @@ const char* RISKI_ERROR_TEXT[11] = {"NONE",
                                     "INSUFFITIENT_SPACE",
                                     "INVALID_SYMBOL",
                                     "INVALID_REQUEST",
+                                    "COMPARISON_FAIL",
                                     "UNKNOWN_ERROR"};

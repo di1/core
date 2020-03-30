@@ -260,7 +260,7 @@ bounds of the area.
   In the theoretical representation above it is clear that $\int_{a}^{b} t(x) \text{\space} dx$
   is the area of a trapezoid. Therefore
   \begin{equation}
-    \int_{a}^{b} t(x) \text{\space} dx = t(b)(b-a) + \frac{1}{2}[t(a)-t(b)](b-a)
+    \int_{a}^{b} t(x) \text{\space} dx = (b-a)(t(b) + \frac{1}{2}[t(a)-t(b)])
   \end{equation}
   Lastly by far the hardest integral, $\int_{a}^{b} s(x) \text{\space} dx$. If this
   were a continouse the function the trapezoidal rule would not give an exact integral,

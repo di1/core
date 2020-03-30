@@ -55,4 +55,15 @@
   } while (0)
 #endif
 
+#ifndef COMPARISON_CHECK
+#define COMPARISON_CHECK(V1, V2, OP, ERROR_CODE, ERROR_CODE_STR)              \
+  do {                                                                        \
+    if (!(V1 OP V2)) {                                                        \
+      printf("->%s@%s:%d => %s %s %s %s\n", __func__, __FILENAME__, __LINE__, \
+             #V1, #OP, #V2, ERROR_CODE_STR[ERROR_CODE]);                      \
+      return ERROR_CODE;                                                      \
+    }                                                                         \
+  } while (0)
+#endif
+
 #endif
