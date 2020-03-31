@@ -33,8 +33,8 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
     if (high_second == high_first) continue;
 
     // Build linear equation from the two points
-    eq = linear_equation_new(
-        slope_first_point, high_first, slope_second_point, high_second);
+    eq = linear_equation_new(slope_first_point, high_first, slope_second_point,
+                             high_second);
 
     size_t number_of_confirmations = 0;
     size_t last_valid_confirmation = 0;
@@ -67,7 +67,7 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
         }
       }
     }
-continue_outer_loop:
+  continue_outer_loop:
     // Two confirmations at least from the two points that were used to
     // construct the line one more for it to be valid (thats what the great
     // economics said don't ask me why)
@@ -90,20 +90,47 @@ continue_outer_loop:
                         &trend_line_integral));
 
     double chart_integral = 0;
-    TRACE(integral_chart(cht, best_last_valid_confirmation,
-          slope_first_point, &chart_integral));
+    TRACE(integral_chart(cht, best_last_valid_confirmation, slope_first_point,
+                         &chart_integral));
+
+    int64_t c = 0;
+    // Find the minimum close between best_last_valid_confirmation and
+    // slope_first_point
+    for (size_t i = best_last_valid_confirmation; i <= slope_first_point; ++i) {
+      struct candle* cur = NULL;
+      TRACE(chart_get_candle(cht, i, &cur));
+      int64_t local_close = 0;
+      TRACE(candle_close(cur, &local_close));
+      if (c == 0) {
+        c = local_close;
+      } else if (local_close < c) {
+        c = local_close;
+      }
+    }
 
     double area = trend_line_integral - chart_integral;
+    if (trend_line_integral < chart_integral) {
+      return RISKI_ERROR_CODE_NONE;
+    }
+
+    double c_area = 0;
+    TRACE(integral_const(c, best_last_valid_confirmation, slope_first_point,
+                         &c_area));
+    double max_area = trend_line_integral - c_area;
+
+    RANGE_CHECK(area, 0, max_area, RISKI_ERROR_CODE_INVALID_RANGE,
+        RISKI_ERROR_TEXT);
 
     char* n = NULL;
     TRACE(chart_get_name(cht, &n));
 
-    TRACE(logger_analysis(
-        n, "SLOPED_TREND", __func__, __FILENAME__, __LINE__,
-        "confirmations=%lu first_point=%lu last_point=%lu coverage=%lu integral_chart=%f integral_trend=%f area=%f",
-        best_number_of_confirmations, slope_first_point,
-        best_last_valid_confirmation, best_last_valid_confirmation_coverage,
-        chart_integral, trend_line_integral, area));
+    TRACE(logger_analysis(n, "SLOPED_TREND", __func__, __FILENAME__, __LINE__,
+                          "confirmations=%lu first_point=%lu last_point=%lu "
+                          "coverage=%lu area=%f max_area=%f",
+                          best_number_of_confirmations, slope_first_point,
+                          best_last_valid_confirmation,
+                          best_last_valid_confirmation_coverage, area,
+                          max_area));
     TRACE(chart_put_sloped_line_pattern(cht, best_last_valid_confirmation,
                                         slope_first_point,
                                         DIRECTION_RESISTANCE));
