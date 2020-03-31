@@ -149,10 +149,12 @@ enum RISKI_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
  * @param {size_t} end The end of the trend line (should be greater than start)
  * @param {enum DIRECTION} direction Weather or not this is a suport or
  * resistance line
+ * @param {size_t} score The score of this trend line, [0,100]
  * @return {enum RISKI_ERROR_CODE} The status
  */
 enum RISKI_ERROR_CODE chart_put_sloped_line_pattern(struct chart* cht,
                                                     size_t start, size_t end,
-                                                    enum DIRECTION direction);
+                                                    enum DIRECTION direction,
+                                                    size_t score);
 
 #endif

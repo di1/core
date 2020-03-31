@@ -118,22 +118,25 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
                          &c_area));
     double max_area = trend_line_integral - c_area;
 
+    double normalized = area/max_area;
+
     RANGE_CHECK(area, 0, max_area, RISKI_ERROR_CODE_INVALID_RANGE,
         RISKI_ERROR_TEXT);
 
     char* n = NULL;
     TRACE(chart_get_name(cht, &n));
 
+    size_t score = normalized * 100;
+
     TRACE(logger_analysis(n, "SLOPED_TREND", __func__, __FILENAME__, __LINE__,
                           "confirmations=%lu first_point=%lu last_point=%lu "
-                          "coverage=%lu area=%f max_area=%f",
+                          "coverage=%lu score=%f",
                           best_number_of_confirmations, slope_first_point,
                           best_last_valid_confirmation,
-                          best_last_valid_confirmation_coverage, area,
-                          max_area));
+                          best_last_valid_confirmation_coverage, normalized));
     TRACE(chart_put_sloped_line_pattern(cht, best_last_valid_confirmation,
                                         slope_first_point,
-                                        DIRECTION_RESISTANCE));
+                                        DIRECTION_RESISTANCE, score));
   }
 
   return RISKI_ERROR_CODE_NONE;
