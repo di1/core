@@ -120,8 +120,8 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
 
     double normalized = area/max_area;
 
-    RANGE_CHECK(area, 0, max_area, RISKI_ERROR_CODE_INVALID_RANGE,
-        RISKI_ERROR_TEXT);
+    //RANGE_CHECK(area, 0, max_area, RISKI_ERROR_CODE_INVALID_RANGE,
+    //    RISKI_ERROR_TEXT);
 
     char* n = NULL;
     TRACE(chart_get_name(cht, &n));

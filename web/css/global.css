@@ -152,7 +152,7 @@ input {
   width: 50%;
 }
 
-.analysis-results {
+.analysis-results-style {
   position: absolute;
   top: 60px;
   width: calc(25% - 40px);
@@ -160,5 +160,23 @@ input {
   background-color: #212733;
   border: 1px solid wheat;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
+.analysis-row {
+  display: flex;
+  width: calc(100% - 20px);
+  justify-content: center;
+  align-items: middle;
+  height: 32px;
+  padding: 10px;
+}
+
+.analysis-row > span:nth-child(1) {
+  flex: 3;
+}
+
+.analysis-row > span:nth-child(2) {
+  flex: 1;
+}

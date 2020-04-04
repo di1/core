@@ -25,6 +25,7 @@ function searchInputKeyPress(evt: KeyboardEvent) {
       console.error('display chart is undefined');
       return;
     }
+
     largeDisplayChart.setSymbol(wantedStock);
   } else {
     if (searchSocket && wantedStock !== '') {

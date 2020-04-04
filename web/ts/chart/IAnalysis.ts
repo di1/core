@@ -2,7 +2,7 @@ interface TrendLine {
   s: number;
   e: number;
   d: number;
-  slope: number;
+  score: number;
 }
 
 interface AnalysisJSON {

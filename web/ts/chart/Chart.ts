@@ -8,6 +8,11 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private conn: WebSocket;
   private chartCanvas: HTMLCanvasElement;
 
+  private analysisList: HTMLDivElement;
+  private numSinglePatternInList: number;
+  private numSlopedPatternInList: number;
+  private numHorizontalPatternInList: number;
+
   private NUM_TICKS: number = 20;
   private PADDING_BOT: number = 50;
   private PADDING_TOP: number = 20;
@@ -36,6 +41,17 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
   private CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY = 1.0;
 
+  private SINGLE_CANDLE_ID_LOOKUP: {[key: number]: string} = {
+    0: 'NONE',
+    1: 'RISING_MARUBOZU',
+    2: 'FALLING_MARUBOZU',
+    3: 'RISING_SPINNING_TOP',
+    4: 'FALLING_SPINNING_TOP',
+    5: 'DOJI_DRAGONFLY',
+    6: 'DOJI_GRAVESTONE',
+    7: 'DOJI_GENERIC',
+  };
+
   /**
     Resets all the top level data that determines the chart
    */
@@ -48,6 +64,11 @@ class CandleChart { // eslint-disable-line no-unused-vars
       analysis: <AnalysisJSON> {singleCandle: [], trendLines: [],
         slopedLines: []},
     };
+
+    this.analysisList.innerHTML = '';
+    this.numSinglePatternInList = 0;
+    this.numSlopedPatternInList = 0;
+    this.numSlopedPatternInList = 0;
   }
   /**
     Creates a candle chart bound to the largeCandleChart.
@@ -56,9 +77,15 @@ class CandleChart { // eslint-disable-line no-unused-vars
    */
   constructor(symbol: string) {
     this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
+    this.analysisList =
+      <HTMLDivElement> document.getElementById('analysis-results');
+
+    this.numSinglePatternInList = 0;
+    this.numSlopedPatternInList = 0;
+    this.numHorizontalPatternInList = 0;
 
     this.symbol = symbol;
-    this.conn = new WebSocket('ws://riski.local:7681', 'lws-minimal');
+    this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);
@@ -387,10 +414,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
     const h: number =
       Math.abs(priceToPixel.eval(candle.o)-priceToPixel.eval(candle.c));
 
-    if (h == 0 && candle.v != 0) {
-      console.log('...' + h);
-    }
-
     // height from the low to the bottom of the candle body
     const lowToBottom : number = priceToPixel.eval(candle.l) - y;
 
@@ -660,6 +683,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
                priceToPixel.eval(candles[trendLine.e].candle.h));
     ctx.lineTo(endingOffset, 0);
     ctx.stroke();
+
     ctx.restore();
   }
 
@@ -719,6 +743,23 @@ class CandleChart { // eslint-disable-line no-unused-vars
       this.drawSlopedTrendLine(ctx, candles, priceToPixel, trendLine,
           startIndex, drawingWidth, rightBarPriceWidth);
     }
+
+    for (let i: number = this.numSlopedPatternInList;
+      i < analysisData.slopedLines.length; ++i) {
+      this.analysisList.insertAdjacentHTML('afterbegin',
+          '<div class="analysis-row">' +
+          '<span>' +
+          new Date(
+              this.ROOT_CHART.chart[
+                  analysisData.slopedLines[i].e].candle.s / 1000000)
+              .toLocaleTimeString() +
+          '</span>' +
+          '<span>' +
+          analysisData.slopedLines[i].score.toString() +
+          '</span>' + '</div>');
+      this.numSlopedPatternInList = i;
+    }
+    this.numSlopedPatternInList = analysisData.slopedLines.length;
 
     ctx.restore();
   }
