@@ -30,7 +30,7 @@ struct analysis_list {
   struct analysis_info* head;
   struct analysis_info* tail;
   pthread_mutex_t can_remove;
-  size_t num_elements;
+  size_t _Atomic num_elements;
 };
 
 /*
@@ -134,6 +134,11 @@ void* analysis_thread_func(void* index) {
               assigned_bin);
 
   while (ANALYSIS_INTERRUPED == 0) {
+    if (bin->num_elements == 0) {
+      usleep(1);
+      continue;
+    }
+
     // get the next analysis in the queue
     struct analysis_info* inf = NULL;
     pthread_mutex_lock(&(bin->can_remove));
@@ -165,6 +170,7 @@ void* analysis_thread_func(void* index) {
     chart_analysis_unlock(cht);
     free(inf);
   }
+  pthread_exit(NULL);
   return NULL;
 }
 

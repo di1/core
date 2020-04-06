@@ -69,8 +69,8 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
     }
   continue_outer_loop:
     // Two confirmations at least from the two points that were used to
-    // construct the line one more for it to be valid (thats what the great
-    // economics said don't ask me why)
+    // construct the line one or two more for it to be valid
+    // (thats what the great economics said don't ask me why)
     if (number_of_confirmations >= 4) {
       // check the length
       size_t segment_coverage = slope_first_point - last_valid_confirmation;
