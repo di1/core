@@ -179,7 +179,8 @@ enum RISKI_ERROR_CODE chart_invalidate_trends(struct chart* cht) {
 
 enum RISKI_ERROR_CODE chart_put_sloped_line_pattern(struct chart* cht,
                                                     size_t start, size_t end,
-                                                    enum DIRECTION direction, size_t score) {
+                                                    enum DIRECTION direction,
+                                                    size_t score) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   RANGE_CHECK(score, 0, 101, RISKI_ERROR_CODE_INVALID_RANGE, RISKI_ERROR_TEXT);
 

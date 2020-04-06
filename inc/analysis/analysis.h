@@ -27,6 +27,7 @@ struct chart;
 // standard inputs
 #include <logger.h>
 #include <pthread.h>
+#include <sched.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>

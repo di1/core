@@ -23,7 +23,10 @@ struct linear_equation* linear_equation_new(int64_t x1, int64_t y1, int64_t x2,
 
 // Evaluates mx+b and returns y
 int64_t linear_equation_eval(struct linear_equation* eq, int64_t x) {
-  return ((eq->d - eq->b) * (x - eq->c)) / (eq->c - eq->a) + eq->d;
+  struct linear_equation e = (*eq);
+  const int64_t num = (e.d - e.b) * (x - e.c);
+  const int64_t den = (e.c - e.a);
+  return (num / den) + e.d;
 }
 
 enum LINEAR_EQUATION_DIRECTION linear_equation_direction(

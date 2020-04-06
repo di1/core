@@ -19,7 +19,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef TRACER_
 #include <tracer.h>
+#endif
+
 #include <unistd.h>
 /**
  * Defines the command line arguments

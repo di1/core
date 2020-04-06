@@ -1,4 +1,5 @@
 #include <analysis/analysis.h>
+#include <sched.h>
 
 /*
  * The analysis info struct is the value of the linked list
@@ -135,7 +136,7 @@ void* analysis_thread_func(void* index) {
 
   while (ANALYSIS_INTERRUPED == 0) {
     if (bin->num_elements == 0) {
-      usleep(1);
+      sleep(0);
       continue;
     }
 
@@ -146,10 +147,10 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
-    if (!inf) {
-      // wait a few seconds for data to populate
-      continue;
-    }
+    // if (!inf) {
+    // wait a few seconds for data to populate
+    //  continue;
+    //}
     struct chart* cht = inf->cht;
 
     size_t start_index = inf->start_candle;
@@ -170,7 +171,6 @@ void* analysis_thread_func(void* index) {
     chart_analysis_unlock(cht);
     free(inf);
   }
-  pthread_exit(NULL);
   return NULL;
 }
 

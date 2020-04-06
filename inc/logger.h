@@ -3,9 +3,15 @@
 
 #include <error_codes.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
+
+#ifndef TRACER_
 #include <tracer.h>
+#endif
+
+bool logger_quite;
 
 /*
  * Logs items in the category of "info".

@@ -59,13 +59,13 @@
 #endif
 
 #ifndef COMPARISON_CHECK
-#define COMPARISON_CHECK(V1, V2, OP, ERROR_CODE, ERROR_CODE_STR) \
-  do {                                                           \
-    if (!(V1 OP V2)) {                                           \
+#define COMPARISON_CHECK(V1, V2, OP, ERROR_CODE, ERROR_CODE_STR)       \
+  do {                                                                 \
+    if (!(V1 OP V2)) {                                                 \
       logger_error(ERROR_CODE, __func__, __FILENAME__, __LINE__, "%s", \
                    ERROR_CODE_STR[ERROR_CODE]);                        \
-      return ERROR_CODE;                                         \
-    }                                                            \
+      return ERROR_CODE;                                               \
+    }                                                                  \
   } while (0)
 #endif
 
