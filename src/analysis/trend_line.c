@@ -16,6 +16,7 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
   size_t best_last_valid_confirmation_coverage = 0;
   size_t best_number_of_confirmations = 0;
 
+  struct linear_equation* best_eq = NULL;
   struct linear_equation* eq = NULL;
 
   for (int i = (int)(num_candles)-2; i >= 0; --i) {
@@ -78,7 +79,15 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
         best_last_valid_confirmation_coverage = segment_coverage;
         best_last_valid_confirmation = last_valid_confirmation;
         best_number_of_confirmations = number_of_confirmations;
+        // linear_equation_free(&best_eq);
+        if (best_eq)
+          linear_equation_free(&best_eq);
+        best_eq = eq;
+      } else {
+        linear_equation_free(&eq);
       }
+    } else {
+      linear_equation_free(&eq);
     }
   }
 
@@ -86,7 +95,7 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
       best_last_valid_confirmation_coverage > 3) {
     // compute area between the trend line and chart
     double trend_line_integral = 0;
-    TRACE(integral_line(eq, best_last_valid_confirmation, slope_first_point,
+    TRACE(integral_line(best_eq, best_last_valid_confirmation, slope_first_point,
                         &trend_line_integral));
 
     double chart_integral = 0;
@@ -137,6 +146,7 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles) {
     TRACE(chart_put_sloped_line_pattern(cht, best_last_valid_confirmation,
                                         slope_first_point, DIRECTION_RESISTANCE,
                                         score));
+    linear_equation_free(&best_eq);
   }
 
   return RISKI_ERROR_CODE_NONE;

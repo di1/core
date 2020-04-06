@@ -147,7 +147,7 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
-    // if (!inf) {
+    //if (!inf) {
     // wait a few seconds for data to populate
     //  continue;
     //}
@@ -350,5 +350,10 @@ enum RISKI_ERROR_CODE analysis_cleanup() {
   for (size_t i = 0; i < num_analysis_threads; ++i) {
     pthread_join(threads[i], NULL);
   }
+  for (size_t i = 0; i < num_analysis_threads; ++i) {
+    free(thread_operations[i]);
+  }
+  free(thread_operations);
+  free(threads);
   return RISKI_ERROR_CODE_NONE;
 }

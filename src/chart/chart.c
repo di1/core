@@ -454,8 +454,11 @@ enum RISKI_ERROR_CODE chart_free(struct chart** cht) {
     }
   }
   free((*cht)->candles);
-  free(*cht);
+  free((*cht)->analysis->trend_lines_horizontal);
+  free((*cht)->analysis->trend_lines_sloped);
   free((*cht)->analysis->scp);
+  free((*cht)->analysis);
+  free((*cht));
   *cht = NULL;
 
   return RISKI_ERROR_CODE_NONE;
