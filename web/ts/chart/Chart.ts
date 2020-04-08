@@ -563,69 +563,77 @@ class CandleChart { // eslint-disable-line no-unused-vars
       priceToPixel: LinearEquation, trendLine: TrendLine, startIndex: number,
       rightBarPriceWidth: number, drawingWidth: number) {
     // Make sure the trend line is in a visible range
-    if (trendLine.s < startIndex) {
-      return;
-    }
-    ctx.save();
-    ctx.beginPath();
-    let height: number = 0;
-    if (trendLine.d == 0) { // support
-      height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_SUPPORT;
-    } else if (trendLine.d == 1) { // resistance
-      height = priceToPixel.eval(candles[trendLine.e].candle.h);
-      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_RESISTANCE;
-    } else if (trendLine.d == 2) { // invalidated support
-      height = priceToPixel.eval(candles[trendLine.e].candle.l);
-      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
-      ctx.setLineDash([5, 5]);
-    } else if (trendLine.d == 3) { // invalidated resistance
-      height = priceToPixel.eval(candles[trendLine.e].candle.h);
-      ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
-      ctx.setLineDash([5, 5]);
-    }
+    try {
+      if (trendLine.s < startIndex) {
+        return;
+      }
+      ctx.save();
+      ctx.beginPath();
+      let height: number = 0;
+      if (trendLine.d == 0) { // support
+        height = priceToPixel.eval(candles[trendLine.e].candle.l);
+        ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_SUPPORT;
+      } else if (trendLine.d == 1) { // resistance
+        height = priceToPixel.eval(candles[trendLine.e].candle.h);
+        ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_RESISTANCE;
+      } else if (trendLine.d == 2) { // invalidated support
+        height = priceToPixel.eval(candles[trendLine.e].candle.l);
+        ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
+        ctx.setLineDash([5, 5]);
+      } else if (trendLine.d == 3) { // invalidated resistance
+        height = priceToPixel.eval(candles[trendLine.e].candle.h);
+        ctx.strokeStyle = this.CHART_STYLE_ANALYSIS_TREND_LINE_INVALIDATED;
+        ctx.setLineDash([5, 5]);
+      }
 
-    ctx.fillStyle = ctx.strokeStyle;
-    ctx.lineWidth = this.CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY;
-    const startingOffsetX: number =
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.lineWidth = this.CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY;
+      const startingOffsetX: number =
       (trendLine.s-startIndex)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
-    const endingOffset =
+      const endingOffset =
       (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING) +
       this.CANDLE_WIDTH;
 
-    // Draw the line with an arrow (45 degree)
-    ctx.translate(startingOffsetX, height);
-    ctx.moveTo(0, 0);
-    ctx.lineTo(endingOffset, 0);
-    ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
-        -10*Math.cos(Math.PI/4.0));
-    ctx.lineTo(endingOffset, 0);
-    ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
-        10*Math.cos(Math.PI/4.0));
-    ctx.lineTo(endingOffset, 0);
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw a side price indicator
-    if (trendLine.d <= 1) {
-      ctx.save();
-      ctx.textBaseline = 'middle';
-      ctx.translate(-(drawingWidth - rightBarPriceWidth), height - (22.4/2.0));
-      ctx.beginPath();
-      ctx.fillStyle = (trendLine.d == 0) ? 'yellow' : '#6666ff';
-
-      const fillTextData: number =
-        (trendLine.d == 0) ? candles[trendLine.e].candle.l :
-        candles[trendLine.e].candle.h;
-      const fillTextDataString: string = (fillTextData/10000).toFixed(4);
-
-      ctx.fillRect(0, 0, rightBarPriceWidth, 22.4);
-      ctx.fillStyle = (trendLine.d == 0) ? 'black' : 'white';
-
-      ctx.fillText('-' + fillTextDataString, 0, (22.4/2.0)+3);
+      // Draw the line with an arrow (45 degree)
+      ctx.translate(startingOffsetX, height);
+      ctx.moveTo(0, 0);
+      ctx.lineTo(endingOffset, 0);
+      ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
+          -10*Math.cos(Math.PI/4.0));
+      ctx.lineTo(endingOffset, 0);
+      ctx.moveTo(endingOffset - (10*Math.cos(Math.PI/4.0)),
+          10*Math.cos(Math.PI/4.0));
+      ctx.lineTo(endingOffset, 0);
       ctx.stroke();
       ctx.restore();
+
+      // Draw a side price indicator
+      if (trendLine.d <= 1) {
+        ctx.save();
+        ctx.textBaseline = 'middle';
+        ctx.translate(-(drawingWidth - rightBarPriceWidth),
+            height - (22.4/2.0));
+        ctx.beginPath();
+        ctx.fillStyle = (trendLine.d == 0) ? 'yellow' : '#6666ff';
+
+        const fillTextData: number =
+        (trendLine.d == 0) ? candles[trendLine.e].candle.l :
+        candles[trendLine.e].candle.h;
+        const fillTextDataString: string = (fillTextData/10000).toFixed(4);
+
+        ctx.fillRect(0, 0, rightBarPriceWidth, 22.4);
+        ctx.fillStyle = (trendLine.d == 0) ? 'black' : 'white';
+
+        ctx.fillText('-' + fillTextDataString, 0, (22.4/2.0)+3);
+        ctx.stroke();
+        ctx.restore();
+      }
+    } catch (ex) {
+      console.error(ex);
+      console.warn('trend line was more recent than chart, ' +
+                   'will show next tick');
+    } finally {
     }
   }
 
@@ -679,9 +687,15 @@ class CandleChart { // eslint-disable-line no-unused-vars
       (trendLine.e-trendLine.s)*(this.CANDLE_WIDTH+this.CANDLE_SPACING);
 
     ctx.translate(startingOffsetX, height);
-    ctx.moveTo(0, priceToPixel.eval(candles[trendLine.s].candle.h) -
-               priceToPixel.eval(candles[trendLine.e].candle.h));
-    ctx.lineTo(endingOffset, 0);
+    if (trendLine.d == 0) {
+      ctx.moveTo(0, priceToPixel.eval(candles[trendLine.s].candle.l) -
+                 priceToPixel.eval(candles[trendLine.e].candle.l));
+      ctx.lineTo(endingOffset, 0);
+    } else if (trendLine.d == 1) {
+      ctx.moveTo(0, priceToPixel.eval(candles[trendLine.s].candle.h) -
+                 priceToPixel.eval(candles[trendLine.e].candle.h));
+      ctx.lineTo(endingOffset, 0);
+    }
     ctx.stroke();
 
     ctx.restore();

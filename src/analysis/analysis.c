@@ -1,5 +1,4 @@
 #include <analysis/analysis.h>
-#include <sched.h>
 
 /*
  * The analysis info struct is the value of the linked list
@@ -147,7 +146,7 @@ void* analysis_thread_func(void* index) {
     pthread_mutex_unlock(&(bin->can_remove));
 
     // analysis_pop returns NULL if there is nothing to do
-    //if (!inf) {
+    // if (!inf) {
     // wait a few seconds for data to populate
     //  continue;
     //}
@@ -165,8 +164,8 @@ void* analysis_thread_func(void* index) {
     TRACE_HAULT(simple_analysis(cht, end_candle));
     TRACE_HAULT(chart_invalidate_trends(cht));
     TRACE_HAULT(find_horizontal_line(cht, end_candle));
-    TRACE_HAULT(find_trend_line(cht, end_candle));
-
+    TRACE_HAULT(find_trend_line(cht, end_candle, DIRECTION_RESISTANCE));
+    TRACE_HAULT(find_trend_line(cht, end_candle, DIRECTION_SUPPORT));
     // release the analysis struct lock
     chart_analysis_unlock(cht);
     free(inf);
