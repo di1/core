@@ -11,6 +11,7 @@
 #include <fxpig/ini.h>
 #include <iex/iex.h>
 #include <logger.h>
+#include <oanda/oanda.h>
 #include <pthread.h>
 #include <security/search.h>
 #include <security/security.h>
@@ -19,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #ifndef TRACER_
 #include <tracer.h>
 #endif
@@ -111,6 +111,8 @@ int main(int argc, char** argv) {
       struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
       fxpig_live(cfg);
       fxpig_ini_free(&cfg);
+    } else {
+      // TRACE(oanda_live());
     }
     analysis_cleanup();
     SERVER_INTERRUPTED = 1;
