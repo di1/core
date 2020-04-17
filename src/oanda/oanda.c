@@ -1,6 +1,11 @@
 #include <oanda/oanda.h>
+#include <stdlib.h>
+
+#include "cjson/cjson.h"
+#include "security/security.h"
 
 char* oanda_working_account = NULL;
+char** oanda_tradeble_instruments = NULL;
 
 enum RISKI_ERROR_CODE oanda_connect(int* ret) {
   int sockfd;
@@ -78,7 +83,97 @@ void SSL_read_http_header(SSL* conn, size_t* content_length) {
   free(line);
 }
 
+void SSL_http_request_json(SSL* conn, char* request_body, cJSON** response) {
+  SSL_write(conn, request_body, strlen(request_body));
+
+  size_t content_length = 0;
+  SSL_read_http_header(conn, &content_length);
+
+  char* response_body = NULL;
+  response_body = (char*)malloc((content_length + 1) * sizeof(char));
+
+  size_t total_read = 0;
+  while (total_read < content_length) {
+    total_read += SSL_read(conn, &response_body[total_read], content_length);
+  }
+  response_body[content_length] = '\x0';
+
+  cJSON* response_json = cJSON_Parse(response_body);
+  free(response_body);
+
+  *response = response_json;
+}
+
+enum RISKI_ERROR_CODE oanda_main_loop(SSL* conn, char* pricing_request_body) {
+  long start_time = time(NULL);
+  int requests_per_second = 0;
+  while (1) {
+    cJSON* price_update_json = NULL;
+    SSL_http_request_json(conn, pricing_request_body, &price_update_json);
+
+    size_t num_prices = 0;
+    const cJSON* prices_json = cJSON_GetObjectItem(price_update_json, "prices");
+    num_prices = cJSON_GetArraySize(prices_json);
+
+    for (size_t i = 0; i < num_prices; ++i) {
+      const cJSON* instrument_price_data = cJSON_GetArrayItem(prices_json, i);
+      cJSON* instrument_name =
+          cJSON_GetObjectItem(instrument_price_data, "instrument");
+      cJSON* instrument_bids =
+          cJSON_GetObjectItem(instrument_price_data, "bids");
+      cJSON* instrument_closeout_bid =
+          cJSON_GetObjectItem(instrument_price_data, "closeoutBid");
+
+      char* instrument_name_str = cJSON_GetStringValue(instrument_name);
+
+      size_t num_bids = cJSON_GetArraySize(instrument_bids);
+      char* bid_str = NULL;
+      if (num_bids != 0) {
+        const cJSON* instrument_best_bid =
+            cJSON_GetArrayItem(instrument_bids, 0);
+        cJSON* bid_object = cJSON_GetObjectItem(instrument_best_bid, "price");
+        bid_str = cJSON_GetStringValue(bid_object);
+      } else {
+        logger_analysis(instrument_name_str, "FEED", __func__, __FILENAME__,
+                        __LINE__, "forced to use closeout ask");
+        bid_str = cJSON_GetStringValue(instrument_closeout_bid);
+      }
+      // Find the . index in the str
+      size_t idxToDel = 0;
+      while (bid_str[idxToDel] != '.') idxToDel += 1;
+      memmove(&bid_str[idxToDel], &bid_str[idxToDel + 1],
+              strlen(bid_str) - idxToDel);
+      int64_t bid = (int64_t)atoi(bid_str);
+      struct security* sec = NULL;
+      TRACE(exchange_get(exchange_oanda, instrument_name_str, &sec));
+      cJSON* ts = cJSON_GetObjectItem(instrument_price_data, "time");
+
+      char* ts_str = cJSON_GetStringValue(ts);
+      idxToDel = 0;
+      while (ts_str[idxToDel] != '.') idxToDel += 1;
+      memmove(&ts_str[idxToDel], &ts_str[idxToDel + 1],
+              strlen(ts_str) - idxToDel);
+
+      // printf("name=%s;bid=%lu; ts=%s\n", instrument_name_str, bid, ts_str);
+      int64_t ts_nanosecond = strtol(ts_str, NULL, 10);
+      TRACE(security_chart_update(sec, bid, ts_nanosecond));
+    }
+    cJSON_Delete(price_update_json);
+
+    if (time(NULL) - start_time >= 1) {
+      requests_per_second = 0;
+      start_time = time(NULL);
+    } else {
+      requests_per_second += 1;
+    }
+  }
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
 enum RISKI_ERROR_CODE oanda_live(char* token) {
+  TRACE(exchange_new("OANDA", &exchange_oanda));
+
   logger_info(__func__, __FILENAME__, __LINE__, "using oanda api token %s",
               token);
 
@@ -103,23 +198,14 @@ enum RISKI_ERROR_CODE oanda_live(char* token) {
   int err = SSL_connect(conn);
   if (err != 1) abort();  // handle error
 
-  // Get the working account ID
-  char* get_accounts = NULL;
-  TRACE(
-      oanda_v20_v3_accounts("api-fxpractice.oanda.com", token, &get_accounts));
-
-  SSL_write(conn, get_accounts, strlen(get_accounts));
-  free(get_accounts);
-
-  size_t content_length = 0;
-  SSL_read_http_header(conn, &content_length);
-
-  char* account_response = NULL;
-  account_response = (char*)malloc((content_length + 1) * sizeof(char));
-  SSL_read(conn, account_response, content_length);
-  account_response[content_length] = '\x0';
-
-  cJSON* account_json = cJSON_Parse(account_response);
+  /*
+   * Get the working account id
+   */
+  cJSON* account_json = NULL;
+  char* http_get_accounts = NULL;
+  TRACE(oanda_v20_v3_accounts("api-fxpractice.oanda.com", token,
+                              &http_get_accounts));
+  SSL_http_request_json(conn, http_get_accounts, &account_json);
   const cJSON* accounts = cJSON_GetObjectItem(account_json, "accounts");
   for (size_t i = 0; i < (size_t)cJSON_GetArraySize(accounts); ++i) {
     const cJSON* account = cJSON_GetArrayItem(accounts, i);
@@ -127,10 +213,48 @@ enum RISKI_ERROR_CODE oanda_live(char* token) {
     const char* id_str = cJSON_GetStringValue(_id);
     oanda_working_account = strdup(id_str);
   }
-  cJSON_Delete(account_json);
+  free(http_get_accounts);
 
+  cJSON_Delete(account_json);
   logger_info(__func__, __FILENAME__, __LINE__, "oanda account id: %s",
               oanda_working_account);
+
+  /*
+   * Read the tradable security for this account from the oanda server
+   */
+  char* http_get_account_instruments = NULL;
+  cJSON* instruments_json = NULL;
+  TRACE(oanda_v20_v3_accounts_instruments("api-fxpractice.oanda.com", token,
+                                          &http_get_account_instruments,
+                                          oanda_working_account));
+
+  SSL_http_request_json(conn, http_get_account_instruments, &instruments_json);
+  free(http_get_account_instruments);
+
+  const cJSON* instruments_array =
+      cJSON_GetObjectItem(instruments_json, "instruments");
+
+  size_t num_instruments = (size_t)cJSON_GetArraySize(instruments_array);
+  oanda_tradeble_instruments = (char**)malloc(num_instruments * sizeof(char*));
+
+  for (size_t i = 0; i < num_instruments; ++i) {
+    const cJSON* instrument = cJSON_GetArrayItem(instruments_array, i);
+    cJSON* displayName = cJSON_GetObjectItem(instrument, "name");
+    oanda_tradeble_instruments[i] = strdup(cJSON_GetStringValue(displayName));
+    TRACE(exchange_put(exchange_oanda, oanda_tradeble_instruments[i],
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+  }
+  cJSON_Delete(instruments_json);
+
+  /*
+   * Start the main loop requesting the latest updates
+   */
+  char* pricing_request_body = NULL;
+  TRACE(oanda_v20_v3_accounts_pricing(
+      "api-fxpractice.oanda.com", token, oanda_tradeble_instruments,
+      num_instruments, oanda_working_account, &pricing_request_body));
+
+  oanda_main_loop(conn, pricing_request_body);
 
   SSL_shutdown(conn);
   SSL_free(conn);

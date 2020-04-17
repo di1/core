@@ -4,6 +4,7 @@
 #include <exchange/exchange.h>
 #include <iex/iex.h>
 #include <logger.h>
+#include <oanda/oanda.h>
 #include <security/search.h>
 #include <stdlib.h>
 #include <string.h>

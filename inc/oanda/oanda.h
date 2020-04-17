@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <oanda/request_builder.h>
 #include <openssl/ssl.h>
+#include <security/security.h>
 #include <sys/socket.h>
 #include <tracer.h>
 

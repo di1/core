@@ -149,7 +149,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
         console.error('onMessage updateCandle happened before init');
         return;
       }
-
+      this.conn.send('analysis|' + this.symbol);
       if (this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle.s ==
           updateCandle.latestCandle.candle.s) {
         this.ROOT_CHART.chart[this.ROOT_CHART.chart.length-1].candle =
@@ -157,7 +157,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
         this.drawFull(this.ROOT_CHART);
       } else {
         this.ROOT_CHART.chart.push({candle: updateCandle.latestCandle.candle});
-        this.conn.send('analysis|' + this.symbol);
         this.drawFull(this.ROOT_CHART);
       }
     } else if (genericMsg['analysis']) {

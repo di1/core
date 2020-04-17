@@ -77,10 +77,10 @@ function onSearchReceived(evt: MessageEvent) {
 
 window.onload = () => {
   // create a new websocket for searching
-  searchSocket = new WebSocket('ws://riski.local:7681', 'lws-minimal');
+  searchSocket = new WebSocket('ws://localhost:7681', 'lws-minimal');
   searchSocket.onmessage = onSearchReceived;
 
-  largeDisplayChart = new CandleChart('AAPL');
+  largeDisplayChart = new CandleChart('USD_JPY');
 
   const searchInput: HTMLInputElement | null =
   <HTMLInputElement> document.getElementById('stock-search-input');

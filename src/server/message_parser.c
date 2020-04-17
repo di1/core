@@ -1,15 +1,11 @@
 #include <server/message_parser.h>
 
-#include "error_codes.h"
-#include "security/search.h"
-#include "security/security.h"
-
 enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
   PTR_CHECK(security, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(exchange_oanda, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
@@ -28,7 +24,7 @@ enum RISKI_ERROR_CODE latest_response(char* security, char** resp) {
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(exchange_oanda, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
@@ -50,7 +46,7 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(exchange_oanda, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,

@@ -35,6 +35,8 @@ typedef struct {
   bool fxpig;
   char* fxpig_ini_file;
   bool dev_web;
+  bool oanda_feed;
+  char* oanda_key;
 } cli;
 
 /**
@@ -47,6 +49,9 @@ cli* cli_parse(int argc, char** argv) {
   options->fxpig = false;
   options->fxpig_ini_file = NULL;
   options->dev_web = false;
+  options->oanda_feed = false;
+  options->oanda_key = NULL;
+
   for (int i = 0; i < argc; ++i) {
     if (strcmp("-pcap_feed", argv[i]) == 0) {
       if (i + 1 < argc) {
@@ -63,7 +68,14 @@ cli* cli_parse(int argc, char** argv) {
         options->fxpig = true;
         options->fxpig_ini_file = argv[i + 1];
       } else {
-        printf("%s", "-fxpig must  be followed by a .ini file");
+        printf("%s", "-fxpig must  be followed by a .ini file\n");
+      }
+    } else if (strcmp("-oanda_feed", argv[i]) == 0) {
+      if (i + 1 < argc) {
+        options->oanda_feed = true;
+        options->oanda_key = argv[i+1];
+      } else {
+        printf("%s", "-oanda_feed must be followd by an api key\n");
       }
     } else if (strcmp("-dev-web", argv[i]) == 0) {
       options->dev_web = true;
@@ -104,15 +116,15 @@ int main(int argc, char** argv) {
   pthread_create(&id, NULL, server_start, NULL);
 
   if (!options->dev_web) {
+    analysis_init();
     if (options->pcap_feed) {
-      analysis_init();
       iex_parse_deep(options->pcap_feed_file);
     } else if (options->fxpig) {
       struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
       fxpig_live(cfg);
       fxpig_ini_free(&cfg);
-    } else {
-      // TRACE(oanda_live());
+    } else if (options->oanda_feed) {
+      TRACE(oanda_live(options->oanda_key));
     }
     analysis_cleanup();
     SERVER_INTERRUPTED = 1;

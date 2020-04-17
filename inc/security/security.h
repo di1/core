@@ -29,7 +29,8 @@ struct security;
 /*
  * Creates a new security given a name.
  * @param {char*} name The name of the security
- * @param {uint64_t} interval The interval between candles in nanoseconds
+ * @param {uint64_t} interval The interval between candles in a consistent
+ * time format
  * @param {struct security**} sec Sets *sec to the newly created security
  * @return {enum RISKI_ERROR_CODE} The status
  */
