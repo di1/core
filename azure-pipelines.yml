@@ -39,7 +39,7 @@ steps:
 
 - task: CMake@1
   inputs:
-    cmakeArgs: 'OPENSSL_ROOT_DIR=/usr/local/opt/openssl/ ..'
+    cmakeArgs: '-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ ..'
   condition: eq( variables['Agent.OS'], 'Darwin')
 
 - task: CMake@1
