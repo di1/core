@@ -6,10 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-
-#ifndef TRACER_
 #include <tracer.h>
-#endif
 
 bool logger_quite;
 

@@ -7,11 +7,13 @@ ADD_SUBDIRECTORY(server)
 ADD_SUBDIRECTORY(analysis)
 ADD_SUBDIRECTORY(fxpig)
 ADD_SUBDIRECTORY(math)
+ADD_SUBDIRECTORY(oanda)
+ADD_SUBDIRECTORY(cjson)
 
 ADD_LIBRARY(string_builder string_builder.c)
 ADD_LIBRARY(error_codes error_codes.c)
 ADD_LIBRARY(logger logger.c)
 
 ADD_EXECUTABLE(riski main.c)
-TARGET_LINK_LIBRARIES(riski
-  string_builder logger fxpig book iex chart security exchange server math analysis Threads::Threads )
+TARGET_LINK_LIBRARIES(riski cjson
+  string_builder oanda logger fxpig book iex chart security exchange server math analysis Threads::Threads )
