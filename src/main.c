@@ -73,7 +73,7 @@ cli* cli_parse(int argc, char** argv) {
     } else if (strcmp("-oanda_feed", argv[i]) == 0) {
       if (i + 1 < argc) {
         options->oanda_feed = true;
-        options->oanda_key = argv[i+1];
+        options->oanda_key = argv[i + 1];
       } else {
         printf("%s", "-oanda_feed must be followd by an api key\n");
       }

@@ -103,7 +103,8 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles,
 
       // Check the data inbetween the last two confirmation points
       for (int64_t i = confirmation_point;
-           i < (int64_t)num_candles && i < (int64_t) num_candles && !trend_broken;
+           i < (int64_t)num_candles && i < (int64_t)num_candles &&
+           !trend_broken;
            ++i) {
         struct candle* cnd = NULL;
         TRACE(chart_get_candle(cht, i, &cnd));
@@ -150,7 +151,7 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles,
       num_confirmations += 1;
       last_valid_confirmation = confirmation_point;
     }
-dont_confirm:
+  dont_confirm:
     // print the number of confirmations along with the width
     if (num_confirmations >= 3) {
       TRACE(chart_put_sloped_line_pattern(cht, last_valid_confirmation,
@@ -158,8 +159,9 @@ dont_confirm:
 
       char* n = NULL;
       TRACE(chart_get_name(cht, &n));
-      printf("[%s] width=%lu num_confirmation=%lu indirect=%lu\n", n, w,
-             num_confirmations, num_indirect_confirmations);
+      printf("[%s] width=%llu num_confirmation=%lu indirect=%lu\n", n,
+             (unsigned long long)w, num_confirmations,
+             num_indirect_confirmations);
 
       free(eq);
       break;
