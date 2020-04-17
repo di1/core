@@ -80,7 +80,7 @@ window.onload = () => {
   searchSocket = new WebSocket('ws://localhost:7681', 'lws-minimal');
   searchSocket.onmessage = onSearchReceived;
 
-  largeDisplayChart = new CandleChart('USD_JPY');
+  largeDisplayChart = new CandleChart('AMD');
 
   const searchInput: HTMLInputElement | null =
   <HTMLInputElement> document.getElementById('stock-search-input');
