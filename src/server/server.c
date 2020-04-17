@@ -141,7 +141,6 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
         msg->len = 0;
       }
 
-
       char *response = NULL;
       TRACE(parse_message(in, len, &response));
       if (!response) break;
@@ -166,7 +165,8 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     default:
       break;
-        free(pss->amsg.payload);}
+      free(pss->amsg.payload);
+  }
 
   return 0;
 }

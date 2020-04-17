@@ -263,6 +263,18 @@ enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
 
 enum RISKI_ERROR_CODE chart_new_candle(struct chart* cht, int64_t price) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  // TODO
+
+  if (cht->cur_candle >= cht->num_candles_allocated) {
+    cht->num_candles_allocated =
+        (size_t)((double)cht->num_candles_allocated * (double)1.5);
+    cht->candles = realloc(
+        cht->candles, sizeof(struct candle**) * cht->num_candles_allocated);
+    cht->analysis->scp =
+        realloc(cht->analysis->scp, sizeof(enum SINGLE_CANDLE_PATTERNS) *
+                                        cht->num_candles_allocated);
+  }
+
   TRACE(candle_new(price, cht->last_update, &cht->candles[cht->cur_candle]));
   return RISKI_ERROR_CODE_NONE;
 }
@@ -272,7 +284,6 @@ enum RISKI_ERROR_CODE chart_get_candle(struct chart* cht, size_t index,
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
               RISKI_ERROR_TEXT);
-
   *cnd = cht->candles[index];
   return RISKI_ERROR_CODE_NONE;
 }
