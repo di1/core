@@ -94,6 +94,13 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     case LWS_CALLBACK_CLOSED:
       /* remove our closing pss from the list of live pss */
+      if (pss->amsg.payload) {
+        struct msg *msg = &pss->amsg;
+        free(msg->payload);
+        msg->payload = NULL;
+        msg->len = 0;
+      }
+
       lws_ll_fwd_remove(struct per_session_data__minimal, pss_list, pss,
                         vhd->pss_list);
       break;
@@ -111,6 +118,11 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
         lwsl_err("ERROR %d writing to ws\n", m);
         return -1;
       }
+
+      free(pss->amsg.payload);
+      pss->amsg.payload = NULL;
+      pss->amsg.len = 0;
+
       pss->current = pss->last;
       break;
 
@@ -122,6 +134,14 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
         msg->len = 0;
       }
 
+      if (pss->amsg.payload) {
+        struct msg *msg = &pss->amsg;
+        free(msg->payload);
+        msg->payload = NULL;
+        msg->len = 0;
+      }
+
+
       char *response = NULL;
       TRACE(parse_message(in, len, &response));
       if (!response) break;
@@ -129,7 +149,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
       pss->amsg.len = response_len;
       /* notice we over-allocate by LWS_PRE */
-      pss->amsg.payload = malloc((LWS_PRE * 2) + response_len);
+      pss->amsg.payload = malloc(LWS_PRE + response_len);
       if (!pss->amsg.payload) {
         lwsl_user("OOM: dropping\n");
         break;
@@ -146,7 +166,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
     default:
       break;
-  }
+        free(pss->amsg.payload);}
 
   return 0;
 }
