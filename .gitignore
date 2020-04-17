@@ -12,3 +12,4 @@ web/package-lock.json
 *.toc
 fxpig.ini
 key.oanda
+*/doc/*
