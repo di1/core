@@ -16,4 +16,4 @@ ADD_LIBRARY(logger logger.c)
 
 ADD_EXECUTABLE(riski main.c)
 TARGET_LINK_LIBRARIES(riski cjson
-  string_builder oanda logger fxpig book iex chart security exchange server math analysis Threads::Threads )
+  string_builder oanda logger fxpig book iex chart security exchange server math analysis Threads::Threads OpenSSL::SSL OpenSSL::Crypto)
