@@ -30,6 +30,7 @@ steps:
 - bash: |
     export OPENSSL_ROOT_DIR=/usr/local/ssl
     export OPENSSL_LIBRARIES=/usr/local/ssl/lib
+    export OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
   condition: eq( variables['Agent.OS'], 'Darwin')
   displayName: 'Setting OpenSSL paths'
 
