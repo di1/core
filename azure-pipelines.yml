@@ -24,7 +24,7 @@ steps:
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: 'sh ./install_libwebsockets.sh'
+    script: 'sh ./scripts/install_libwebsockets.sh'
   displayName: 'Install libwebsockets'
 
 - bash: |
