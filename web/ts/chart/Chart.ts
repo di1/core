@@ -1,5 +1,32 @@
 type RectDrawFunc = (x: number, y: number, w: number, h: number) => void;
 
+const DOWN_ARROW_SVG: string =
+  '<svg xmlns="http://www.w3.org/2000/svg"' +
+  'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"' +
+  'width="24" height="24" viewBox="0 0 24 24">' +
+  '<path fill="#f33" d="M5,6.41L6.41,5L17,15.59V9H19V19H9V17H15.59L5,6.41Z" />'+
+  '</svg>';
+
+const UP_ARROW_SVG: string =
+  '<svg xmlns="http://www.w3.org/2000/svg"' +
+  'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"' +
+  'width="24" height="24" viewBox="0 0 24 24">' +
+  '<path fill="#49796b"' +
+  'd="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z" />'+
+  '</svg>';
+
+/*
+const EYE_SVG: string =
+  '<svg xmlns="http://www.w3.org/2000/svg"' +
+  'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"' +
+  'width="24" height="24" viewBox="0 0 24 24">' +
+  '<path fill="wheat" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,' +
+  '12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,' +
+  '12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,' +
+  '19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />'+
+  '</svg>';
+  */
+
 /**
   Represents a CandleChart
  */
@@ -8,7 +35,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
   private conn: WebSocket;
   private chartCanvas: HTMLCanvasElement;
 
-  private analysisList: HTMLDivElement;
   private numSinglePatternInList: number;
   private numSlopedPatternInList: number;
   private numHorizontalPatternInList: number;
@@ -41,15 +67,17 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
   private CHART_STYLE_ANALYSIS_TREND_LINE_INTENSITY = 1.0;
 
+  private ANALYSIS_TREE_SINGLE_CANDLE_ADDED = 0;
+
   private SINGLE_CANDLE_ID_LOOKUP: {[key: number]: string} = {
     0: 'NONE',
-    1: 'RISING_MARUBOZU',
-    2: 'FALLING_MARUBOZU',
-    3: 'RISING_SPINNING_TOP',
-    4: 'FALLING_SPINNING_TOP',
-    5: 'DOJI_DRAGONFLY',
-    6: 'DOJI_GRAVESTONE',
-    7: 'DOJI_GENERIC',
+    1: 'MARUBOZU',
+    2: 'MARUBOZU',
+    3: 'SPINNING_TOP',
+    4: 'SPINNING_TOP',
+    5: 'DRAGONFLY',
+    6: 'GRAVESTONE',
+    7: 'DOJI',
   };
 
   /**
@@ -65,10 +93,15 @@ class CandleChart { // eslint-disable-line no-unused-vars
         slopedLines: []},
     };
 
-    this.analysisList.innerHTML = '';
-    this.numSinglePatternInList = 0;
-    this.numSlopedPatternInList = 0;
-    this.numSlopedPatternInList = 0;
+    const singleCandleUL: HTMLDivElement =
+      <HTMLDivElement> document.getElementById('single-candle-patterns-list');
+
+    singleCandleUL.innerHTML = '';
+
+    // this.numSinglePatternInList = 0;
+    // this.numSlopedPatternInList = 0;
+    // this.numSlopedPatternInList = 0;
+    this.ANALYSIS_TREE_SINGLE_CANDLE_ADDED = 0;
   }
   /**
     Creates a candle chart bound to the largeCandleChart.
@@ -77,15 +110,12 @@ class CandleChart { // eslint-disable-line no-unused-vars
    */
   constructor(symbol: string) {
     this.chartCanvas = <HTMLCanvasElement> document.getElementById('chart');
-    this.analysisList =
-      <HTMLDivElement> document.getElementById('analysis-results');
-
     this.numSinglePatternInList = 0;
     this.numSlopedPatternInList = 0;
     this.numHorizontalPatternInList = 0;
 
     this.symbol = symbol;
-    this.conn = new WebSocket('ws://localhost:7681', 'lws-minimal');
+    this.conn = new WebSocket('ws://' + window.location.hostname + ':7681', 'lws-minimal');
     this.conn.onopen = this.onOpen.bind(this);
     this.conn.onclose = this.onClose.bind(this);
     this.conn.onmessage = this.onMessage.bind(this);
@@ -286,7 +316,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.translate(0.5, 0.5);
 
     // Set font
-    ctx.font = 'normal 1.1em Hack';
+    ctx.font = 'normal 1.1em Inconsolata';
 
     // Most drawing of text has a baseline of middle and drawing text is
     // mainly of white text
@@ -503,7 +533,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     // Set the font to draw the width of the candle
     ctx.font = 'normal ' +
-      (this.CANDLE_WIDTH*2.0).toString() + 'px Hack';
+      (this.CANDLE_WIDTH*2.0).toString() + 'px Inconsolata';
 
 
     // Convert the analysisCode into a character for better visualization
@@ -756,24 +786,6 @@ class CandleChart { // eslint-disable-line no-unused-vars
       this.drawSlopedTrendLine(ctx, candles, priceToPixel, trendLine,
           startIndex, drawingWidth, rightBarPriceWidth);
     }
-
-    for (let i: number = this.numSlopedPatternInList;
-      i < analysisData.slopedLines.length; ++i) {
-      this.analysisList.insertAdjacentHTML('afterbegin',
-          '<div class="analysis-row">' +
-          '<span>' +
-          new Date(
-              this.ROOT_CHART.chart[
-                  analysisData.slopedLines[i].e].candle.s / 1000000)
-              .toLocaleTimeString() +
-          '</span>' +
-          '<span>' +
-          analysisData.slopedLines[i].score.toString() +
-          '</span>' + '</div>');
-      this.numSlopedPatternInList = i;
-    }
-    this.numSlopedPatternInList = analysisData.slopedLines.length;
-
     ctx.restore();
   }
 
@@ -796,6 +808,44 @@ class CandleChart { // eslint-disable-line no-unused-vars
     }
 
     return mouseCandleIndex;
+  }
+
+  /**
+    Inserts into the analysis treeview the candle pattern
+    @param {number} id The id of the candle
+    @param {number} idx The candle index
+   */
+  private insertSingleCandleIntoTreeView(id: number, idx: number) {
+    const ts = new Date(this.ROOT_CHART.chart[idx].candle.e/1000000);
+    const tsStr: string = ts.toTimeString().substring(0, 8);
+
+    let svgArrowUrl: string = '';
+    switch (id) {
+      case 1:
+      case 3:
+      case 5:
+      case 7:
+        svgArrowUrl = UP_ARROW_SVG;
+        break;
+      default:
+        svgArrowUrl = DOWN_ARROW_SVG;
+    }
+
+    const htmlListStr: string =
+      '<li>' +
+        '<span>' +
+          svgArrowUrl +
+        '</span>' +
+        '<span>' +
+          this.SINGLE_CANDLE_ID_LOOKUP[id] +
+        '</span>' +
+        '<span>' + tsStr + '</span>' +
+      '</li>';
+
+    const singleCandleUL: HTMLDivElement =
+      <HTMLDivElement> document.getElementById('single-candle-patterns-list');
+
+    singleCandleUL.insertAdjacentHTML('afterbegin', htmlListStr);
   }
 
   /**
@@ -861,9 +911,22 @@ class CandleChart { // eslint-disable-line no-unused-vars
     const mouseCandleIndex: number =
       this.mouseToCandleIndex(startIndex, candles);
 
+    if (this.ANALYSIS_RESULTS.analysis.singleCandle) {
+      for (let i = this.ANALYSIS_TREE_SINGLE_CANDLE_ADDED;
+        i < this.ANALYSIS_RESULTS.analysis.singleCandle.length; ++i) {
+        const singleCandlePatternId: number =
+          this.ANALYSIS_RESULTS.analysis.singleCandle[i];
+        if (singleCandlePatternId && singleCandlePatternId != 0) {
+          this.insertSingleCandleIntoTreeView(singleCandlePatternId, i);
+        }
+      }
+      this.ANALYSIS_TREE_SINGLE_CANDLE_ADDED =
+        this.ANALYSIS_RESULTS.analysis.singleCandle.length - 1;
+    }
+
     ctx.save();
     // Draw the hovered candle data
-    ctx.font = (this.PADDING_TOP+1).toString() + 'px Hack';
+    ctx.font = (this.PADDING_TOP+1).toString() + 'px Inconsolata';
     ctx.textBaseline = 'top';
     ctx.fillStyle = 'white';
     ctx.fillText(' O:' + (candles[mouseCandleIndex].candle.o/10000).toFixed(4) +
