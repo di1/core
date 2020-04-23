@@ -1,0 +1,41 @@
+
+#single-candle-patterns-list {
+  overflow-x: hidden;
+}
+
+#single-candle-patterns-list > li {
+  display: flex;
+}
+
+#single-candle-patterns-list > li > span {
+  display: flex;
+  flex-grow: 1;
+  justify-content: left;
+  align-items: center;
+}
+
+#single-candle-patterns-list > li > span:first-child {
+  max-width: 2em;
+  min-width: 2em;
+  height: auto;
+}
+
+#single-candle-patterns-list > li > span:nth-child(2) {
+  justify-content: left;
+  min-width: 5.5em;
+  max-width: 5.5em;
+}
+
+#single-candle-patterns-list > li > span:nth-child(3) {
+  min-width: 5em;
+  max-width: 5em;
+}
+#single-candle-patterns-list > li > span:last-child {
+  justify-content: center;
+  padding-right: 10px;
+}
+
+#single-candle-patterns-list > li > span:last-child > object {
+  width: 1.2em;
+  height: auto;
+}

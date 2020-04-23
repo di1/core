@@ -14,18 +14,22 @@ command -v npm >/dev/null 2>&1 || {
 
 cd web/
 
-echo "[WEB   ] Updating NPM"
-npm update > /dev/null
 
-echo "[WEB   ] Installing NPM packages"
-npm install > /dev/null
+if [[ $1 != "-fast" ]]
+then
+  echo "[WEB   ] Updating NPM"
+  npm update > /dev/null
 
-# Run ES lint on all typescript files
-for tsFile in `find ts -name "*.ts"`;
-do
-  echo "[LINT  ] ${tsFile}"
-  ./node_modules/.bin/eslint ${tsFile} --fix
-done
+  echo "[WEB   ] Installing NPM packages"
+  npm install > /dev/null
+
+  # Run ES lint on all typescript files
+  for tsFile in `find ts -name "*.ts"`;
+  do
+    echo "[LINT  ] ${tsFile}"
+    ./node_modules/.bin/eslint ${tsFile} --fix
+  done
+fi
 
 echo "[WEB   ] Compiling typescript"
 ./node_modules/.bin/tsc

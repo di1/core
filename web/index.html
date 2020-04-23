@@ -1,33 +1,95 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="UTF-8">
-    <meta lang="EN">
-    <link rel="stylesheet" type="text/css" href="/css/global.css">
-    <script type="text/javascript" src="/main.min.js"></script>
+    <title>Riski</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/index.css">
+    <link rel="stylesheet" type="text/css" href="./css/treeview.css">
+    <script src="main.min.js"></script>
   </head>
 
   <body>
-    <div id="search-area">
-      <input type="text" placeholder="Search..." id="stock-search-input"
-        autocomplete="off" required>
-      <div id="search-results"></div>
-    </div>
-    <br/>
-    <div class="chart-container">
-      <canvas id="chart"></canvas>
+    <div id="top-bar">
+      <span>
+        Riski
+      </span>
     </div>
 
-    <div id="analysis-results" class="analysis-results-style"
-      style="display:none">
-      <div class="analysis-row">
-        <span>
-          SLOPED_TREND
-        </span>
-        <span>
-          SCORE: 0
-        </span>
+    <div id="analysis-tree">
+      <div id="analysis-container">
+        <ul id="root-analysis-tree">
+          <li>Analysis</li>
+          <ul id="single-candle-patterns">
+            <li>Single Candle</li>
+            <ul id="single-candle-patterns-list">
+              <!-- template html for single-candle -->
+              <!--
+              <li>
+                <span>
+                  <object type="image/svg+xml" data="./img/icons/uparrow.svg">
+                  </object>
+                </span>
+                <span>
+                  Marubozu
+                </span>
+
+                <span>9:35AM</span>
+                <span>
+                  <object type="image/svg+xml" data="./img/icons/eye.svg">
+                  </object>
+                </span>
+              </li>
+              -->
+              <!--
+              <li>
+                <span>
+                  <object type="image/svg+xml" data="./img/icons/downarrow.svg">
+                  </object>
+                </span>
+                <span>Doji</span>
+                <span>9:34AM</span>
+
+                <span>
+                  <object type="image/svg+xml" data="./img/icons/eye.svg">
+                  </object>
+                </span>
+              </li>
+              -->
+            </ul>
+          </ul>
+        </ul>
       </div>
     </div>
+
+    <div id="ticker-overview">
+    </div>
+
+    <div id="right-side">
+      <div id="chart-area">
+        <div id="chart-tabs">
+          <div>
+            <input type="text" placeholder="Search..." id="stock-search-input"
+                                                       autocomplete="off">
+            <div id="search-results"></div>
+          </div>
+          <div>
+            <span class="chart-tab">
+              <span>
+                AMD
+              </span>
+              <span>
+                &times;
+              </span>
+            </span>
+          </div>
+        </div>
+        <div id="chart-container">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+    </div>
+
   </body>
+
 </html>
