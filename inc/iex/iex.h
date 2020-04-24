@@ -3,7 +3,7 @@
 
 // tcp ip / wireshark / packet analyzer
 #include <arpa/inet.h>
-
+#include <stdint.h>
 
 #define u_char unsigned char
 #define u_short unsigned short
@@ -12,7 +12,9 @@
 #undef u_char
 
 #define u_short unsigned short
+#define u_char unsigned char
 #include <netinet/ip.h>
+#undef u_char
 #undef u_short
 
 #include <netinet/udp.h>
@@ -26,7 +28,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 // iex packet and type data
