@@ -2,14 +2,6 @@
 
 #include "error_codes.h"
 
-#define TIME(CODE, MESSAGE)                                                             \
-  do {                                                                                  \
-    clock_t begin = clock();                                                            \
-    CODE clock_t end = clock();                                                         \
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;                         \
-    TRACE(logger_info(__func__, __FILENAME__, __LINE__, "%s %lf", MESSAGE, time_spent); \
-  } while (0);
-
 int IEX_SIGNAL_INTER = 0;
 pcap_t* desc;
 
@@ -40,13 +32,13 @@ enum RISKI_ERROR_CODE symbol_sanitize(char* s, size_t n) {
  * packets, the incoming packets from a file are indisquinshible
  * from an interface
  */
-void packet_handler(u_char* userData, const struct pcap_pkthdr* pkthdr,
-                    const u_char* packet);
+void packet_handler(unsigned char* userData, const struct pcap_pkthdr* pkthdr,
+                    const unsigned char* packet);
 
 /**
  * Processes the data inside the udp packet
  */
-enum RISKI_ERROR_CODE iex_tp_handler(u_char* data);
+enum RISKI_ERROR_CODE iex_tp_handler(unsigned char* data);
 
 /**
  * Prints the packet header for debug information
@@ -130,8 +122,8 @@ enum RISKI_ERROR_CODE iex_parse_deep(char* file) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-void packet_handler(u_char* userData, const struct pcap_pkthdr* pkthdr,
-                    const u_char* packet) {
+void packet_handler(unsigned char* userData, const struct pcap_pkthdr* pkthdr,
+                    const unsigned char* packet) {
   // we won't be passing any user defined information
   (void)userData;
   (void)pkthdr;
@@ -158,7 +150,7 @@ void packet_handler(u_char* userData, const struct pcap_pkthdr* pkthdr,
     // verify udp packet and verify src
     if (ip_header->ip_p == IPPROTO_UDP && is_iex_traffic(ip_src, ip_dst)) {
       // extract the packet data
-      u_char* data = (u_char*)(packet + sizeof(struct ether_header) +
+      unsigned char* data = (unsigned char*)(packet + sizeof(struct ether_header) +
                                sizeof(struct ip) + sizeof(struct udphdr));
 
       // offload the udp data processing out of this function
@@ -412,7 +404,7 @@ enum RISKI_ERROR_CODE parse_auction_information_message(void* payload) {
  * actually an iex packet and sending it of to a parse_*
  * function to do a task
  */
-enum RISKI_ERROR_CODE iex_tp_handler(u_char* data) {
+enum RISKI_ERROR_CODE iex_tp_handler(unsigned char* data) {
   PTR_CHECK(data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // the header starts at position 0 of the data
