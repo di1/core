@@ -11,6 +11,7 @@
 #include <openssl/ssl.h>
 #include <security/security.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <tracer.h>
 
 /*
