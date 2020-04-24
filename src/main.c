@@ -7,8 +7,6 @@
 #include <chart/candle.h>
 #include <chart/chart.h>
 #include <exchange/exchange.h>
-#include <fxpig/fxpig.h>
-#include <fxpig/ini.h>
 #include <iex/iex.h>
 #include <logger.h>
 #include <oanda/oanda.h>
@@ -120,9 +118,8 @@ int main(int argc, char** argv) {
     if (options->pcap_feed) {
       iex_parse_deep(options->pcap_feed_file);
     } else if (options->fxpig) {
-      struct fxpig_ini_config* cfg = fxpig_ini_parse(options->fxpig_ini_file);
-      fxpig_live(cfg);
-      fxpig_ini_free(&cfg);
+      printf("deprecated feed\n");
+      exit(1);
     } else if (options->oanda_feed) {
       TRACE(oanda_live(options->oanda_key));
     }
