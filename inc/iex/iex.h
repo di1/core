@@ -1,14 +1,18 @@
 #ifndef IEX_
 #define IEX_
 
-typedef unsigned char u_char;
-
 // tcp ip / wireshark / packet analyzer
 #include <arpa/inet.h>
+
+
+#define u_char (unsigned char)
 #include <net/ethernet.h>
+#undef u_char
+
 #include <netinet/ip.h>
 #include <netinet/udp.h>
 #include <pcap.h>
+
 
 // on interup
 #include <signal.h>

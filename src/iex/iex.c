@@ -1,5 +1,4 @@
 #include <iex/iex.h>
-
 #include "error_codes.h"
 
 int IEX_SIGNAL_INTER = 0;
