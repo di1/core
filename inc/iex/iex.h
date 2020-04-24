@@ -23,6 +23,7 @@
 
 #include <pcap.h>
 
+#include <sys/socket.h>
 
 // on interup
 #include <signal.h>
