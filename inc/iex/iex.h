@@ -17,7 +17,10 @@
 #undef u_char
 #undef u_short
 
+#define u_short unsigned short
 #include <netinet/udp.h>
+#undef u_short
+
 #include <pcap.h>
 
 
