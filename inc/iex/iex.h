@@ -1,6 +1,8 @@
 #ifndef IEX_
 #define IEX_
 
+typedef unsigned char u_char;
+
 // tcp ip / wireshark / packet analyzer
 #include <arpa/inet.h>
 #include <net/ethernet.h>
