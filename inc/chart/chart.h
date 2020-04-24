@@ -102,6 +102,16 @@ enum RISKI_ERROR_CODE chart_put_single_candle_pattern(
     struct chart* cht, size_t index, enum SINGLE_CANDLE_PATTERNS identifier);
 
 /*
+ * Sets a candle tag with a single candle pattern
+ * @param {struct chart*} cht A chart
+ * @param {size_t} index The index of the candle to flag
+ * @param {enum DOUBLE_CANDLE_PATTERNS} identifier The flag to assign
+ * @return {enum RISKI_ERROR_CODE} The status
+ */
+enum RISKI_ERROR_CODE chart_put_double_candle_pattern(
+    struct chart* cht, size_t index, enum DOUBLE_CANDLE_PATTERNS identifier);
+
+/*
  * Marks a line on a chart given two candles, and a boolean "direction"
  * which indicates weather this line should be draw from the lows or the highs.
  * @param {struct chart*} cht A chart

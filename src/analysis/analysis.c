@@ -78,7 +78,17 @@ pthread_t* threads;
     if (res != SINGLE_CANDLE_PATTERN_NONE) {                          \
       return RISKI_ERROR_CODE_NONE;                                   \
     }                                                                 \
-  } while (0);
+  } while (0)
+
+#define DOUBLE_CANDLE_PATTERN_PERFORM(ANALYSIS_FUNCTION)              \
+  do {                                                                \
+    enum DOUBLE_CANDLE_PATTERNS res = DOUBLE_CANDLE_PATTERNS_NONE;    \
+    TRACE(ANALYSIS_FUNCTION(end_candle - 1, cht, &res));              \
+    TRACE(chart_put_double_candle_pattern(cht, end_candle - 1, res)); \
+    if (res != DOUBLE_CANDLE_PATTERNS_NONE) {                         \
+      return RISKI_ERROR_CODE_NONE;                                   \
+    }                                                                 \
+  } while (0)
 
 /*
  * Performs simple candle stick analysis on the chart
@@ -89,6 +99,25 @@ pthread_t* threads;
  * index, which since is 1 indexed will be end_candle-1 in the
  * array.
  */
+
+enum RISKI_ERROR_CODE perform_all_single_candle_patterns(
+    struct chart* cht, size_t end_candle, struct candle* last_candle) {
+  SINGLE_CANDLE_PATTERN_PERFORM(is_white_marubozu);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_dragonfly);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_gravestone);
+  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_generic);
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE perform_all_double_candle_patterns(struct chart* cht,
+                                                         size_t end_candle) {
+  DOUBLE_CANDLE_PATTERN_PERFORM(is_bullish_engulfing);
+  return RISKI_ERROR_CODE_NONE;
+}
+
 enum RISKI_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -104,16 +133,8 @@ enum RISKI_ERROR_CODE simple_analysis(struct chart* cht, size_t end_candle) {
   // Now that we have a valid candle perform all single candle
   // analysis
 
-  // return value of each single analysis
-
-  SINGLE_CANDLE_PATTERN_PERFORM(is_white_marubozu);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_black_marubozu);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_white_spinning_top);
-  SINGLE_CANDLE_PATTERN_PERFORM(is_black_spinning_top);
-  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_dragonfly);
-  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_gravestone);
-  SINGLE_CANDLE_PATTERN_PERFORM(perform_doji_generic);
-
+  TRACE(perform_all_single_candle_patterns(cht, end_candle, last_candle));
+  TRACE(perform_all_double_candle_patterns(cht, end_candle));
   return RISKI_ERROR_CODE_NONE;
 }
 

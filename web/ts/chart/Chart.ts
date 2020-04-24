@@ -89,8 +89,8 @@ class CandleChart { // eslint-disable-line no-unused-vars
     };
 
     this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
-      analysis: <AnalysisJSON> {singleCandle: [], trendLines: [],
-        slopedLines: []},
+      analysis: <AnalysisJSON> {singleCandle: [], doubleCandle: [],
+        trendLines: [], slopedLines: []},
     };
 
     const singleCandleUL: HTMLDivElement =
@@ -129,7 +129,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
 
     this.ANALYSIS_RESULTS = <RootAnalysisJSON> {
       analysis: <AnalysisJSON> {singleCandle: [], trendLines: [],
-        slopedLines: []},
+        doubleCandle: [], slopedLines: []},
     };
   }
 
@@ -505,6 +505,30 @@ class CandleChart { // eslint-disable-line no-unused-vars
     ctx.stroke();
     ctx.restore();
   }
+  /**
+    Draws an analysis that applies to a single candle
+
+    @param {CanvasRenderingContext2D} ctx The rendering context
+    @param {number} widthOffset The X offset of the candle
+    @param {LinearEquation} priceToPixel An equation that converts a price
+      to a Y pixel coordiant.
+    @param {Candle} candle The candle to draw below
+    @param {number} analysisCode The single candle analysis code number
+   */
+  private drawDoubleCandleAnalysis(ctx: CanvasRenderingContext2D,
+      widthOffset: number, priceToPixel: LinearEquation, candle: Candle,
+      analysisCode: number) {
+    if (analysisCode == 0) {
+      return;
+    }
+
+
+    ctx.save();
+    ctx.translate(widthOffset + this.CANDLE_WIDTH, priceToPixel.eval(candle.h));
+    ctx.strokeRect(0, 0, (-(((this.CANDLE_WIDTH) * 2) + this.CANDLE_SPACING)),
+        -(priceToPixel.eval(candle.h) - priceToPixel.eval(candle.l)));
+    ctx.restore();
+  }
 
   /**
     Draws an analysis that applies to a single candle
@@ -760,14 +784,22 @@ class CandleChart { // eslint-disable-line no-unused-vars
       const analysisCode: number = (i < analysisData.singleCandle.length) ?
         analysisData.singleCandle[i] : 0;
 
+      // Extract the double candle analysis code
+      const analysisCodeDouble: number =
+        (i < analysisData.singleCandle.length) ?
+        analysisData.doubleCandle[i] : 0;
+
       // Draw the candle body and wick
-      this.drawCandle(ctx, widthOffset,
-        (analysisCode > 0) ? ctx.strokeRect : ctx.fillRect, candles[i].candle,
-        priceToPixel);
+      this.drawCandle(ctx, widthOffset, ctx.fillRect, candles[i].candle,
+          priceToPixel);
 
       // Draw the single candle analysis
       this.drawSingleCandleAnalysis(
           ctx, widthOffset, priceToPixel, candles[i].candle, analysisCode);
+
+      this.drawDoubleCandleAnalysis(
+          ctx, widthOffset, priceToPixel, candles[i].candle,
+          analysisCodeDouble);
 
       // Draw the volume box
       this.drawVolume(ctx, widthOffset, candles[i].candle, volumeToPixel);
@@ -786,6 +818,7 @@ class CandleChart { // eslint-disable-line no-unused-vars
       this.drawSlopedTrendLine(ctx, candles, priceToPixel, trendLine,
           startIndex, drawingWidth, rightBarPriceWidth);
     }
+
     ctx.restore();
   }
 

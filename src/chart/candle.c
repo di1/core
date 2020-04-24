@@ -45,6 +45,7 @@ enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
     *t = c->ELEMENT;                                               \
     return RISKI_ERROR_CODE_NONE;                                  \
   }
+
 CREATE_CANDLE_GET_FUNCTION(candle_volume, uint64_t, volume)
 CREATE_CANDLE_GET_FUNCTION(candle_open, int64_t, open)
 CREATE_CANDLE_GET_FUNCTION(candle_high, int64_t, high)
@@ -52,6 +53,7 @@ CREATE_CANDLE_GET_FUNCTION(candle_low, int64_t, low)
 CREATE_CANDLE_GET_FUNCTION(candle_close, int64_t, close)
 CREATE_CANDLE_GET_FUNCTION(candle_start, uint64_t, start_time)
 CREATE_CANDLE_GET_FUNCTION(candle_end, uint64_t, end_time)
+
 #undef CREATE_CANDLE_GET_FUNCTION
 
 enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price,

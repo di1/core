@@ -159,9 +159,9 @@ enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles,
 
       char* n = NULL;
       TRACE(chart_get_name(cht, &n));
-      printf("[%s] width=%llu num_confirmation=%lu indirect=%lu\n", n,
-             (unsigned long long)w, num_confirmations,
-             num_indirect_confirmations);
+      //printf("[%s] width=%llu num_confirmation=%lu indirect=%lu\n", n,
+       //      (unsigned long long)w, num_confirmations,
+        //     num_indirect_confirmations);
 
       free(eq);
       break;

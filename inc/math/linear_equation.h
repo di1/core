@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /*
  * Defines a linear equation.

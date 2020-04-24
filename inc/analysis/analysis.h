@@ -15,11 +15,18 @@ struct chart;
 #endif
 
 // include the different analysis
+
+// single candle
 #include <analysis/doji.h>
 #include <analysis/horizontal_line.h>
 #include <analysis/marubozu.h>
 #include <analysis/spinning_top.h>
+
+// trends
 #include <analysis/trend_line.h>
+
+// double candle
+#include <analysis/engulfing.h>
 
 // used for function call tracing
 #include <tracer.h>

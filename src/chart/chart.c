@@ -25,6 +25,10 @@ struct trend_line {
  * @param {enum SINGLE_CANDLE_PATTERNS*} scp A list the size of
  * num_candles_allocated where each element defines the analysis on that
  * specific candle index in the chart.
+ * @param {enum DOUBLE_CANDLE_PATTERNS*} dcp A list the size of
+ * num_candles_allocated where each element defines the analysis on that
+ * specific candle index in the chart. This one referes to the double candle
+ * patterns instead of the single candle patterns like scp.
  * @param {size_t} num_trend_lines_horizontal The number of horizontal trend
  * lines.
  * @param {struct trend_line*} trend_lines_horizontal A list of trend lines
@@ -36,6 +40,7 @@ struct trend_line {
 struct chart_analysis {
   pthread_mutex_t lock;
   enum SINGLE_CANDLE_PATTERNS* scp;
+  enum DOUBLE_CANDLE_PATTERNS* dcp;
   size_t num_trend_lines_horizontal;
   struct trend_line* trend_lines_horizontal;
   size_t num_trend_lines_sloped;
@@ -99,6 +104,10 @@ enum RISKI_ERROR_CODE chart_new(uint64_t interval, char* name,
       (cht->num_candles_allocated) * sizeof(enum SINGLE_CANDLE_PATTERNS));
   PTR_CHECK(cht->analysis->scp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  cht->analysis->dcp = (enum DOUBLE_CANDLE_PATTERNS*)malloc(
+      (cht->num_candles_allocated) * sizeof(enum DOUBLE_CANDLE_PATTERNS));
+  PTR_CHECK(cht->analysis->dcp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
   cht->analysis->trend_lines_horizontal = NULL;
   cht->analysis->num_trend_lines_horizontal = 0;
 
@@ -108,6 +117,10 @@ enum RISKI_ERROR_CODE chart_new(uint64_t interval, char* name,
   // initalize all the analysis to NONE
   for (size_t i = 0; i < cht->num_candles_allocated; ++i) {
     cht->analysis->scp[i] = SINGLE_CANDLE_PATTERN_NONE;
+  }
+
+  for (size_t i = 0; i < cht->num_candles_allocated; ++i) {
+    cht->analysis->dcp[i] = DOUBLE_CANDLE_PATTERNS_NONE;
   }
 
   pthread_mutex_init(&(cht->analysis->lock), NULL);
@@ -134,6 +147,14 @@ enum RISKI_ERROR_CODE chart_put_single_candle_pattern(
   RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
               RISKI_ERROR_TEXT);
   cht->analysis->scp[index] = identifier;
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE chart_put_double_candle_pattern(
+    struct chart* cht, size_t index, enum DOUBLE_CANDLE_PATTERNS identifier) {
+  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  RANGE_CHECK(index, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE, RISKI_ERROR_TEXT);
+  cht->analysis->dcp[index] = identifier;
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -266,6 +287,7 @@ enum RISKI_ERROR_CODE chart_new_candle(struct chart* cht, int64_t price) {
   // TODO
 
   if (cht->cur_candle >= cht->num_candles_allocated) {
+    size_t prev_candles_allocated = cht->num_candles_allocated;
     cht->num_candles_allocated =
         (size_t)((double)cht->num_candles_allocated * (double)1.5);
     cht->candles = realloc(
@@ -273,6 +295,16 @@ enum RISKI_ERROR_CODE chart_new_candle(struct chart* cht, int64_t price) {
     cht->analysis->scp =
         realloc(cht->analysis->scp, sizeof(enum SINGLE_CANDLE_PATTERNS) *
                                         cht->num_candles_allocated);
+    cht->analysis->dcp =
+        realloc(cht->analysis->dcp, sizeof(enum DOUBLE_CANDLE_PATTERNS) *
+                                        cht->num_candles_allocated);
+
+    // set the newly allocated memory to their default state.
+    for (size_t i = prev_candles_allocated; i < cht->num_candles_allocated;
+        ++i) {
+      cht->analysis->scp[i] = SINGLE_CANDLE_PATTERN_NONE;
+      cht->analysis->dcp[i] = DOUBLE_CANDLE_PATTERNS_NONE;
+    }
   }
 
   TRACE(candle_new(price, cht->last_update, &cht->candles[cht->cur_candle]));
@@ -396,6 +428,14 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart* cht, char** json) {
     if (i != num_candles - 1) strcat(resbuf, ",");
     TRACE(string_builder_append(sb, resbuf));
   }
+  TRACE(string_builder_append(sb, "], \"doubleCandle\":["));
+  for (size_t i = 0; i < num_candles; ++i) {
+    char resbuf[10] = {0};
+    sprintf(resbuf, "%u", chta->dcp[i]);
+    if (i != num_candles - 1) strcat(resbuf, ",");
+    TRACE(string_builder_append(sb, resbuf));
+  }
+
   TRACE(string_builder_append(sb, "], \"trendLines\":["));
   for (size_t i = 0; i < chta->num_trend_lines_horizontal; ++i) {
     char trend_line_json_buf[100];
