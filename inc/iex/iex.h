@@ -6,10 +6,15 @@
 
 
 #define u_char unsigned char
+#define u_short unsigned short
 #include <net/ethernet.h>
+#undef u_short
 #undef u_char
 
+#define u_short unsigned short
 #include <netinet/ip.h>
+#undef u_short
+
 #include <netinet/udp.h>
 #include <pcap.h>
 
