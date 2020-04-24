@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 
 
-#define u_char (unsigned char)
+#define u_char unsigned char
 #include <net/ethernet.h>
 #undef u_char
 
