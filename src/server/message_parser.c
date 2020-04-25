@@ -1,11 +1,30 @@
 #include <server/message_parser.h>
 
+enum RISKI_ERROR_CODE extract_request_query(char* query,
+    struct exchange** sec, char** security) {
+  char* exchange = NULL;
+  exchange = strtok(query, ":");
+
+  if (strcmp(exchange, "IEX") == 0) {
+    *sec = iex_exchange;
+  } else if (strcmp(exchange, "OANDA") == 0) {
+    *sec = exchange_oanda;
+  }
+
+  *security = strtok(NULL, ":");
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
 enum RISKI_ERROR_CODE init_response(char* security, char** resp) {
   PTR_CHECK(security, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  struct exchange* working_exchange = NULL;
+  TRACE(extract_request_query(security, &working_exchange, &security));
+
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
@@ -23,8 +42,11 @@ enum RISKI_ERROR_CODE latest_response(char* security, char** resp) {
   PTR_CHECK(security, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  struct exchange* working_exchange = NULL;
+  TRACE(extract_request_query(security, &working_exchange, &security));
+
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,
@@ -45,8 +67,11 @@ enum RISKI_ERROR_CODE analysis_response(char* security, char** resp) {
   PTR_CHECK(security, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(resp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  struct exchange* working_exchange = NULL;
+  TRACE(extract_request_query(security, &working_exchange, &security));
+
   struct security* sec = NULL;
-  TRACE(exchange_get(iex_exchange, security, &sec));
+  TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
     TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, __FILENAME__,

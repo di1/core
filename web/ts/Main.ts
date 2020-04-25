@@ -142,7 +142,7 @@ window.onload = () => {
   searchSocket = new WebSocket('ws://' + window.location.hostname + ':7681', 'lws-minimal');
   searchSocket.onmessage = onSearchReceived;
 
-  largeDisplayChart = new CandleChart('AMD');
+  largeDisplayChart = new CandleChart('IEX:AMD');
 
   const searchInput: HTMLInputElement | null =
   <HTMLInputElement> document.getElementById('stock-search-input');
