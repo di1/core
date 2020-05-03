@@ -20,3 +20,19 @@ interface IChart {
 interface ILatestCandle {
   latestCandle: ICandle;
 }
+
+interface Trend {
+  s: number;
+  e: number;
+  d: number;
+}
+
+interface Analysis {
+  singleCandle: number[];
+  doubleCandle: number[];
+  trendLines: Trend;
+}
+
+interface IAnalysis {
+  analysis: Analysis;
+}

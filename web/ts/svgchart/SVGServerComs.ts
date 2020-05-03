@@ -1,6 +1,7 @@
 type SocketReadyFunc = () => any;
 type FullChartReceivedFunc = (cht: IChart) => any;
 type LatestCandleReceivedFunc = (cnd: ILatestCandle) => any;
+type AnalysisReceivedFunc = (anl: IAnalysis) => any;
 
 /**
   An abstraction to websocket that allows for callback based server
@@ -24,6 +25,8 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
    */
   private onlatestcandlereceived: LatestCandleReceivedFunc;
 
+  private onanalysisreceived: AnalysisReceivedFunc;
+
   /**
     Creates a new connection and sets up the bindings.
     @param {string} ip The servers ip address
@@ -32,15 +35,19 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
     sends full chart information.
     @param {LatestCandleReceivedFunc} onlatestcandlereceived Callback when
     server sends latest candle information
+    @param {AnalysisReceivedFunc} onanalysisreceived Function to call when
+    the full analysis is sent from the server
    */
   constructor(ip: string, onsocketready: SocketReadyFunc,
       onfullchartreceived: FullChartReceivedFunc,
-      onlatestcandlereceived: LatestCandleReceivedFunc) {
+      onlatestcandlereceived: LatestCandleReceivedFunc,
+      onanalysisreceived: AnalysisReceivedFunc) {
     this.socket = new WebSocket(ip, 'lws-minimal');
 
     this.onsocketready = onsocketready;
     this.onfullchartreceived = onfullchartreceived;
     this.onlatestcandlereceived = onlatestcandlereceived;
+    this.onanalysisreceived = onanalysisreceived;
 
     this.socket.onmessage = this.onmessage.bind(this);
     this.socket.onopen = this.onopen.bind(this);
@@ -59,6 +66,21 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
       return false;
     } else {
       this.socket.send('init|' + exchange + ':' + security);
+      return true;
+    }
+  }
+
+  /**
+    Asks the server for the full analysis data
+    @param {string} exchange The excahge to pull from
+    @param {string} security The ticker/security symbol
+    @return {boolean} Returns false if socket isn't open otherwize returns true.
+   */
+  public getAnalysisData(exchange: string, security: string): boolean {
+    if (this.socket.readyState != this.socket.OPEN) {
+      return false;
+    } else {
+      this.socket.send('analysis|' + exchange + ':' + security);
       return true;
     }
   }
@@ -93,6 +115,8 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
       this.onfullchartreceived(<IChart>response);
     } else if (response['latestCandle']) {
       this.onlatestcandlereceived(<ILatestCandle>response);
+    } else if (response['analysis']) {
+      this.onanalysisreceived(<IAnalysis>response);
     }
   }
 

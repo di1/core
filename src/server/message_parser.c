@@ -1,7 +1,7 @@
 #include <server/message_parser.h>
 
-enum RISKI_ERROR_CODE extract_request_query(char* query,
-    struct exchange** sec, char** security) {
+enum RISKI_ERROR_CODE extract_request_query(char* query, struct exchange** sec,
+                                            char** security) {
   char* exchange = NULL;
   exchange = strtok(query, ":");
 

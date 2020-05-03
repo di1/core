@@ -2,8 +2,28 @@
   Represents a linear equation
  */
 class LinearEquation { // eslint-disable-line no-unused-vars
-  slope: number;
-  inter: number;
+  private slope: number;
+  private inter: number;
+
+  /**
+    The first x coordiant used to build the line
+   */
+  public x1: number;
+
+  /**
+    The first y coordiant used to build the line
+   */
+  public y1: number;
+
+  /**
+    The second x coordiant used to build the line
+   */
+  public x2: number;
+
+  /**
+    The second y coordiant used to build the line
+   */
+  public y2: number;
 
   /**
     Constructs a linear equation given two points
@@ -16,6 +36,10 @@ class LinearEquation { // eslint-disable-line no-unused-vars
   constructor(x1: number, y1: number, x2: number, y2: number) {
     this.slope = (y2-y1)/(x2-x1);
     this.inter = y1 - (this.slope*x1);
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
   }
 
   /**

@@ -1,4 +1,5 @@
 #include <iex/iex.h>
+
 #include "error_codes.h"
 
 int IEX_SIGNAL_INTER = 0;
@@ -149,8 +150,9 @@ void packet_handler(unsigned char* userData, const struct pcap_pkthdr* pkthdr,
     // verify udp packet and verify src
     if (ip_header->ip_p == IPPROTO_UDP && is_iex_traffic(ip_src, ip_dst)) {
       // extract the packet data
-      unsigned char* data = (unsigned char*)(packet + sizeof(struct ether_header) +
-                               sizeof(struct ip) + sizeof(struct udphdr));
+      unsigned char* data =
+          (unsigned char*)(packet + sizeof(struct ether_header) +
+                           sizeof(struct ip) + sizeof(struct udphdr));
 
       // offload the udp data processing out of this function
       TRACE_HAULT(iex_tp_handler(data));

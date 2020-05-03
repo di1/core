@@ -12,7 +12,7 @@ enum RISKI_ERROR_CODE is_bullish_engulfing(size_t idx, struct chart* cht,
   TRACE(chart_get_candle(cht, idx, &cnd1));
 
   struct candle* cnd2 = NULL;
-  TRACE(chart_get_candle(cht, idx-1, &cnd2));
+  TRACE(chart_get_candle(cht, idx - 1, &cnd2));
 
   int64_t cnd1_o, cnd1_h, cnd1_l, cnd1_c = 0;
   TRACE(candle_open(cnd1, &cnd1_o));
@@ -49,8 +49,8 @@ enum RISKI_ERROR_CODE is_bullish_engulfing(size_t idx, struct chart* cht,
   }
 
   // make sure the first candle "engulfes" the second candle
-  if (cnd1_o < cnd2_c && cnd1_c > cnd1_o
-      && cnd1_l < cnd2_l && cnd1_h > cnd2_h) {
+  if (cnd1_o < cnd2_c && cnd1_c > cnd1_o && cnd1_l < cnd2_l &&
+      cnd1_h > cnd2_h) {
     char* n = NULL;
     TRACE(chart_get_name(cht, &n));
     printf("[%s] bullish engulfing\n", n);
