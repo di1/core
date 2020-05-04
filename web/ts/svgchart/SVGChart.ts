@@ -177,36 +177,47 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     @param {IAnalysis} anl The analysis sent from the server
    */
   private onanalysisreceived(anl: IAnalysis) {
-    // This is the initial analysis received go and update each
-    // candle analysis first.
-    for (let i: number =
-         this.NumberOfCandlePatternsDrawn;
-      i < anl.analysis.singleCandle.length; ++i) {
-      this.CandleDomReferences[i].putSingleCandleAnalysis(
-          anl.analysis.singleCandle[i]);
-      this.CandleDomReferences[i].putDoubleCandleAnalysis(
-          anl.analysis.doubleCandle[i]);
-    }
-    this.NumberOfCandlePatternsDrawn = anl.analysis.singleCandle.length - 1;
+    try {
+      // This is the initial analysis received go and update each
+      // candle analysis first.
+      for (let i: number =
+           this.NumberOfCandlePatternsDrawn;
+        i < anl.analysis.singleCandle.length; ++i) {
+        this.CandleDomReferences[i].putSingleCandleAnalysis(
+            anl.analysis.singleCandle[i]);
+        this.CandleDomReferences[i].putDoubleCandleAnalysis(
+            anl.analysis.doubleCandle[i]);
+      }
+      this.NumberOfCandlePatternsDrawn = anl.analysis.singleCandle.length - 1;
 
-    for (let i: number =
-         this.NumberOfSlopedTrendsDrawn;
-      i < anl.analysis.slopedLines.length; ++i) {
-      this.CandleDomReferences[anl.analysis.slopedLines[i].e]
-          .putSlopedTrendLine(anl.analysis.slopedLines[i]);
-    }
-    this.NumberOfSlopedTrendsDrawn = anl.analysis.slopedLines.length;
+      for (let i: number =
+           this.NumberOfSlopedTrendsDrawn;
+        i < anl.analysis.slopedLines.length; ++i) {
+        this.CandleDomReferences[anl.analysis.slopedLines[i].e]
+            .putSlopedTrendLine(anl.analysis.slopedLines[i]);
+      }
+      this.NumberOfSlopedTrendsDrawn = anl.analysis.slopedLines.length;
 
-    for (let i: number =
-         this.NumberOfHorizontalTrendsDrawn;
-      i < anl.analysis.trendLines.length; ++i) {
-      this.CandleDomReferences[anl.analysis.trendLines[i].e]
-          .putHorizontalTrendLine(anl.analysis.trendLines[i]);
-    }
-    this.NumberOfHorizontalTrendsDrawn = anl.analysis.trendLines.length;
+      for (let i: number =
+           this.NumberOfHorizontalTrendsDrawn;
+        i < anl.analysis.trendLines.length; ++i) {
+        this.CandleDomReferences[anl.analysis.trendLines[i].e]
+            .putHorizontalTrendLine(anl.analysis.trendLines[i]);
+      }
+      this.NumberOfHorizontalTrendsDrawn = anl.analysis.trendLines.length;
 
-    if (!this.Socket.getLatestCandle(this.InputExchange, this.InputSecurity)) {
-      console.error('unable to send latest candle from analysis callback');
+      if (!this.Socket.getLatestCandle(this.InputExchange,
+          this.InputSecurity)) {
+        console.error('unable to send latest candle from analysis callback');
+      }
+    } catch (ex) {
+      console.warn('chart is a few milliseconds behind, analysis view delayed' +
+                   ' until next candle');
+    } finally {
+      if (!this.Socket.getLatestCandle(this.InputExchange,
+          this.InputSecurity)) {
+        console.error('unable to send latest candle from analysis callback');
+      }
     }
   }
 
