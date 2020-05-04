@@ -121,6 +121,18 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     this.SvgCandleRoot = <SVGElement> SvgCandleRootTop.children[0];
     this.SvgYAxisRoot = <SVGElement> SvgCandleRootTop.children[1];
 
+    // draw the text symbols identifing what this chart is displaying
+    const SvgChartTitle: SVGTextElement =
+      <SVGTextElement> document.createElementNS(SVGCandleChart.SVG_NS, 'text');
+
+    SvgChartTitle.setAttributeNS(null, 'x', '0');
+    SvgChartTitle.setAttributeNS(null, 'y', '0');
+    SvgChartTitle.setAttributeNS(null, 'dominant-baseline', 'hanging');
+    SvgChartTitle.setAttributeNS(null, 'font-size', '1.3em');
+    SvgChartTitle.innerHTML = exchange + ' : ' + security;
+
+    this.SvgCandleRoot.appendChild(SvgChartTitle);
+
     this.Socket = new SVGServerComs(this.SERVER_IP,
         this.onsocketready.bind(this),
         this.onfullchartreceived.bind(this),
@@ -269,9 +281,9 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     }
 
     this.PriceTransformation = new LinearEquation(minPrice, 1080,
-        maxPrice, 0);
+        maxPrice, 27.2);
     this.PixelTransformation = new LinearEquation(1080, minPrice,
-        0, maxPrice);
+        27.2, maxPrice);
   }
 
   /**
@@ -302,9 +314,9 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     if (maxPrice != this.PriceTransformation.x2 ||
         minPrice != this.PriceTransformation.x1) {
       this.PriceTransformation = new LinearEquation(minPrice, 1080,
-          maxPrice, 0);
+          maxPrice, 27.2);
       this.PixelTransformation = new LinearEquation(1080, minPrice,
-          0, maxPrice);
+          27.2, maxPrice);
 
       // Loop through each candle and force update
 
@@ -334,7 +346,7 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
             'text');
       yAxisText.setAttributeNS(null, 'x', '2010');
       yAxisText.setAttributeNS(null, 'y', yoffset.toString());
-      yAxisText.setAttributeNS(null, 'font-size', '1em');
+      yAxisText.setAttributeNS(null, 'font-size', '1.3em');
       yAxisText.setAttributeNS(null, 'text-rendering', 'optimizeLegibility');
       yAxisText.setAttributeNS(null, 'dominant-baseline', 'middle');
 
@@ -380,4 +392,7 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
 
 window.onload = () => {
   new SVGCandleChart(0, 'OANDA', 'EUR_USD');
+  new SVGCandleChart(1, 'OANDA', 'USD_JPY');
+  new SVGCandleChart(2, 'OANDA', 'AUD_CAD');
+  new SVGCandleChart(3, 'OANDA', 'USD_CAD');
 };

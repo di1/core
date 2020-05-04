@@ -524,23 +524,25 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     this.PriceTransformedCandle.l = this.RawCandle.l;
     this.PriceTransformedCandle.c = this.RawCandle.c;
     this.performCandleTransformation();
-    this.buildCandleBody();
-    this.buildCandleWick();
+    if (this.CndIdx >= -1) {
+      this.buildCandleBody();
+      this.buildCandleWick();
 
-    if (this.SlopedTrendLineData && this.SlopedTrendLine) {
-      this.putSlopedTrendLine(this.SlopedTrendLineData);
-    }
+      if (this.SlopedTrendLineData && this.SlopedTrendLine) {
+        this.putSlopedTrendLine(this.SlopedTrendLineData);
+      }
 
-    if (this.HorizontalTrendLineData && this.HorizontalTrendLine) {
-      this.putHorizontalTrendLine(this.HorizontalTrendLineData);
-    }
+      if (this.HorizontalTrendLineData && this.HorizontalTrendLine) {
+        this.putHorizontalTrendLine(this.HorizontalTrendLineData);
+      }
 
-    if (this.SingleCandleTextCode && this.SingleCandleText) {
-      this.putSingleCandleAnalysis(this.SingleCandleTextCode);
-    }
+      if (this.SingleCandleTextCode && this.SingleCandleText) {
+        this.putSingleCandleAnalysis(this.SingleCandleTextCode);
+      }
 
-    if (this.DoubleCandleAnalysis && this.DoubleCandleAnalysisCode) {
-      this.putDoubleCandleAnalysis(this.DoubleCandleAnalysisCode);
+      if (this.DoubleCandleAnalysis && this.DoubleCandleAnalysisCode) {
+        this.putDoubleCandleAnalysis(this.DoubleCandleAnalysisCode);
+      }
     }
   }
 }
