@@ -20,7 +20,7 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
   /**
     This candle is the transformed prices
    */
-  private PriceTransformedCandle: Candle;
+  public PriceTransformedCandle: Candle;
 
   /**
     This candle contains the raw prices
@@ -29,8 +29,9 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
 
   /**
     The candle index 0 being the first candle
+    These needs to be public for other candles to know where this candle is
    */
-  private cndIdx: number;
+  public CndIdx: number;
 
   /**
     The root chart this candle belongs to
@@ -49,6 +50,47 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     6: 'D',
     7: 'D',
   }
+
+  /**
+    Holds the text element saying what kind of single candle analysis
+    we have. (dom reference)
+   */
+  private SingleCandleText: SVGTextElement | null = null;
+
+  /**
+    Holds the text element id for reproducing the text box
+   */
+  private SingleCandleTextCode: number | null = null;
+
+  /**
+    Holds the line showing the sloped trend (dom reference)
+   */
+  private SlopedTrendLine: SVGLineElement | null = null;
+
+  /**
+    Holds the horizontal trend line (dom reference)
+   */
+  private HorizontalTrendLine: SVGLineElement | null = null;
+
+  /**
+    Holds the information to rebuild the sloped trend line
+   */
+  private SlopedTrendLineData: Trend | null = null;
+
+  /**
+    Holds the information to rebuild the horizontal trend line
+   */
+  private HorizontalTrendLineData: Trend | null = null;
+
+  /**
+    The shaded are for double candle analysis (dom reference)
+   */
+  private DoubleCandleAnalysis: SVGRectElement | null = null;
+
+  /**
+    The double candle analysis code for reproducing the shaded area
+   */
+  private DoubleCandleAnalysisCode: number | null = null;
 
   /**
     Creates the initial candle body. The candle body is represented as an svg
@@ -77,8 +119,6 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
 
     // If this is a doji there are some visual that can't be shows using
     // crispEdges
-    let doji: boolean = false;
-
     if (this.PriceTransformedCandle.o > this.PriceTransformedCandle.c) {
       cb.setAttributeNS(null, 'height',
           (this.PriceTransformedCandle.o - this.PriceTransformedCandle.c)
@@ -97,10 +137,9 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
       cb.setAttributeNS(null, 'height', '1');
       cb.setAttributeNS(null, 'y', this.PriceTransformedCandle.o.toString() +
                         'px');
-      doji = true;
     }
 
-    cb.setAttributeNS(null, 'x', (this.cndIdx *
+    cb.setAttributeNS(null, 'x', (this.CndIdx *
                           this.rootChart.getCandleWidth()).toString() + 'px');
     cb.setAttributeNS(null, 'shape-rendering', 'geometricPrecision');
 
@@ -130,11 +169,11 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     }
 
     cw.setAttributeNS(null, 'x1',
-        ((this.cndIdx *
+        ((this.CndIdx *
                    this.rootChart.getCandleWidth()) +
                    this.rootChart.getCandleWidth() / 2.0).toString() + 'px');
     cw.setAttributeNS(null, 'y1', this.PriceTransformedCandle.h.toString());
-    cw.setAttributeNS(null, 'x2', ((this.cndIdx *
+    cw.setAttributeNS(null, 'x2', ((this.CndIdx *
                                    this.rootChart.getCandleWidth()) +
                                    this.rootChart.getCandleWidth() / 2.0)
         .toString() + 'px');
@@ -154,15 +193,15 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     Creates a new candle and adds it to the DOM
     @param {SVGCandleChart} cht The root chart object
     @param {Candle} cnd Initial candle data
-    @param {number} cndIdx The initial candle index
+    @param {number} CndIdx The initial candle index
    */
-  constructor(cht: SVGCandleChart, cnd: Candle, cndIdx: number) {
+  constructor(cht: SVGCandleChart, cnd: Candle, CndIdx: number) {
     this.PriceTransformedCandle = cnd;
     this.rootChart = cht;
     this.RawCandle = <Candle>{'o': cnd.o, 'h': cnd.h, 'l': cnd.l, 'c': cnd.c};
     this.performCandleTransformation();
 
-    this.cndIdx = cndIdx;
+    this.CndIdx = CndIdx;
     this.candleBody = this.buildCandleBody();
     this.candleWick = this.buildCandleWick();
 
@@ -216,7 +255,7 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
   /**
     Converts candle OHLC into pixel coordinates
    */
-  private performCandleTransformation() {
+  private performCandleTransformation(): void {
     this.PriceTransformedCandle.o =
       this.rootChart.getPriceTransformation().eval(
           this.PriceTransformedCandle.o);
@@ -235,10 +274,9 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     Shifts the candle 1 candle to the left to make room for other candles on the
     right
    */
-  public shiftLeft() {
-    this.cndIdx -= 1;
-    this.buildCandleBody();
-    this.buildCandleWick();
+  public shiftLeft(): void {
+    this.CndIdx -= 1;
+    this.forceUpdate();
   }
 
   /**
@@ -247,55 +285,262 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
     @param {number} id The ID specifiying what type of single candle pattern
     this candle represents.
    */
-  public putSingleCandleAnalysis(id: number) {
+  public putSingleCandleAnalysis(id: number): void {
+    let newlyCreatedCandle: boolean = true;
+    console.log('fdsa');
     switch (id) {
       case 0:
         break;
       default:
-        const singleCandleDisplay: SVGTextElement =
+        this.SingleCandleTextCode = id;
+        if (this.SingleCandleText === null) {
+          this.SingleCandleText =
           <SVGTextElement> document.createElementNS(SVGCandleChart.SVG_NS,
               'text');
-        singleCandleDisplay.setAttributeNS(null, 'x',
-            (this.cndIdx * this.rootChart.getCandleWidth()).toString());
-        singleCandleDisplay.setAttributeNS(null, 'y',
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.SingleCandleText.setAttributeNS(null, 'x',
+            (this.CndIdx * this.rootChart.getCandleWidth()).toString());
+        this.SingleCandleText.setAttributeNS(null, 'y',
             (this.PriceTransformedCandle.l + 1).toString());
-        singleCandleDisplay.setAttributeNS(null, 'font-size',
-            (this.rootChart.getCandleWidth()*(1.5)).toString() + 'px');
-        singleCandleDisplay.setAttributeNS(null, 'dominant-baseline',
+        this.SingleCandleText.setAttributeNS(null, 'font-size',
+            (this.rootChart.getCandleWidth()*1.6).toString() + 'px');
+        this.SingleCandleText.setAttributeNS(null, 'dominant-baseline',
             'hanging');
-        singleCandleDisplay.innerHTML = this.SingleCandleLookUp[id];
+        this.SingleCandleText.setAttributeNS(null, 'font-family', 'monospace');
+        this.SingleCandleText.setAttributeNS(null, 'text-anchore', 'middle');
+        this.SingleCandleText.innerHTML = this.SingleCandleLookUp[id];
 
-        this.candleGroup.appendChild(singleCandleDisplay);
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.SingleCandleText);
+        }
     }
   }
 
-  public putDoubleCandleAnalysis(id: number) {
+  /**
+    Adds double candle analysis to the chart by shading the tow candles
+    region blue
+    @param {number} id
+   */
+  public putDoubleCandleAnalysis(id: number): void {
+    let newlyCreatedCandle: boolean = true;
     switch (id) {
       case 0:
         break;
       default:
-        console.log('abc');
-        const doubleCandleDisplay: SVGRectElement =
-          <SVGRectElement> document.createElementNS(SVGCandleChart.SVG_NS,
-                                                    'rect');
-        doubleCandleDisplay.setAttributeNS(null, 'x',
-           ((this.cndIdx * this.rootChart.getCandleWidth()) -
+        this.DoubleCandleAnalysisCode = id;
+        if (this.DoubleCandleAnalysis === null) {
+          this.DoubleCandleAnalysis =
+            <SVGRectElement> document.createElementNS(SVGCandleChart.SVG_NS,
+                'rect');
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'x',
+            ((this.CndIdx * this.rootChart.getCandleWidth()) -
              (this.rootChart.getCandleWidth())).toString());
-        doubleCandleDisplay.setAttributeNS(null, 'y',
-                                 this.PriceTransformedCandle.h.toString());
-        doubleCandleDisplay.setAttributeNS(null, 'width',
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'y',
+            this.PriceTransformedCandle.h.toString());
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'width',
             (this.rootChart.getCandleWidth() * 2).toString());
-        doubleCandleDisplay.setAttributeNS(null, 'height',
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'height',
             (this.PriceTransformedCandle.l - this.PriceTransformedCandle.h)
-            .toString());
-        doubleCandleDisplay.setAttributeNS(null, 'stroke-width', '1');
-        doubleCandleDisplay.setAttributeNS(null, 'stroke', 'black');
-        doubleCandleDisplay.setAttributeNS(null, 'shape-rendering',
-                                           'geometricPrecision');
-        doubleCandleDisplay.setAttributeNS(null, 'fill', 'blue');
-        doubleCandleDisplay.setAttributeNS(null, 'fill-opacity', '0.3');
+                .toString());
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'stroke-width', '1');
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'stroke', 'black');
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'shape-rendering',
+            'geometricPrecision');
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'fill', 'blue');
+        this.DoubleCandleAnalysis.setAttributeNS(null, 'fill-opacity', '0.3');
 
-        this.candleGroup.appendChild(doubleCandleDisplay);
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.DoubleCandleAnalysis);
+        }
+    }
+  }
+
+  /**
+    Puts a sloped trend line on the chart
+    @param {Trend} tnd The trend line to put
+   */
+  public putSlopedTrendLine(tnd: Trend): void {
+    // Puts a support or ristance trend line on the chart
+    this.SlopedTrendLineData = tnd;
+    let newlyCreatedCandle: boolean = true;
+    switch (tnd.d) {
+      case 0: // support
+      case 2: // support
+        if (this.SlopedTrendLine === null) {
+          this.SlopedTrendLine =
+            <SVGLineElement> document.createElementNS(SVGCandleChart.SVG_NS,
+                'line');
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.SlopedTrendLine.setAttributeNS(null, 'x1',
+            ((this.CndIdx * this.rootChart.getCandleWidth()) +
+                                   this.rootChart.getCandleWidth() / 2.0)
+                .toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'y1',
+            this.PriceTransformedCandle.l.toString());
+
+        this.SlopedTrendLine.setAttributeNS(null, 'x2',
+            ((this.rootChart.CandleDomReferences[tnd.s].CndIdx *
+              this.rootChart.getCandleWidth()) +
+                this.rootChart.getCandleWidth() / 2.0)
+                .toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'y2',
+            this.rootChart.CandleDomReferences[tnd.s].
+                PriceTransformedCandle.l.toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'shape-rendering',
+            'geometricPrecision');
+        this.SlopedTrendLine.setAttributeNS(null, 'stroke-width', '2');
+        this.SlopedTrendLine.setAttributeNS(null, 'stroke', '#FE4EDA');
+
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.SlopedTrendLine);
+        }
+
+        break;
+      case 1: // resistance
+      case 3: // resistance
+        if (this.SlopedTrendLine === null) {
+          this.SlopedTrendLine =
+            <SVGLineElement> document.createElementNS(SVGCandleChart.SVG_NS,
+                'line');
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.SlopedTrendLine.setAttributeNS(null, 'x1',
+            ((this.CndIdx * this.rootChart.getCandleWidth()) +
+                                   this.rootChart.getCandleWidth() / 2.0)
+                .toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'y1',
+            this.PriceTransformedCandle.h.toString());
+
+        this.SlopedTrendLine.setAttributeNS(null, 'x2',
+            ((
+              this.rootChart.CandleDomReferences[tnd.s].CndIdx *
+                this.rootChart.getCandleWidth()) +
+                                   this.rootChart.getCandleWidth() / 2.0)
+                .toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'y2',
+            this.rootChart.CandleDomReferences[tnd.s].
+                PriceTransformedCandle.h.toString());
+        this.SlopedTrendLine.setAttributeNS(null, 'shape-rendering',
+            'geometricPrecision');
+        this.SlopedTrendLine.setAttributeNS(null, 'stroke-width', '2');
+        this.SlopedTrendLine.setAttributeNS(null, 'stroke', '#FE4EDA');
+
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.SlopedTrendLine);
+        }
+        break;
+    }
+  }
+
+  /**
+    Puts a horizontal trend line on the chart
+    @param {Trend} tnd The trend
+   */
+  public putHorizontalTrendLine(tnd: Trend): void {
+    this.HorizontalTrendLineData = tnd;
+    let newlyCreatedCandle: boolean = true;
+    switch (tnd.d) {
+      case 0: // support
+      case 2: // support
+        if (this.HorizontalTrendLine == null) {
+          this.HorizontalTrendLine =
+            <SVGLineElement> document.createElementNS(SVGCandleChart.SVG_NS,
+                'line');
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.HorizontalTrendLine.setAttributeNS(null, 'x1',
+            (this.CndIdx * this.rootChart.getCandleWidth() +
+                this.rootChart.getCandleWidth() / 2.0).toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'y1',
+            this.PriceTransformedCandle.l
+                .toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'x2',
+            (this.rootChart.CandleDomReferences[tnd.s].CndIdx *
+                this.rootChart.getCandleWidth() +
+                this.rootChart.getCandleWidth() / 2.0).toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'y2',
+            this.PriceTransformedCandle.l
+                .toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'shape-rendering',
+            'geometricPrecision');
+        this.HorizontalTrendLine.setAttributeNS(null, 'stroke-width', '1');
+        this.HorizontalTrendLine.setAttributeNS(null, 'stroke', 'purple');
+
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.HorizontalTrendLine);
+        }
+        break;
+      case 1: // resistance
+      case 3: // resistance
+        if (this.HorizontalTrendLine === null) {
+          this.HorizontalTrendLine =
+            <SVGLineElement> document.createElementNS(SVGCandleChart.SVG_NS,
+                'line');
+        } else {
+          newlyCreatedCandle = false;
+        }
+        this.HorizontalTrendLine.setAttributeNS(null, 'x1',
+            (this.CndIdx * this.rootChart.getCandleWidth() +
+             this.rootChart.getCandleWidth() / 2.0).toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'y1',
+            this.PriceTransformedCandle.h
+                .toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'x2',
+            (this.rootChart.CandleDomReferences[tnd.s].CndIdx *
+             this.rootChart.getCandleWidth() +
+             this.rootChart.getCandleWidth() / 2.0).toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'y2',
+            this.PriceTransformedCandle.h
+                .toString());
+        this.HorizontalTrendLine.setAttributeNS(null, 'shape-rendering',
+            'geometricPrecision');
+        this.HorizontalTrendLine.setAttributeNS(null, 'stroke-width', '1');
+        this.HorizontalTrendLine.setAttributeNS(null, 'stroke', 'black');
+
+        if (newlyCreatedCandle) {
+          this.candleGroup.appendChild(this.HorizontalTrendLine);
+        }
+        break;
+    }
+  }
+
+
+  /**
+    Forces an update to the candle body and wick
+    TODO: Force update needs to hande the analysis that will be changed
+   */
+  public forceUpdate() {
+    this.PriceTransformedCandle.o = this.RawCandle.o;
+    this.PriceTransformedCandle.h = this.RawCandle.h;
+    this.PriceTransformedCandle.l = this.RawCandle.l;
+    this.PriceTransformedCandle.c = this.RawCandle.c;
+    this.performCandleTransformation();
+    this.buildCandleBody();
+    this.buildCandleWick();
+
+    if (this.SlopedTrendLineData && this.SlopedTrendLine) {
+      this.putSlopedTrendLine(this.SlopedTrendLineData);
+    }
+
+    if (this.HorizontalTrendLineData && this.HorizontalTrendLine) {
+      this.putHorizontalTrendLine(this.HorizontalTrendLineData);
+    }
+
+    if (this.SingleCandleTextCode && this.SingleCandleText) {
+      this.putSingleCandleAnalysis(this.SingleCandleTextCode);
+    }
+
+    if (this.DoubleCandleAnalysis && this.DoubleCandleAnalysisCode) {
+      this.putDoubleCandleAnalysis(this.DoubleCandleAnalysisCode);
     }
   }
 }

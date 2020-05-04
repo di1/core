@@ -64,8 +64,9 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
   /**
     Stores all the candle dom references in memory to avoid
     excessive dom quriese with document.get or document.select
+    This needs to be public for the candles to access other candles
    */
-  private CandleDomReferences: Array<SVGCandleStick> = [];
+  public CandleDomReferences: Array<SVGCandleStick> = [];
 
   /**
     Stores all the tick prices dom references
@@ -86,6 +87,21 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     Displays the latest candle close
    */
   private SVGLastPriceBox: SVGGElement | null = null;
+
+  /**
+    Keeps track of the number of trends draw that are sloped
+   */
+  private NumberOfSlopedTrendsDrawn: number = 0;
+
+  /**
+    Keeps track of the number of trends drawn that are flat
+   */
+  private NumberOfHorizontalTrendsDrawn: number = 0;
+
+  /**
+    Keeps track of the number of candle patterns drawn
+   */
+  private NumberOfCandlePatternsDrawn: number = 0;
 
   /**
     Creates a new live svg chart
@@ -151,11 +167,34 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
   private onanalysisreceived(anl: IAnalysis) {
     // This is the initial analysis received go and update each
     // candle analysis first.
-    for (let i: number = 0; i < anl.analysis.singleCandle.length; ++i) {
+    for (let i: number =
+         this.NumberOfCandlePatternsDrawn;
+      i < anl.analysis.singleCandle.length; ++i) {
       this.CandleDomReferences[i].putSingleCandleAnalysis(
           anl.analysis.singleCandle[i]);
       this.CandleDomReferences[i].putDoubleCandleAnalysis(
           anl.analysis.doubleCandle[i]);
+    }
+    this.NumberOfCandlePatternsDrawn = anl.analysis.singleCandle.length - 1;
+
+    for (let i: number =
+         this.NumberOfSlopedTrendsDrawn;
+      i < anl.analysis.slopedLines.length; ++i) {
+      this.CandleDomReferences[anl.analysis.slopedLines[i].e]
+          .putSlopedTrendLine(anl.analysis.slopedLines[i]);
+    }
+    this.NumberOfSlopedTrendsDrawn = anl.analysis.slopedLines.length;
+
+    for (let i: number =
+         this.NumberOfHorizontalTrendsDrawn;
+      i < anl.analysis.trendLines.length; ++i) {
+      this.CandleDomReferences[anl.analysis.trendLines[i].e]
+          .putHorizontalTrendLine(anl.analysis.trendLines[i]);
+    }
+    this.NumberOfHorizontalTrendsDrawn = anl.analysis.trendLines.length;
+
+    if (!this.Socket.getLatestCandle(this.InputExchange, this.InputSecurity)) {
+      console.error('unable to send latest candle from analysis callback');
     }
   }
 
@@ -191,6 +230,7 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
       // since we added a new candle, we will branch off into the analysis
       // callback instead of requesting the latest data
       this.Socket.getAnalysisData(this.InputExchange, this.InputSecurity);
+      return;
     }
     this.Socket.getLatestCandle(this.InputExchange, this.InputSecurity);
   }
@@ -259,11 +299,19 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
     if (cnd.h > maxPrice) maxPrice = cnd.h;
     if (cnd.l < minPrice) minPrice = cnd.l;
 
+    if (maxPrice != this.PriceTransformation.x2 ||
+        minPrice != this.PriceTransformation.x1) {
+      this.PriceTransformation = new LinearEquation(minPrice, 1080,
+          maxPrice, 0);
+      this.PixelTransformation = new LinearEquation(1080, minPrice,
+          0, maxPrice);
 
-    this.PriceTransformation = new LinearEquation(minPrice, 1080,
-        maxPrice, 0);
-    this.PixelTransformation = new LinearEquation(1080, minPrice,
-        0, maxPrice);
+      // Loop through each candle and force update
+
+      this.CandleDomReferences.forEach( (value: SVGCandleStick) => {
+        value.forceUpdate();
+      });
+    }
   }
 
   /**
@@ -286,7 +334,7 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
             'text');
       yAxisText.setAttributeNS(null, 'x', '2010');
       yAxisText.setAttributeNS(null, 'y', yoffset.toString());
-      yAxisText.setAttributeNS(null, 'font-size', '1.58em');
+      yAxisText.setAttributeNS(null, 'font-size', '1em');
       yAxisText.setAttributeNS(null, 'text-rendering', 'optimizeLegibility');
       yAxisText.setAttributeNS(null, 'dominant-baseline', 'middle');
 
@@ -328,13 +376,8 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
   public getCandleWidth(): number {
     return this.CandleWidth;
   }
-
-  public onmousewheel(evt: Event) {
-    console.log(evt);
-  }
-
 }
 
 window.onload = () => {
-  new SVGCandleChart(0, 'OANDA', 'USD_JPY');
+  new SVGCandleChart(0, 'OANDA', 'EUR_USD');
 };

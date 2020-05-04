@@ -30,7 +30,8 @@ interface Trend {
 interface Analysis {
   singleCandle: number[];
   doubleCandle: number[];
-  trendLines: Trend;
+  trendLines: Trend[];
+  slopedLines: Trend[];
 }
 
 interface IAnalysis {

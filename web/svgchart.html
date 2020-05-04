@@ -5,14 +5,18 @@
 
     <style>
       html, body {
-        font-family: 'Monospace';
+        font-family: 'sans-serif';
       }
       svg {
-
+        border: 1px solid black;
       }
       .sub-chart {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
       }
       .search-input {
         border: 1px solid black;
@@ -22,9 +26,6 @@
   </head>
   <body>
     <div class="sub-chart">
-      <div class="search-area">
-        <input class="search-input"></input>
-      </div>
       <svg xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 2100 1080" preserveAspectRatio="xMidYMid meet"
         shape-rendering="geometricPrecision">
