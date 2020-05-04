@@ -287,7 +287,6 @@ class SVGCandleStick { // eslint-disable-line no-unused-vars
    */
   public putSingleCandleAnalysis(id: number): void {
     let newlyCreatedCandle: boolean = true;
-    console.log('fdsa');
     switch (id) {
       case 0:
         break;
