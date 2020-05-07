@@ -11,7 +11,7 @@ class SVGCandleChart { // eslint-disable-line no-unused-vars
   /**
     The server ip to be used by the websocket
    */
-  private SERVER_IP: string = 'ws://161.35.136.101:7681';
+  private SERVER_IP: string = 'ws://' + document.domain + ':7681';
 
   /**
     The root svg element that holds the active chart
