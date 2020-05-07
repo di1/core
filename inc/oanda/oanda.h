@@ -7,11 +7,11 @@
 #include <exchange/exchange.h>
 #include <logger.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <oanda/request_builder.h>
 #include <openssl/ssl.h>
 #include <security/security.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <tracer.h>
 
 /*

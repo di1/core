@@ -22,9 +22,7 @@
 #undef u_short
 
 #include <netinet/in.h>
-
 #include <pcap.h>
-
 #include <sys/socket.h>
 
 // on interup

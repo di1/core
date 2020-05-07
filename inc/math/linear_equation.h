@@ -2,8 +2,8 @@
 #define LINEAR_EQUATION_
 
 #include <math.h>
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 /*
  * Defines a linear equation.
