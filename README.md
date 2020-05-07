@@ -17,5 +17,5 @@ commits to this repository should be compiled with clang and not gcc.
 
 ### Acknowledgements
 
-![Oanda](https://avatars0.githubusercontent.com/u/658105?s=32)
-![IEX Group](https://avatars3.githubusercontent.com/u/4103535?s=32)
+[![Oanda](https://avatars0.githubusercontent.com/u/658105?s=32)](https://github.com/oanda)
+[![IEX Group](https://avatars3.githubusercontent.com/u/4103535?s=32)](https://github.com/iexg)
