@@ -1,95 +1,85 @@
-<!DOCTYPE html>
 <html>
-
   <head>
-    <title>Riski</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="./css/index.css">
-    <link rel="stylesheet" type="text/css" href="./css/treeview.css">
-    <script src="main.min.js"></script>
+    <meta charset="UTF-8">
+    <script src="./main.min.js"></script>
+
+    <style>
+      html, body {
+        font-family: 'sans-serif';
+      }
+
+      body {
+      }
+
+      svg {
+      }
+
+      .sub-chart {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        float: left;
+      }
+
+      .sub-chart:nth-child(1) > svg {
+      }
+
+      .sub-chart:nth-child(4) > svg {
+      }
+
+      .search-input {
+        border: 1px solid black;
+      }
+    </style>
+
   </head>
-
   <body>
-    <div id="top-bar">
-      <span>
-        Riski
-      </span>
+    <div class="sub-chart">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 2100 1080" preserveAspectRatio="xMidYMid meet"
+        shape-rendering="geometricPrecision">
+        <g>
+        </g>
+        <g>
+          <line x1="2005" y1="0" x2="2005" y2="1080" stroke="black"></line>
+        </g>
+      </svg>
     </div>
-
-    <div id="analysis-tree">
-      <div id="analysis-container">
-        <ul id="root-analysis-tree">
-          <li>Analysis</li>
-          <ul id="single-candle-patterns">
-            <li>Single Candle</li>
-            <ul id="single-candle-patterns-list">
-              <!-- template html for single-candle -->
-              <!--
-              <li>
-                <span>
-                  <object type="image/svg+xml" data="./img/icons/uparrow.svg">
-                  </object>
-                </span>
-                <span>
-                  Marubozu
-                </span>
-
-                <span>9:35AM</span>
-                <span>
-                  <object type="image/svg+xml" data="./img/icons/eye.svg">
-                  </object>
-                </span>
-              </li>
-              -->
-              <!--
-              <li>
-                <span>
-                  <object type="image/svg+xml" data="./img/icons/downarrow.svg">
-                  </object>
-                </span>
-                <span>Doji</span>
-                <span>9:34AM</span>
-
-                <span>
-                  <object type="image/svg+xml" data="./img/icons/eye.svg">
-                  </object>
-                </span>
-              </li>
-              -->
-            </ul>
-          </ul>
-        </ul>
-      </div>
+    <div class="sub-chart">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 2100 1080" preserveAspectRatio="xMidYMid meet"
+        shape-rendering="geometricPrecision">
+        <g>
+        </g>
+        <g>
+          <line x1="2005" y1="0" x2="2005" y2="1080" stroke="black"></line>
+        </g>
+      </svg>
     </div>
-
-    <div id="ticker-overview">
+    <div class="sub-chart">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 2100 1080" preserveAspectRatio="xMidYMid meet"
+        shape-rendering="geometricPrecision">
+        <g>
+        </g>
+        <g>
+          <line x1="2005" y1="0" x2="2005" y2="1080" stroke="black"></line>
+        </g>
+      </svg>
     </div>
-
-    <div id="right-side">
-      <div id="chart-area">
-        <div id="chart-tabs">
-          <div>
-            <input type="text" placeholder="Search..." id="stock-search-input"
-                                                       autocomplete="off">
-            <div id="search-results"></div>
-          </div>
-          <div>
-            <span class="chart-tab">
-              <span>
-                AMD
-              </span>
-              <span>
-                &times;
-              </span>
-            </span>
-          </div>
-        </div>
-        <div id="chart-container">
-          <canvas id="chart"></canvas>
-        </div>
-      </div>
+    <div class="sub-chart">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 2100 1080" preserveAspectRatio="xMidYMid meet"
+        shape-rendering="geometricPrecision">
+        <g>
+        </g>
+        <g>
+          <line x1="2005" y1="0" x2="2005" y2="1080" stroke="black"></line>
+        </g>
+      </svg>
     </div>
 
   </body>
-
 </html>
