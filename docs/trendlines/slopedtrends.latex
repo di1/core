@@ -1,0 +1,88 @@
+\section{Sloped Trend Lines}
+
+\quad Sloped trend lines in technical analysis are commonly defined as sloped lines
+that touch a high or low candle at least 3 times and all candles the line covers
+are at least less than or equal or greater than or equal to the values of the
+line. Below is an example of the resistance line with $s(x)$ representing a
+theoretical stock price chart and $t(x)$ represents a theoretical trend line.
+
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[
+        grid = major,
+        xmin = 0,
+        xmax = 10,
+        ymin = 0,
+        ymax = 10,
+        xlabel = {time},
+        ylabel = {price},
+    ]
+      \addplot[
+        color = black,
+        domain = 0:10,
+      ]{-((x-4.1) + sin(deg(4*x))) + 6};
+      \legend{$s(x)$,$t(x)$}
+      \addplot[
+        color = blue,
+        domain = 0:10
+      ]{-x + 11.1};
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+
+It is easy to see in the domain $[0,10]$ that $s(x) \le t(x)$. There is another
+feature that is not so clear, and that is that each confirmation is exactly
+the same same width away from each other. Simply finding a line with $3$
+confirmations is not enough to provide a valid trend line, instead $3$
+confirmations are needed as well as symmetry between each confirmation.
+Problems arise when going from theory to actuality in the fact that in reality
+there is almost never a trend line that has these two properties, instead
+we must approximate or quantify how good the real trend is to its
+theoretical counterpart. We propose two arguments, Orbital Symmetry and
+Trend Area in finding these lines.
+
+\subsection{Orbital Symmetry}
+\quad Orbital Symmetry is a proposed technique to find well symmetric trend
+lines. The question is simple, given a list of candles high, lows, close, or
+open denoted by the ordered set
+
+\[
+  S = \{
+    C_{0}, C_{1}, ... C_{n-1} \text{\space} |
+    \text{\space} n \in \mathbb{Z}
+  \}
+\] does $S$ satisfy the
+conditions of an orbitally symmetric trend line?
+We will define an Orbitally Symmetric trend line as a trend lines with
+symmetric points around a circle. For example, if the perfect point of symmetry
+is at point $n$, then any point between $[n-\frac{w}{2}, n+\frac{w}{w}] w
+\in \mathbb{Z}$ can be
+considered a perfect point of symmetry. Below is a conjecture that the given
+set $S$ satisfies an orbitally symmetric trend line.
+
+\begin{proof}[Conjecture: Orbitally Symmetric Trend Line]
+  An order set
+  $$
+    S = \{C_{0}, C_{1}, ... C_{n-1} \text{\space} | \text{\space} n \in \mathbb{Z}\}
+  $$ with $|S| = n$,a valid orbitally symmetric trend line iff
+  $|S| \ge 3$ and there exists a line $f(n)$ constructed by the points
+  $(0, C_{0})$ $(n-1,C_{n-1})$ such that
+  \[
+    (\forall x \in S, x \le f(x)) \lor (\forall x \in S, x \ge f(x))
+  \]
+  and
+  \[
+    \exists w|n
+  \]
+  \[
+    \forall c \equiv w \pmod n
+  \]
+  \[
+    \exists x \in [c-\frac{w}{2}, c+\frac{w}{2})] : x = f(x)
+  \]
+\end{proof}
+
+
+\subsection{Trend Area}
+
+

@@ -1,0 +1,29 @@
+\documentclass{article}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\pgfplotsset{samples=200}
+
+\title{Riski}
+\author{Vittorio Papandrea}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Riski is an attempt to develop and maintain mathematical conjectures and
+implementations of various technical analysis used in modeling traded security
+charts (Japanese Candle Stick Charts). This paper will outline and show
+various techniques and mathematical conjectures on how to implement these
+analysis for use in algorithm trading and analysis.
+\end{abstract}
+
+\input{trendlines/slopedtrends.latex}
+
+\end{document}
