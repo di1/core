@@ -3,17 +3,22 @@
 #Exit on first error
 set -e
 
-command -v git >/dev/null 2>&1 || {
-  echo >&2 "[ERROR] git is not installed."
-}
-
 command -v npm >/dev/null 2>&1 || {
   echo >&2 "[ERROR] npm is not installed."
   exit 1
 }
 
-cd web/
+command -v pdflatex >/dev/null 2>&1 || {
+  exit >&2 "[ERROR] pdflatex is not installed."
+}
 
+echo "[DOC   ] Compiling latex documentation"
+cd docs
+pdflatex riski.latex
+cp riski.pdf ../
+
+cd ..
+cd web/
 
 if [[ $1 != "-fast" ]]
 then
@@ -38,7 +43,8 @@ echo "[WEB   ] Minimizing javascript"
 ./node_modules/.bin/uglifyjs main.js -o main.min.js
 cd ..
 
-echo $(pwd)
+export CC=/bin/clang
+export CXX=/bin/clang++
 
 mkdir -p build/
 cd build/
