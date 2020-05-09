@@ -1,0 +1,13 @@
+DELIMITER : ' '
+          | '\n'
+
+
+KEYWORDS : 'vr'
+         | 'fn'
+         | '::'
+
+CHARS : [a-z|A-Z] CHARS
+      | '\n'
+
+COMMENT : ';' CHARS
+
