@@ -20,6 +20,11 @@ struct token {
   char* value;
 };
 
+/**
+ * Holds the list of all tokens processed
+ * @param {size_t} the number of tokens in the list
+ * @param {struct token*} A list of struct token
+ */
 struct token_list {
   size_t num_tokens;
   struct token* toks;
