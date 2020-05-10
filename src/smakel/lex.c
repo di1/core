@@ -1,5 +1,3 @@
-#include "error_codes.h"
-#include "tracer.h"
 #include <smakel/lex.h>
 
 /**
@@ -28,6 +26,13 @@ struct token {
 struct token_list {
   size_t num_tokens;
   struct token* toks;
+};
+
+enum RISKI_ERROR_CODE lex_classify_token(struct token_list* tl, char buf[256]) {
+  (void) tl;
+  (void) buf;
+
+  return RISKI_ERROR_CODE_NONE;
 }
 
 enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
@@ -40,13 +45,6 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
     return RISKI_ERROR_CODE_INVALID_FILE;
   }
 
-  // max token length buff is 256 characters
-  size_t line = 0;
-  size_t column = 0;
-
-  // buffer for the last read character
-  char chrPtr = '\x0';
-
   // create a token list
   struct token_list* tl = NULL;
   tl = (struct token_list*) malloc(sizeof(struct token_list) * 1);
@@ -55,9 +53,34 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
   tl->num_tokens = 0;
   tl->toks = NULL;
 
-  while ( (chrPtr = fgetc(fp)), chrPtr != EOF ) {
-    switch (chrPtr) {
+  // buffer for the last read character
+  char chr_ptr = '\x0';
+
+  char token_buffer[256] = {'\x0'}; // max buffer length is 256
+
+  size_t cur_token_buffer_ptr = 0;
+  size_t global_line = 1;
+  size_t global_column = 1;
+
+  while ( (chr_ptr = fgetc(fp)), chr_ptr != EOF ) {
+    switch (chr_ptr) {
+      // switch on any delimiter
+      case ' ':
+      case '\n':
+        printf("%s\n", token_buffer);
+        memset(token_buffer, '\x0', 256);
+        cur_token_buffer_ptr = 0;
+        break;
       default:
+        token_buffer[cur_token_buffer_ptr] = chr_ptr;
+        cur_token_buffer_ptr += 1;
+
+        if (cur_token_buffer_ptr >= sizeof(token_buffer)) {
+          // TODO clean up would probably be best practice here
+          // TODO even if we just exit the program after this.
+          printf("%lu:%lu %s\n", global_line, global_column, token_buffer);
+          return RISKI_ERROR_CODE_LEX_TOKEN_TO_BIG;
+        }
         break;
     }
   }

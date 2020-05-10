@@ -16,9 +16,10 @@ enum LEXER_TOKEN {
 };
 
 /**
- * Private declaration for the token struct
+ * Private declaration for the list of tokens
  */
-struct token;
+struct token_list;
 
+enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret);
 
 #endif
