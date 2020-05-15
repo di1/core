@@ -1,9 +1,9 @@
 #ifndef VM_
 #define VM_
 
+#include <lisp/ast.h>
+#include <lisp/lex.h>
 #include <tracer.h>
-#include <smakel/lex.h>
-#include <smakel/ast.h>
 
 /**
  * Loads a program from the file system for

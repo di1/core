@@ -8,6 +8,7 @@
 #include <chart/chart.h>
 #include <exchange/exchange.h>
 #include <iex/iex.h>
+#include <lisp/vm.h>
 #include <logger.h>
 #include <oanda/oanda.h>
 #include <pthread.h>
@@ -18,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <smakel/vm.h>
 
 #ifndef TRACER_
 #include <tracer.h>
