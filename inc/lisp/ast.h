@@ -8,7 +8,11 @@
  */
 struct ast;
 
-enum AST_NODE_TYPE { AST_NODE_COMMENT };
+enum AST_NODE_TYPE {
+  AST_NODE_TYPE_COMMENT,
+  AST_NODE_TYPE_ATOMIC,
+  AST_NODE_TYPE_S_EXPRESSION
+};
 
 /**
  * Given a list of tokens builds the abstract syntax tree.

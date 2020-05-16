@@ -43,4 +43,10 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret);
  */
 enum RISKI_ERROR_CODE lex_num_tokens(struct token_list* tl, size_t* ret);
 
+/**
+ * Gets the token value of a specified index
+ */
+enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl,size_t idx, 
+    enum LEXER_TOKEN* tok);
+
 #endif
