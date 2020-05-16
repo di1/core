@@ -13,6 +13,10 @@ enum RISKI_ERROR_CODE ast_build(struct token_list* tl,
 
   struct ast* root = NULL;
 
+  size_t num_tokens = 0;
+  TRACE(lex_num_tokens(tl, &num_tokens));
+  printf("generating ast from %lu tokens\n", num_tokens);
+
   *execution_graph = root;
   return RISKI_ERROR_CODE_NONE;
 }

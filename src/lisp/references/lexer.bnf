@@ -3,7 +3,7 @@ s_expression : atomic_symbol
 
 list : "(" s_expression <s_expression> ")"
 
-atomic_symbol : letter atom_part
+atomic : letter atom_part
 
 atom_part : empty
           | letter atom_part

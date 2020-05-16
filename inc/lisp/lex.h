@@ -41,6 +41,6 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret);
 /**
  * Gets the number of tokens processed
  */
-enum RISKI_ERROR_CODE lex_num_tokens(struct token_list** tl, size_t* ret);
+enum RISKI_ERROR_CODE lex_num_tokens(struct token_list* tl, size_t* ret);
 
 #endif

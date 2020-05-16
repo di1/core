@@ -283,9 +283,9 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE lex_num_tokens(struct token_list** tl, size_t* ret) {
+enum RISKI_ERROR_CODE lex_num_tokens(struct token_list* tl, size_t* ret) {
   PTR_CHECK(tl, RISKI_ERROR_CODE_NONE, RISKI_ERROR_TEXT);
-  *ret = (*tl)->num_tokens;
+  *ret = tl->num_tokens;
   return RISKI_ERROR_CODE_NONE;
 }
 

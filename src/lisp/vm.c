@@ -1,14 +1,11 @@
 #include <lisp/vm.h>
 
 enum RISKI_ERROR_CODE vm_load(const char* loc) {
+  // lex the file
   struct token_list* tl;
-
   TRACE(lex_file(loc, &tl));
 
-  size_t num_tokens = 0;
-  TRACE(lex_num_tokens(&tl, &num_tokens));
-  printf("processed %lu tokens\n", num_tokens);
-
+  // generate the abstract syntax tree
   struct ast* execution_graph = NULL;
   TRACE(ast_build(tl, &execution_graph));
 
