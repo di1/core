@@ -289,7 +289,18 @@ enum RISKI_ERROR_CODE lex_num_tokens(struct token_list* tl, size_t* ret) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl,size_t idx, 
+enum RISKI_ERROR_CODE lex_get_tok(struct token_list* tl, size_t idx,
+    struct token** ret) {
+  PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(ret, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  RANGE_CHECK(idx, 0, tl->num_tokens, RISKI_ERROR_CODE_INVALID_RANGE,
+      RISKI_ERROR_TEXT);
+
+  *ret = tl->toks[idx];
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl,size_t idx,
     enum LEXER_TOKEN* tok) {
 
   PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
