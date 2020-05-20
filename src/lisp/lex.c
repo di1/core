@@ -3,15 +3,9 @@
 #define ATOMIC_LENGTH 256
 
 const char* lexer_token_str_val[LEXER_TOKENS_NUM] = {
-  "LEXER_TOKEN_OPAR",
-  "LEXER_TOKEN_CPAR",
-  "LEXER_TOKEN_ATOMIC",
-  "LEXER_TOKEN_COMMENT",
-  "LEXER_TOKEN_QUOTE",
-  "LEXER_TOKEN_SEMICOLON",
-  "LEXER_TOKEN_NEW_LINE",
-  "LEXER_TOKEN_STRING"
-};
+    "LEXER_TOKEN_OPAR",     "LEXER_TOKEN_CPAR",  "LEXER_TOKEN_ATOMIC",
+    "LEXER_TOKEN_COMMENT",  "LEXER_TOKEN_QUOTE", "LEXER_TOKEN_SEMICOLON",
+    "LEXER_TOKEN_NEW_LINE", "LEXER_TOKEN_STRING"};
 
 /**
  * Stores information about a token that was parsed.
@@ -75,7 +69,7 @@ enum RISKI_ERROR_CODE lex_token_delete(size_t idx, struct token_list* tl) {
   tl->toks[idx] = NULL;
 
   // shift
-  for (size_t shift_idx = idx+1; shift_idx < tl->num_tokens; ++shift_idx) {
+  for (size_t shift_idx = idx + 1; shift_idx < tl->num_tokens; ++shift_idx) {
     tl->toks[shift_idx - 1] = tl->toks[shift_idx];
   }
   tl->num_tokens -= 1;
@@ -93,8 +87,8 @@ enum RISKI_ERROR_CODE lex_token_list_print(struct token_list* tl) {
     struct token* tok = tl->toks[i];
     PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
     printf("TOKEN TYPE=%-40s LINE=%-3lu COLUMN=%-3lu VALUE=%s\n",
-        lexer_token_str_val[tok->type], tok->line, tok->column,
-        (tok->type == LEXER_TOKEN_NEW_LINE ? "" : tok->value));
+           lexer_token_str_val[tok->type], tok->line, tok->column,
+           (tok->type == LEXER_TOKEN_NEW_LINE ? "" : tok->value));
   }
 
   return RISKI_ERROR_CODE_NONE;
@@ -131,9 +125,9 @@ enum RISKI_ERROR_CODE lex_flush_buffer(char token_buffer[ATOMIC_LENGTH],
  * condensation token value.
  */
 enum RISKI_ERROR_CODE lex_condense(struct token_list* tl,
-    enum LEXER_TOKEN beg_tok, enum LEXER_TOKEN end_tok,
-    enum LEXER_TOKEN res_value, bool reduce) {
-
+                                   enum LEXER_TOKEN beg_tok,
+                                   enum LEXER_TOKEN end_tok,
+                                   enum LEXER_TOKEN res_value, bool reduce) {
   for (size_t i = 0; i < tl->num_tokens; ++i) {
     if (tl->toks[i]->type == beg_tok) {
       // loop until a new line character is found
@@ -148,8 +142,8 @@ enum RISKI_ERROR_CODE lex_condense(struct token_list* tl,
       }
       // must increase new_token_length by j to account for the spaces
       // this could allocate extra space
-      char* comment_length = (char*)
-        malloc((new_token_length + j + 1) * sizeof(char));
+      char* comment_length =
+          (char*)malloc((new_token_length + j + 1) * sizeof(char));
       memset(comment_length, '\x0', new_token_length + j + 1);
       // reduce j by one to not include the new line character
       if (reduce || j == tl->num_tokens) {
@@ -162,7 +156,7 @@ enum RISKI_ERROR_CODE lex_condense(struct token_list* tl,
         strcpy(&comment_length[offset], tl->toks[l]->value);
         offset += tl->toks[l]->token_length;
         if (!(tl->toks[l]->type == LEXER_TOKEN_QUOTE ||
-            tl->toks[l+1]->type == LEXER_TOKEN_QUOTE)) {
+              tl->toks[l + 1]->type == LEXER_TOKEN_QUOTE)) {
           comment_length[offset] = ' ';
           offset += 1;
         }
@@ -174,9 +168,9 @@ enum RISKI_ERROR_CODE lex_condense(struct token_list* tl,
       tl->toks[i]->type = res_value;
 
       // delete the tokens that have been condensed
-      for (size_t num_to_delete = 0; num_to_delete < (reduce ? j-i+1 : j-i);
-          ++num_to_delete) {
-        TRACE(lex_token_delete(i+1, tl));
+      for (size_t num_to_delete = 0;
+           num_to_delete < (reduce ? j - i + 1 : j - i); ++num_to_delete) {
+        TRACE(lex_token_delete(i + 1, tl));
       }
     }
   }
@@ -262,9 +256,9 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
 
   // get rid of the new line so we reduce
   TRACE(lex_condense(tl, LEXER_TOKEN_SEMICOLON, LEXER_TOKEN_NEW_LINE,
-        LEXER_TOKEN_COMMENT, true));
+                     LEXER_TOKEN_COMMENT, true));
   TRACE(lex_condense(tl, LEXER_TOKEN_QUOTE, LEXER_TOKEN_QUOTE,
-        LEXER_TOKEN_STRING, false));
+                     LEXER_TOKEN_ATOMIC, false));
 
   // get rid of new lines that were not condensed as these new line characters
   // were likely used for formatting
@@ -290,22 +284,21 @@ enum RISKI_ERROR_CODE lex_num_tokens(struct token_list* tl, size_t* ret) {
 }
 
 enum RISKI_ERROR_CODE lex_get_tok(struct token_list* tl, size_t idx,
-    struct token** ret) {
+                                  struct token** ret) {
   PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(ret, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   RANGE_CHECK(idx, 0, tl->num_tokens, RISKI_ERROR_CODE_INVALID_RANGE,
-      RISKI_ERROR_TEXT);
+              RISKI_ERROR_TEXT);
 
   *ret = tl->toks[idx];
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl,size_t idx,
-    enum LEXER_TOKEN* tok) {
-
+enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl, size_t idx,
+                                     enum LEXER_TOKEN* tok) {
   PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   RANGE_CHECK(idx, 0, tl->num_tokens, RISKI_ERROR_CODE_INVALID_RANGE,
-      RISKI_ERROR_TEXT);
+              RISKI_ERROR_TEXT);
   *tok = tl->toks[idx]->type;
   return RISKI_ERROR_CODE_NONE;
 }

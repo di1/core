@@ -1,5 +1,7 @@
-#include "error_codes.h"
 #include <lisp/ast.h>
+
+enum RISKI_ERROR_CODE ast_parse_s_expression(struct token_list* tl, size_t* idx,
+                                             struct ast* root);
 
 struct ast {
   enum AST_NODE_TYPE type;
@@ -28,12 +30,11 @@ enum RISKI_ERROR_CODE ast_skip_comments(size_t* idx, struct token_list* tl) {
  * @param {struct ast**} ret Will set *ast to the newly created ast
  */
 enum RISKI_ERROR_CODE ast_new(enum AST_NODE_TYPE type, struct token* tok,
-    struct ast** ret) {
-
+                              struct ast** ret) {
   PTR_CHECK(ret, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   struct ast* node = NULL;
 
-  node = (struct ast*) malloc(1 * sizeof(struct ast));
+  node = (struct ast*)malloc(1 * sizeof(struct ast));
   node->children = NULL;
   node->num_children = 0;
   node->tok = tok;
@@ -53,17 +54,57 @@ enum RISKI_ERROR_CODE ast_append_child(struct ast* parent, struct ast* child) {
   PTR_CHECK(child, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   parent->num_children += 1;
-  parent->children = (struct ast**) realloc(parent->children,
-      parent->num_children * sizeof(struct ast*));
+  parent->children = (struct ast**)realloc(
+      parent->children, parent->num_children * sizeof(struct ast*));
   PTR_CHECK(parent->children, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   parent->children[parent->num_children - 1] = child;
 
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE ast_parse_list(struct token_list* tl,
-    size_t idx, struct ast* root) {
+enum RISKI_ERROR_CODE ast_parse_list(struct token_list* tl, size_t* idx,
+                                     struct ast* root) {
+  PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(idx, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(root, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  TRACE(ast_skip_comments(idx, tl));
+
+  // make sue the beginning character is an opar
+  enum LEXER_TOKEN tok_value = LEXER_TOKENS_NUM;
+  TRACE(lex_token_type(tl, *idx, &tok_value));
+
+  if (tok_value != LEXER_TOKEN_OPAR) {
+    printf("error: expected (\n");
+    return RISKI_ERROR_CODE_UNKNOWN;
+  }
+
+  // increase token ptr
+  (*idx) += 1;
+
+  // create child
+  struct ast* list_child = NULL;
+  struct token* tok = NULL;
+
+  TRACE(lex_get_tok(tl, *idx, &tok));
+  TRACE(ast_new(AST_NODE_TYPE_LIST, tok, &list_child));
+  TRACE(lex_token_type(tl, *idx, &tok_value));
+
+  while (tok_value != LEXER_TOKEN_CPAR) {
+    TRACE(ast_parse_s_expression(tl, idx, list_child));
+    TRACE(lex_token_type(tl, *idx, &tok_value));
+  }
+
+  // check cpar
+  if (tok_value != LEXER_TOKEN_CPAR) {
+    printf("error: expected )\n");
+    return RISKI_ERROR_CODE_NONE;
+  }
+
+  // increase ptr
+  (*idx) += 1;
+
+  return RISKI_ERROR_CODE_NONE;
 }
 
 /**
@@ -72,11 +113,13 @@ enum RISKI_ERROR_CODE ast_parse_list(struct token_list* tl,
  * @param {size_t} idx The index of the token
  * @param {struct ast*} root The root child to add the atomic to
  */
-enum RISKI_ERROR_CODE ast_parse_atomic(struct token_list* tl,
-    size_t* idx, struct ast* root) {
+enum RISKI_ERROR_CODE ast_parse_atomic(struct token_list* tl, size_t* idx,
+                                       struct ast* root) {
   PTR_CHECK(tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(idx, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(root, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  TRACE(ast_skip_comments(idx, tl));
 
   enum LEXER_TOKEN tok_value = LEXER_TOKENS_NUM;
   TRACE(lex_token_type(tl, *idx, &tok_value));
@@ -94,6 +137,9 @@ enum RISKI_ERROR_CODE ast_parse_atomic(struct token_list* tl,
 
   TRACE(ast_append_child(root, child));
 
+  // increase token ptr
+  (*idx) += 1;
+
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -108,9 +154,8 @@ enum RISKI_ERROR_CODE ast_parse_atomic(struct token_list* tl,
  * @param {struct ast*} root The root node we are currently working
  * with.
  */
-enum RISKI_ERROR_CODE ast_parse_s_expression(struct token_list* tl,
-    size_t* idx, struct ast* root) {
-
+enum RISKI_ERROR_CODE ast_parse_s_expression(struct token_list* tl, size_t* idx,
+                                             struct ast* root) {
   // make sure root isn't null
   PTR_CHECK(root, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -131,10 +176,16 @@ enum RISKI_ERROR_CODE ast_parse_s_expression(struct token_list* tl,
     case LEXER_TOKEN_OPAR:
       // TODO
       // this is valid create the list
+      TRACE(ast_parse_list(tl, idx, root));
+      return RISKI_ERROR_CODE_NONE;
+      break;
+    case LEXER_TOKEN_CPAR:
+      return RISKI_ERROR_CODE_NONE;
       break;
     default:
       printf("compile error\n");
       return RISKI_ERROR_CODE_INVALID_FILE;
+      break;
   }
   return RISKI_ERROR_CODE_NONE;
 }
@@ -155,6 +206,8 @@ enum RISKI_ERROR_CODE ast_build(struct token_list* tl,
   // Parse the lisp
   size_t idx = 0;
   TRACE(ast_parse_s_expression(tl, &idx, root));
+
+  printf("did something\n");
 
   *execution_graph = root;
   return RISKI_ERROR_CODE_NONE;
