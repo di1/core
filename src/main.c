@@ -8,6 +8,7 @@
 #include <chart/chart.h>
 #include <exchange/exchange.h>
 #include <iex/iex.h>
+#include <lisp/vm.h>
 #include <logger.h>
 #include <oanda/oanda.h>
 #include <pthread.h>
@@ -18,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #ifndef TRACER_
 #include <tracer.h>
 #endif
@@ -30,11 +32,18 @@
 typedef struct {
   bool pcap_feed;
   char* pcap_feed_file;
+
   bool fxpig;
   char* fxpig_ini_file;
+
   bool dev_web;
+
   bool oanda_feed;
   char* oanda_key;
+
+  bool compile;
+  char* locaion;
+
 } cli;
 
 /**
@@ -77,6 +86,13 @@ cli* cli_parse(int argc, char** argv) {
       }
     } else if (strcmp("-dev-web", argv[i]) == 0) {
       options->dev_web = true;
+    } else if (strcmp("-c", argv[i]) == 0) {
+      if (i + 1 < argc) {
+        options->compile = true;
+        options->locaion = argv[i + 1];
+      } else {
+        printf("%s", "-compile feed must be followed by a file location\n");
+      }
     }
   }
 
@@ -107,6 +123,12 @@ int main(int argc, char** argv) {
   valid_working_directory();
 
   cli* options = cli_parse(argc, argv);
+
+  // Don't go into the bottom cause we just need to compile
+  if (options->compile) {
+    vm_load((const char*)options->locaion);
+    return 1;
+  }
 
   TRACE(search_init("./symbols.csv"));
 
