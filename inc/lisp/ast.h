@@ -13,7 +13,8 @@ enum AST_NODE_TYPE {
   AST_NODE_TYPE_COMMENT,
   AST_NODE_TYPE_ATOMIC,
   AST_NODE_TYPE_S_EXPRESSION,
-  AST_NODE_TYPE_LIST
+  AST_NODE_TYPE_LIST,
+  AST_NODE_TYPE_NUMS
 };
 
 /**
@@ -23,5 +24,10 @@ enum AST_NODE_TYPE {
  * @param {struct ast**} ret The return value
  */
 enum RISKI_ERROR_CODE ast_build(struct token_list* tl, struct ast** ret);
+
+/**
+ *
+ */
+enum RISKI_ERROR_CODE ast_pp(struct ast* root, size_t lvl);
 
 #endif

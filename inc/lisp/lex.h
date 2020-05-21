@@ -55,4 +55,6 @@ enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl, size_t idx,
 enum RISKI_ERROR_CODE lex_get_tok(struct token_list* tl, size_t idx,
                                   struct token** ret);
 
+enum RISKI_ERROR_CODE lex_token_value(struct token* tok, char** val);
+
 #endif

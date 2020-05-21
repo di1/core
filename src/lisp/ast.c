@@ -1,7 +1,17 @@
 #include <lisp/ast.h>
 
+#define INDENTATION_LEVEL 2
+
 enum RISKI_ERROR_CODE ast_parse_s_expression(struct token_list* tl, size_t* idx,
                                              struct ast* root);
+
+const char* ast_node_type_text[AST_NODE_TYPE_NUMS] = {
+  "PROGRAM",
+  "COMMENT",
+  "ATOMIC",
+  "S_EXPRESSION",
+  "LIST"
+};
 
 struct ast {
   enum AST_NODE_TYPE type;
@@ -88,6 +98,8 @@ enum RISKI_ERROR_CODE ast_parse_list(struct token_list* tl, size_t* idx,
 
   TRACE(lex_get_tok(tl, *idx, &tok));
   TRACE(ast_new(AST_NODE_TYPE_LIST, tok, &list_child));
+  TRACE(ast_append_child(root, list_child));
+
   TRACE(lex_token_type(tl, *idx, &tok_value));
 
   while (tok_value != LEXER_TOKEN_CPAR) {
@@ -205,10 +217,38 @@ enum RISKI_ERROR_CODE ast_build(struct token_list* tl,
 
   // Parse the lisp
   size_t idx = 0;
-  TRACE(ast_parse_s_expression(tl, &idx, root));
-
-  printf("did something\n");
+  while (idx < num_tokens) {
+    TRACE(ast_parse_s_expression(tl, &idx, root));
+  }
 
   *execution_graph = root;
   return RISKI_ERROR_CODE_NONE;
 }
+
+enum RISKI_ERROR_CODE ast_pp(struct ast* root, size_t lvl) {
+  PTR_CHECK(root, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  switch (root->type) {
+    case AST_NODE_TYPE_PROGRAM:
+    case AST_NODE_TYPE_S_EXPRESSION:
+    case AST_NODE_TYPE_LIST:
+      printf("%*c%s\n", (int)lvl, ' ', ast_node_type_text[root->type]);
+      for (size_t i = 0; i < root->num_children; ++i) {
+        TRACE(ast_pp(root->children[i], lvl + INDENTATION_LEVEL));
+      }
+      break;
+    case AST_NODE_TYPE_COMMENT:
+      break;
+    case AST_NODE_TYPE_ATOMIC:
+      printf("%*c%s\n", (int)lvl, ' ', ast_node_type_text[root->type]);
+      char* val = NULL;
+      TRACE(lex_token_value(root->tok, &val));
+      printf("%*c%s\n", (int)lvl + INDENTATION_LEVEL, ' ', val);
+      break;
+    default:
+      printf("something is seriously wrong\n");
+      break;
+  }
+  return RISKI_ERROR_CODE_NONE;
+}
+
+#undef INDENTATION_LEVEL

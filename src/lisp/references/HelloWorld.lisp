@@ -1,2 +1,1 @@
-; fjdksla
 (print "Hello Riski")

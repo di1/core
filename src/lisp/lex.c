@@ -269,7 +269,7 @@ enum RISKI_ERROR_CODE lex_file(const char* file, struct token_list** ret) {
     }
   }
 
-  TRACE(lex_token_list_print(tl));
+  // TRACE(lex_token_list_print(tl));
 
   *ret = tl;
   fclose(fp);
@@ -302,5 +302,13 @@ enum RISKI_ERROR_CODE lex_token_type(struct token_list* tl, size_t idx,
   *tok = tl->toks[idx]->type;
   return RISKI_ERROR_CODE_NONE;
 }
+
+enum RISKI_ERROR_CODE lex_token_value(struct token* tok, char** val) {
+  PTR_CHECK(tok, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK(val, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  *val = tok->value;
+  return RISKI_ERROR_CODE_NONE;
+}
+
 
 #undef ATOMIC_LENGTH
