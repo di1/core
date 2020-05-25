@@ -13,13 +13,15 @@ class Chart {// eslint-disable-line no-unused-vars
    */
   private CandleChart: HTMLCanvasElement;
   private ChartOptions: HTMLDivElement;
+  private ChartOptionsSearchIcon: HTMLObjectElement;
+  private ChartOptionsSearchInput: HTMLInputElement;
   private ChartCandleView: ChartCandleView | null = null;
 
   /**
     Represents the exchange and symbol to pull data from
    */
-  private Exchange: string = 'IEX';
-  private Symbol: string = 'SPY';
+  private Exchange: string = 'OANDA';
+  private Symbol: string = 'EUR_USD';
 
   /**
     Handles communication between the server and
@@ -30,8 +32,13 @@ class Chart {// eslint-disable-line no-unused-vars
 
   /**
     Default constructor for a chart
+    @param {string} exchange The initial exchange (this can be changed)
+    @param {string} symbol The initial symbol (this can be changed)
    */
-  constructor() {
+  constructor(exchange: string, symbol: string) {
+    this.Exchange = exchange;
+    this.Symbol = symbol;
+
     // Create new container
     this.Container =
       document.createElement('div') as HTMLDivElement;
@@ -43,6 +50,32 @@ class Chart {// eslint-disable-line no-unused-vars
       document.createElement('div') as HTMLDivElement;
     this.ChartOptions.classList.add('chart-options');
     this.Container.appendChild(this.ChartOptions);
+
+    this.ChartOptionsSearchInput =
+      document.createElement('input') as HTMLInputElement;
+    this.ChartOptionsSearchInput.value = this.Exchange + ':' +
+      this.Symbol;
+
+    this.ChartOptions.appendChild(this.ChartOptionsSearchInput);
+
+    this.ChartOptionsSearchIcon =
+      document.createElement('object') as HTMLObjectElement;
+    this.ChartOptionsSearchIcon.data = 'img/icons/search-24px.svg';
+    this.ChartOptionsSearchIcon.type = 'image/svg+xml';
+    this.ChartOptionsSearchIcon.style.borderRight = '1px solid var(--fg)';
+
+    this.ChartOptionsSearchIcon.onload = ((evt: Event) => {
+      const svgicon: Document | null =
+        (<HTMLObjectElement>evt.srcElement).getSVGDocument();
+      console.log(svgicon);
+      if (svgicon) {
+        (<SVGPathElement>svgicon.querySelector('path'))
+            .setAttributeNS(null, 'fill', '#B3B1AD');
+      }
+    });
+
+    this.ChartOptions.appendChild(this.ChartOptionsSearchIcon);
+
 
     // Create the two canvas
     this.CandleChart =
