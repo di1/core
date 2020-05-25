@@ -1,7 +1,10 @@
 #ifndef TRACER_
 #define TRACER_
 
+#ifndef LOGGER_
 #include <logger.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The front end gui for the riski chart analyzer",
   "dependencies": {
+    "ayu": "^7.2.1",
     "typescript": "^3.9.3",
     "uglify-js": "^3.9.3"
   },

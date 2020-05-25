@@ -7,7 +7,7 @@ type AnalysisReceivedFunc = (anl: IAnalysis) => any;
   An abstraction to websocket that allows for callback based server
   communication
  */
-class SVGServerComs { // eslint-disable-line no-unused-vars
+class ServerComs { // eslint-disable-line no-unused-vars
   private socket: WebSocket;
 
   /**
@@ -125,7 +125,6 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
     @param {Event} evt The event
    */
   private onopen(evt: Event) {
-    console.log('websocket opened');
     this.onsocketready();
   }
 
@@ -134,8 +133,8 @@ class SVGServerComs { // eslint-disable-line no-unused-vars
     Callback for websocket onclose
     @param {Event} evt The event
    */
-  private onclose(evt: Event) {
-    console.log('websocket closed');
+  private onclose(evt: CloseEvent) {
+    console.error('Socket Connection Closed (' + evt.code + ')');
   }
 
   /**
