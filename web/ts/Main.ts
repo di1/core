@@ -2,5 +2,5 @@
   Start the loop
  */
 window.onload = () => {
-  new Chart();
+  new Chart('IEX', 'SPY');
 };
