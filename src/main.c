@@ -58,6 +58,7 @@ cli* cli_parse(int argc, char** argv) {
   options->dev_web = false;
   options->oanda_feed = false;
   options->oanda_key = NULL;
+  options->compile = false;
 
   for (int i = 0; i < argc; ++i) {
     if (strcmp("-pcap_feed", argv[i]) == 0) {

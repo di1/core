@@ -6,9 +6,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-#include <tracer.h>
 
-bool logger_quite;
+#ifndef TRACER_
+#include <tracer.h>
+#endif
 
 /*
  * Logs items in the category of "info".

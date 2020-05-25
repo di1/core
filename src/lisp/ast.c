@@ -251,4 +251,50 @@ enum RISKI_ERROR_CODE ast_pp(struct ast* root, size_t lvl) {
   return RISKI_ERROR_CODE_NONE;
 }
 
+enum RISKI_ERROR_CODE atomic_to_asm(char* val) {
+  // check for build in functions first
+  // they have a special op code
+  if (strcmp(val, "print") == 0) {
+    printf("print\n");
+  } else if (strcmp(val, "defvar") == 0) {
+    printf("assign\n");
+  } else if (val[0] == '"') {
+    size_t l = 0;
+    l = strlen(val) - 2;
+    printf("push_str %lu %.*s\n", l, (int)l, &val[1]);
+  } else {
+  }
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE ast_cc(struct ast* root) {
+  PTR_CHECK(root, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  switch (root->type) {
+    case AST_NODE_TYPE_PROGRAM:
+      for (size_t i = 0; i < root->num_children; ++i) {
+        TRACE(ast_cc(root->children[i]));
+      }
+      break;
+    case AST_NODE_TYPE_S_EXPRESSION:
+    case AST_NODE_TYPE_LIST:
+      for (int i = root->num_children-1; i >= 0; --i) {
+        TRACE(ast_cc(root->children[i]));
+      }
+      break;
+    case AST_NODE_TYPE_COMMENT:
+      break;
+    case AST_NODE_TYPE_ATOMIC: {
+      char* val = NULL;
+      TRACE(lex_token_value(root->tok, &val));
+      TRACE(atomic_to_asm(val));
+                               }
+      break;
+    default:
+      printf("something is seriously wrong\n");
+      break;
+  }
+  return RISKI_ERROR_CODE_NONE;
+
+}
+
 #undef INDENTATION_LEVEL

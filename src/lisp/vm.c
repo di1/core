@@ -12,5 +12,8 @@ enum RISKI_ERROR_CODE vm_load(const char* loc) {
   // for debugging print out the ast
   TRACE(ast_pp(execution_graph, 2)); 
 
+  // generate bytecode
+  TRACE(ast_cc(execution_graph));
+
   return RISKI_ERROR_CODE_NONE;
 }

@@ -63,7 +63,7 @@ enum RISKI_ERROR_CODE candle_update(struct candle* c, int64_t price,
   c->volume += 1;
   // set the close time only if the last price time
   // is greater than the most recent price
-  if (time > c->end_time) {
+  if (time >= c->end_time) {
     c->end_time = time;
     c->close = price;
   }

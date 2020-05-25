@@ -30,4 +30,6 @@ enum RISKI_ERROR_CODE ast_build(struct token_list* tl, struct ast** ret);
  */
 enum RISKI_ERROR_CODE ast_pp(struct ast* root, size_t lvl);
 
+enum RISKI_ERROR_CODE ast_cc(struct ast* root);
+
 #endif
