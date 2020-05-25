@@ -285,7 +285,6 @@ enum RISKI_ERROR_CODE chart_put_horizontal_line_pattern(
 
 enum RISKI_ERROR_CODE chart_new_candle(struct chart* cht, int64_t price) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  // TODO
 
   if (cht->cur_candle >= cht->num_candles_allocated) {
     size_t prev_candles_allocated = cht->num_candles_allocated;
@@ -325,8 +324,14 @@ enum RISKI_ERROR_CODE chart_update(struct chart* cht, int64_t price,
                                    uint64_t ts) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  // convert ts into the start time of its coorisponding candle
+  // this will sync all the candles to the beginning minute no matter
+  // when the server is started
+  size_t offset = ts % cht->interval;
+  ts = ts - offset;
   // special case where this is the first chart update
   if (cht->last_update == 0) {
+    // sync the first candle to the closest minute
     cht->last_update = ts;
     TRACE(chart_new_candle(cht, price));
     return RISKI_ERROR_CODE_NONE;
@@ -335,9 +340,8 @@ enum RISKI_ERROR_CODE chart_update(struct chart* cht, int64_t price,
   // check if the interval requires us to make a new candle
   if (ts - cht->last_update > cht->interval) {
     // create a new candle
-    // check if fill-ins are reqired
-    size_t fill_in_candles = (ts - cht->last_update) / cht->interval;
-
+    // check if fill-ins are required
+    size_t fill_in_candles = ((ts - cht->last_update) / cht->interval) - 1;
     if (fill_in_candles != 1) {
       for (size_t i = 0; i < fill_in_candles - 1; ++i) {
         // fill in the candles in between with dojies of the

@@ -16,6 +16,12 @@ class Chart {// eslint-disable-line no-unused-vars
   private ChartCandleView: ChartCandleView | null = null;
 
   /**
+    Represents the exchange and symbol to pull data from
+   */
+  private Exchange: string = 'IEX';
+  private Symbol: string = 'SPY';
+
+  /**
     Handles communication between the server and
     the charts. Each chart gets their own websocket
     connection.
@@ -46,7 +52,7 @@ class Chart {// eslint-disable-line no-unused-vars
     this.Container.appendChild(this.CandleChart);
 
     // Create the socket connection
-    this.Socket = new ServerComs('ws://riski.sh:7681',
+    this.Socket = new ServerComs('ws://localhost:7681',
         this.onsocketready.bind(this),
         this.onfullchartreceived.bind(this),
         this.onlatestcandlereceived.bind(this),
@@ -61,7 +67,7 @@ class Chart {// eslint-disable-line no-unused-vars
     console.log('Connected to ws://' + document.domain + ':7681');
 
     // start up the chart candle view
-    this.Socket.getFullChart('OANDA', 'USD_JPY');
+    this.Socket.getFullChart(this.Exchange, this.Symbol);
   }
 
   /**
@@ -74,7 +80,7 @@ class Chart {// eslint-disable-line no-unused-vars
     } else {
       this.ChartCandleView = new ChartCandleView(this.CandleChart, cht);
     }
-    this.Socket.getLatestCandle('OANDA', 'USD_JPY');
+    this.Socket.getLatestCandle(this.Exchange, this.Symbol);
   }
 
   /**
@@ -84,9 +90,9 @@ class Chart {// eslint-disable-line no-unused-vars
   private onlatestcandlereceived(cnd: ILatestCandle): void {
     if (this.ChartCandleView) {
       if (!this.ChartCandleView.chartPartialUpdate(cnd)) {
-        this.Socket.getFullChart('OANDA', 'USD_JPY');
+        this.Socket.getFullChart(this.Exchange, this.Symbol);
       } else {
-        this.Socket.getLatestCandle('OANDA', 'USD_JPY');
+        this.Socket.getLatestCandle(this.Exchange, this.Symbol);
       }
     }
   }
