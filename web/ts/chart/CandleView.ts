@@ -40,6 +40,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   // This gets set to true if a resize or major change of candles happens
   private ForceRefresh: boolean = false;
 
+  // This gets used to calculate server ping
+  private DisplayLatency: number = 0;
+
   /**
     Default constructor
     @param {HTMLCanvasElement} canvaselement The <canvas> element to draw to
@@ -100,6 +103,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     Condition the frame for redraw, this also starts the drawing loop
    */
   private draw(): void {
+    // keep track of how long it takes to draw a frame
+    const frameBeginTime: number = Date.now();
+
     // clear everything
     this.Renderer.save();
 
@@ -151,6 +157,13 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.drawCandles(pt, lftCndIdx);
 
     this.Renderer.restore();
+
+    // get the time it took to draw this frame
+    const frameEndTime: number = Date.now();
+
+    // compute the display latency
+    this.DisplayLatency = frameEndTime - frameBeginTime;
+    console.log('Display Latency: ' + this.DisplayLatency + 'ms');
   }
 
   /**
