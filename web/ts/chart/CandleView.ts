@@ -313,7 +313,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       }
       this.Renderer.textAlign = 'left';
       this.Renderer.textBaseline = 'middle';
-      this.Renderer.font = '16px Inconsolata bold';
+      this.Renderer.font = '16px Inconsolata';
       this.Renderer.fillText(this.priceToText(curCnd.c),
           this.Width,
           ylvl + 0.5);

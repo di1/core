@@ -11,7 +11,7 @@ enum RISKI_ERROR_CODE oanda_connect(int* ret) {
   int sockfd;
   struct sockaddr_in servaddr;
 
-  // socket create and varification
+  // socket create and verification
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd == -1) {
     printf("socket creation failed...\n");

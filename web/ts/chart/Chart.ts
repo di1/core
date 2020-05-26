@@ -24,6 +24,11 @@ class Chart {// eslint-disable-line no-unused-vars
   private Symbol: string = 'EUR_USD';
 
   /**
+    Represents the color scheme
+   */
+  private Theme: ITheme;
+
+  /**
     Handles communication between the server and
     the charts. Each chart gets their own websocket
     connection.
@@ -34,25 +39,41 @@ class Chart {// eslint-disable-line no-unused-vars
     Default constructor for a chart
     @param {string} exchange The initial exchange (this can be changed)
     @param {string} symbol The initial symbol (this can be changed)
+    @param {ITheme} theme The theme to use
    */
-  constructor(exchange: string, symbol: string) {
+  constructor(exchange: string, symbol: string, theme: ITheme) {
+    this.Theme = theme;
     this.Exchange = exchange;
     this.Symbol = symbol;
 
     // Create new container
     this.Container =
       document.createElement('div') as HTMLDivElement;
-    this.Container.classList.add('cht-container');
+
+    this.Container.style.margin = '10px';
+    this.Container.style.width = 'calc(100% - 22px)';
+    this.Container.style.height = 'calc(100% - 22px)';
+    this.Container.style.border = '1px solid ' + this.Theme.ui;
+
     document.body.appendChild(this.Container);
 
     // Create the options bar
     this.ChartOptions =
       document.createElement('div') as HTMLDivElement;
     this.ChartOptions.classList.add('chart-options');
+    this.ChartOptions.style.float = 'left';
+    this.ChartOptions.style.width = 'calc(100%)';
+    this.ChartOptions.style.height = '2em';
+    this.ChartOptions.style.display = 'flex';
     this.Container.appendChild(this.ChartOptions);
 
     this.ChartOptionsSearchInput =
       document.createElement('input') as HTMLInputElement;
+    this.ChartOptionsSearchInput.style.backgroundColor = this.Theme.bg;
+    this.ChartOptionsSearchInput.style.color = this.Theme.fg;
+    this.ChartOptionsSearchInput.style.border = 'none';
+    this.ChartOptionsSearchInput.style.paddingLeft = '1em';
+
     this.ChartOptionsSearchInput.value = this.Exchange + ':' +
       this.Symbol;
 
@@ -80,12 +101,14 @@ class Chart {// eslint-disable-line no-unused-vars
     // Create the two canvas
     this.CandleChart =
       document.createElement('canvas') as HTMLCanvasElement;
-    this.CandleChart.classList.add('candle-chart');
+    this.CandleChart.style.float = 'left';
+    this.CandleChart.style.width = 'calc(100%)';
+    this.CandleChart.style.height = 'calc(100% - 2em)';
 
     this.Container.appendChild(this.CandleChart);
 
     // Create the socket connection
-    this.Socket = new ServerComs('ws://' + document.domain + ':7681',
+    this.Socket = new ServerComs('ws://riski.sh:7681',
         this.onsocketready.bind(this),
         this.onfullchartreceived.bind(this),
         this.onlatestcandlereceived.bind(this),
