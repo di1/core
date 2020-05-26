@@ -338,10 +338,10 @@ enum RISKI_ERROR_CODE chart_update(struct chart* cht, int64_t price,
   }
 
   // check if the interval requires us to make a new candle
-  if (ts - cht->last_update > cht->interval) {
+  if (ts != cht->last_update) {
     // create a new candle
     // check if fill-ins are required
-    size_t fill_in_candles = ((ts - cht->last_update) / cht->interval) - 1;
+    size_t fill_in_candles = ((ts - cht->last_update) / cht->interval);
     if (fill_in_candles != 1) {
       for (size_t i = 0; i < fill_in_candles - 1; ++i) {
         // fill in the candles in between with dojies of the
