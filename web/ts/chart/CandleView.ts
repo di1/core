@@ -62,6 +62,17 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // The initial full chart to draw
     this.FullChartData = cht;
 
+    // capture the mousewheel callback for scrolling
+    this.CanvasElement.onwheel = ((evt: WheelEvent) => {
+      if (evt.deltaY < 0) {
+        this.CandleWidth += 4;
+        this.CandleSpacing = this.CandleWidth / 2;
+      } else if (evt.deltaY > 0 && this.CandleWidth > 4) {
+        this.CandleWidth -= 4;
+        this.CandleSpacing = this.CandleWidth / 2;
+      }
+    });
+
     // start the drawing loop
     this.draw();
   }
@@ -141,13 +152,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const lstCnd: Candle = this.FullChartData.chart[chtLgt-1].candle;
     if (lstCnd.s == cnd.latestCandle.candle.s) {
       this.FullChartData.chart[chtLgt-1].candle = cnd.latestCandle.candle;
-
-      if (lstCnd.o !== cnd.latestCandle.candle.o ||
-          lstCnd.h !== cnd.latestCandle.candle.h ||
-          lstCnd.l !== cnd.latestCandle.candle.l ||
-          lstCnd.c !== cnd.latestCandle.candle.c) {
-        this.draw();
-      }
+      this.draw();
       return true;
     } else {
       return false;

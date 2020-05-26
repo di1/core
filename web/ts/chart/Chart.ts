@@ -108,7 +108,7 @@ class Chart {// eslint-disable-line no-unused-vars
     this.Container.appendChild(this.CandleChart);
 
     // Create the socket connection
-    this.Socket = new ServerComs('ws://' + document.domain + ':7681',
+    this.Socket = new ServerComs('ws://riski.sh:7681',
         this.onsocketready.bind(this),
         this.onfullchartreceived.bind(this),
         this.onlatestcandlereceived.bind(this),
