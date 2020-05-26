@@ -36,6 +36,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
   private Precision: number = 100000.0;
   private FixedCount: number = 5;
+
+  // This gets set to true if a resize or major change of candles happens
+  private ForceRefresh: boolean = false;
+
   /**
     Default constructor
     @param {HTMLCanvasElement} canvaselement The <canvas> element to draw to
@@ -71,6 +75,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
         this.CandleWidth -= 4;
         this.CandleSpacing = this.CandleWidth / 2;
       }
+      this.ForceRefresh = true;
+    });
+
+    window.onresize = ((evt: UIEvent) => {
+      this.ForceRefresh = true;
     });
 
     // start the drawing loop
@@ -94,8 +103,13 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // clear everything
     this.Renderer.save();
 
-    this.Width = this.CanvasElement.getBoundingClientRect().width;
-    this.Height = this.CanvasElement.getBoundingClientRect().height;
+    const newWidth: number =
+      this.CanvasElement.getBoundingClientRect().width;
+    const newHeight: number =
+      this.CanvasElement.getBoundingClientRect().height;
+
+    this.Width = newWidth;
+    this.Height = newHeight;
 
     this.Renderer.clearRect(0, 0, this.Width, this.Height);
 
@@ -151,8 +165,14 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const chtLgt: number = this.FullChartData.chart.length;
     const lstCnd: Candle = this.FullChartData.chart[chtLgt-1].candle;
     if (lstCnd.s == cnd.latestCandle.candle.s) {
-      this.FullChartData.chart[chtLgt-1].candle = cnd.latestCandle.candle;
-      this.draw();
+      if ((this.ForceRefresh) || (lstCnd.o != cnd.latestCandle.candle.o ||
+          lstCnd.h != cnd.latestCandle.candle.h ||
+          lstCnd.l != cnd.latestCandle.candle.l ||
+          lstCnd.c != cnd.latestCandle.candle.c)) {
+        this.FullChartData.chart[chtLgt-1].candle = cnd.latestCandle.candle;
+        this.draw();
+        this.ForceRefresh = false;
+      }
       return true;
     } else {
       return false;
