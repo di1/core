@@ -2,7 +2,8 @@
 
 This project is an attempt to develop and maintain mathematical conjectures
 and implementations of various technical analysis used in modeling
-traded security charts (Japanese Candle Stick Charts).
+traded security charts (Japanese Candle Stick Charts). Riski is intended
+to be an open source trading platform used for backtesting, and live trading. 
 
 ### Building
 
