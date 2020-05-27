@@ -1,11 +1,6 @@
 #include <chart/chart.h>
 
 /*
- * The maximum number of candles any given chart has
- */
-size_t g_max_candles = 0;
-
-/*
  * The struct to represent a trend line
  * @param {size_t} start_index The starting candle
  * @param {size_t} end_index The end index candle
@@ -51,7 +46,7 @@ struct chart_analysis {
  * A struct representing the chart
  * @param {uint64_t} interval The interval between two candles
  * @param {size_t} num_candles_allocated The number of allocated candles
- * @param {size_t} cur_candle The current number of allocated candles
+ * @param {_Atomic size_t} cur_candle The current number of allocated candles
  * @param {uint64_t} last_update The start of the last candle
  * @param {struct candle**} candles The list of candles
  * @param {struct chart_analysis*} analysis The analysis coorisponding to the
@@ -366,7 +361,6 @@ enum RISKI_ERROR_CODE chart_update(struct chart* cht, int64_t price,
     TRACE(candle_update(cht->candles[cht->cur_candle], price, ts));
   }
 
-  if (cht->cur_candle > g_max_candles) g_max_candles = cht->cur_candle;
   return RISKI_ERROR_CODE_NONE;
 }
 

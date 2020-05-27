@@ -58,7 +58,6 @@ enum RISKI_ERROR_CODE security_get_chart(struct security* sec, char** json) {
   PTR_CHECK(json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   pthread_mutex_lock(&(sec->m_chart_update));
-
   char* dat = NULL;
   TRACE(chart_json(sec->cht, &dat));
   pthread_mutex_unlock(&(sec->m_chart_update));
