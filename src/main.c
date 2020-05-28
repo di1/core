@@ -8,7 +8,6 @@
 #include <chart/chart.h>
 #include <exchange/exchange.h>
 #include <iex/iex.h>
-#include <lisp/vm.h>
 #include <logger.h>
 #include <oanda/oanda.h>
 #include <pthread.h>
@@ -124,12 +123,6 @@ int main(int argc, char** argv) {
   valid_working_directory();
 
   cli* options = cli_parse(argc, argv);
-
-  // Don't go into the bottom cause we just need to compile
-  if (options->compile) {
-    vm_load((const char*)options->locaion);
-    return 1;
-  }
 
   TRACE(search_init("./symbols.csv"));
 
