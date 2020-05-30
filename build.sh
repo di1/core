@@ -90,7 +90,7 @@ sudo make install
 
 cd ../../
 LSDEBUG in $(pwd)
-mv libwebsockets/cmake/FindLibWebSockets.cmake ./cmake/
+cp libwebsockets/cmake/FindLibWebSockets.cmake ./cmake/
 
 LSINFO ==== FINISHED LIBWEBSOCKETS ====
 
