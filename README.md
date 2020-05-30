@@ -7,20 +7,27 @@ to be an open source trading platform used for backtesting, and live trading.
 
 ### Building
 
-*Note Windows Builds are Not Supported nor is there plans for a Windows build*
+*Note Riski is highly dependent on POSIX and Windows builds are not planned
+to be supported*
 
-
-Building the entire Riski framework including documentation
-requires a few packages. Since Riski
+Building the entire Riski framework requires a few packages. Since Riski
 in intended to be rolling release there is no minimum version for packages.
 Instead make sure to always build with the latest dependencies.
 
-Before continuing make sure `npm`, `nodejs`, `clang`, `pdflatex` are installed.
+Building the entire Riski framework is as simple as running `sudo bash build.sh`
+The script will hault if a package needs to be installed and will not continue.
 
-To build the entire framework first run the `scripts/install_libwebsockets.sh`
-then the `build.sh` file. Note that `build.sh` requires clang and will not work
-with gcc although manually building the server code with gcc is possible. All
-commits to this repository should be compiled with clang and not gcc.
+### Feed Support
+Currently IEX tick data is supported by running
+
+`riski -pcap_feed FILE`
+
+And live oanda feed is supported by running. The live oanda feed currently
+only works with demo accounts.
+
+`riski -oanda API_KEY`
+
+### Implementing Analysis and Strategies through the C API
 
 ### Acknowledgements
 

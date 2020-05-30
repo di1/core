@@ -1,8 +1,5 @@
 #include <analysis/trend_line.h>
 
-#include "chart/chart.h"
-#include "math/linear_equation.h"
-
 enum RISKI_ERROR_CODE
 get_working_value (struct candle *cnd, int64_t *res, enum DIRECTION type)
 {
