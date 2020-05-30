@@ -236,8 +236,9 @@ analysis_load ()
                   exit (1);
                 }
 
-              logger_info (__func__, __FILENAME__, __LINE__, "loaded %s by %s",
-                           dyn->get_name (), dyn->get_author ());
+              TRACE(logger_analysis("N/A", dyn->get_name(), __func__,
+                  __FILENAME__, __LINE__, "(C) %s", 
+                  dyn->get_author()));
 
               loaded_funs.num_functions += 1;
               loaded_funs.funs = (struct vtable **)realloc (
