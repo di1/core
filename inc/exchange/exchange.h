@@ -15,15 +15,15 @@ struct exchange;
  * @param {struct exchange**} exchange Will set *exchange to the new exchange
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange);
+enum RISKI_ERROR_CODE exchange_new (char *name, struct exchange **exchange);
 
 /*
  * Creates a new security and puts in the hashtable,
  * Name and interval definitions are equivelent to security_new
  * and can be found in security.h
  */
-enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
-                                   uint64_t interval);
+enum RISKI_ERROR_CODE exchange_put (struct exchange *e, char *name,
+                                    uint64_t interval);
 
 /*
  * Gets a security given its name
@@ -33,13 +33,13 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
  * @param {struct security**} sec Will set *sec to the security
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name,
-                                   struct security** sec);
+enum RISKI_ERROR_CODE exchange_get (struct exchange *e, char *name,
+                                    struct security **sec);
 
 /*
  * Frees the exchange and all the securities that were added to it
  * @param {struct exchange**} e Will free *e and set *e to NULL
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE exchange_free(struct exchange** e);
+enum RISKI_ERROR_CODE exchange_free (struct exchange **e);
 #endif

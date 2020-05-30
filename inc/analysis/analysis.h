@@ -4,6 +4,7 @@
 // riski error codes to enable stack tracing
 #include <error_codes.h>
 #include <tracer.h>
+
 // used for candle interface
 #include <chart/candle.h>
 
@@ -15,18 +16,6 @@ struct chart;
 #endif
 
 // include the different analysis
-
-// single candle
-#include <analysis/doji.h>
-#include <analysis/horizontal_line.h>
-#include <analysis/marubozu.h>
-#include <analysis/spinning_top.h>
-
-// trends
-#include <analysis/trend_line.h>
-
-// double candle
-#include <analysis/engulfing.h>
 
 // used for function call tracing
 #include <tracer.h>
@@ -52,7 +41,7 @@ struct analysis_list;
  * Initalizes threads to perform analysis on.
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE analysis_init();
+enum RISKI_ERROR_CODE analysis_init ();
 
 /*
  * Pushes information to a thread to analyize it
@@ -61,8 +50,8 @@ enum RISKI_ERROR_CODE analysis_init();
  * @param {size_t} end The maximum candle to look at
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE analysis_push(struct chart* sec, size_t start,
-                                    size_t end);
+enum RISKI_ERROR_CODE analysis_push (struct chart *sec, size_t start,
+                                     size_t end);
 
 /*
  * Pops the very first element to the analysis and puts it inside (*inf).
@@ -70,14 +59,14 @@ enum RISKI_ERROR_CODE analysis_push(struct chart* sec, size_t start,
  * @param {struct analysis_info**} inf A pointer to populate the pop result.
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE analysis_pop(struct analysis_list* bin,
-                                   struct analysis_info** inf);
+enum RISKI_ERROR_CODE analysis_pop (struct analysis_list *bin,
+                                    struct analysis_info **inf);
 
 /*
  * Joins the analysis threads together and cleans up loose memory
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE analysis_cleanup();
+enum RISKI_ERROR_CODE analysis_cleanup ();
 
 /*
  * Creates a new analysis info that can be processed by a worker thread.
@@ -86,8 +75,8 @@ enum RISKI_ERROR_CODE analysis_cleanup();
  * @param {size_t} end The end of the analysis
  * @param {struct analysis_info**} inf Pointer to the resulting analysis info
  */
-enum RISKI_ERROR_CODE analysis_create_info(struct chart* cht, size_t start,
-                                           size_t end,
-                                           struct analysis_info** inf);
+enum RISKI_ERROR_CODE analysis_create_info (struct chart *cht, size_t start,
+                                            size_t end,
+                                            struct analysis_info **inf);
 
 #endif

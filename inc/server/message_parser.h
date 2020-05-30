@@ -16,6 +16,6 @@
  * @param {char**} resp Will set *resp to the message to send back
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE parse_message(char* msg, int len, char** resp);
+enum RISKI_ERROR_CODE parse_message (char *msg, int len, char **resp);
 
 #endif

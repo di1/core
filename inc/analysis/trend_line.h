@@ -27,7 +27,7 @@ struct chart;
  * @param {struct char*} num_candles The chart
  * @param {size_t} num_candles The last candle that isn't going to change
  */
-enum RISKI_ERROR_CODE find_trend_line(struct chart* cht, size_t num_candles,
-                                      enum DIRECTION type);
+enum RISKI_ERROR_CODE find_trend_line (struct chart *cht, size_t num_candles,
+                                       enum DIRECTION type);
 
 #endif

@@ -6,7 +6,8 @@
 /*
  * The RISKI error codes
  */
-enum RISKI_ERROR_CODE {
+enum RISKI_ERROR_CODE
+{
   RISKI_ERROR_CODE_NONE = 0,
   RISKI_ERROR_CODE_NULL_PTR = 1,
   RISKI_ERROR_CODE_MALLOC_ERROR = 2,
@@ -26,6 +27,6 @@ enum RISKI_ERROR_CODE {
 /*
  * The RISKI error texts
  */
-extern const char* RISKI_ERROR_TEXT[14];
+extern const char *RISKI_ERROR_TEXT[14];
 
 #endif

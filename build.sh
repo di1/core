@@ -1,53 +1,81 @@
 #!/bin/bash
 
-#Exit on first error
 set -e
 
-command -v npm >/dev/null 2>&1 || {
-  echo >&2 "[ERROR] npm is not installed."
+source scripts/log.sh
+
+LS_LEVEL=LS_DEBUG_LEVEL
+LSINFO Riski \(C\) Vittorio Papandrea
+
+
+LSINFO ==== BUILDING FRONTEND ====
+
+NPMLOCATION=$(which npm 2> /dev/null)
+
+if [[ $? == 1 ]]; then
+  LSERROR npm is not installed
   exit 1
-}
-
-command -v pdflatex >/dev/null 2>&1 || {
-  exit >&2 "[ERROR] pdflatex is not installed."
-}
-
-echo "[DOC   ] Compiling latex documentation"
-cd docs
-pdflatex riski.latex
-cp riski.pdf ../
-
-cd ..
-cd web/
-
-if [[ $1 != "-fast" ]]
-then
-  echo "[WEB   ] Updating NPM"
-  npm update > /dev/null
-
-  echo "[WEB   ] Installing NPM packages"
-  npm install > /dev/null
-
-  # Run ES lint on all typescript files
-  for tsFile in `find ts -name "*.ts"`;
-  do
-    echo "[LINT  ] ${tsFile}"
-    ./node_modules/.bin/eslint ${tsFile} --fix
-  done
+else
+  LSDEBUG npm location $NPMLOCATION
 fi
 
-echo "[WEB   ] Compiling typescript"
+CLANGLOCATION=$(which clang 2>/dev/null)
+
+if [[ $? == 1 ]]; then
+  LSERROR clang is not installed
+  exit 1
+else
+  LSDEBUG clang location $CLANGLOCATION
+fi
+
+
+CLANGPPLOCATION=$(which clang++ 2>/dev/null)
+
+if [[ $? == 1 ]]; then
+  LSERROR clang++ is not installed
+  exit 1
+else
+  LSDEBUG clang++ location $CLANGLOCATION
+fi
+
+
+cd web/
+LSDEBUG in $(pwd)
+
+LSINFO npm update
+npm update
+
+LSINFO npm install
+npm install > /dev/null
+
+for file in $(find ./ts -name *.ts); do
+  LSDEBUG linting $file
+  ./node_modules/.bin/eslint $file
+done
+
+LSINFO compiling typescript
 ./node_modules/.bin/tsc
 
-echo "[WEB   ] Minimizing javascript"
-./node_modules/.bin/uglifyjs main.js -o main.min.js
-cd ..
+LSINFO minimizing javascript for faster performance
+./node_modules/.bin/uglifyjs main.js -o main.min.js 
 
-export CC=/bin/clang
-export CXX=/bin/clang++
+LSINFO ==== FINISHED FRONTEND ====
 
-mkdir -p build/
-cd build/
-cmake ..
-make
+echo
+echo
+
+LSINFO ==== BUILDING SERVER ====
 cd ../
+LSDEBUG in $(pwd)
+mkdir -p build/
+cd build
+LSDEBUG in $(pwd)
+LSINFO running cmake
+
+CC=$CLANGLOCATION
+CXX=$CLANGPPLOCATION
+
+cmake ..
+LSINFO running make
+make
+LSINFO ==== FINISHED SERVER ====

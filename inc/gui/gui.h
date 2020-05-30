@@ -5,7 +5,8 @@
 #include <gtk/gtk.h>
 #include <stdbool.h>
 
-enum PRICE_ACTION_COLUMNS {
+enum PRICE_ACTION_COLUMNS
+{
   PAC_SEC,
   PAC_BID,
   PAC_ASK,
@@ -14,6 +15,6 @@ enum PRICE_ACTION_COLUMNS {
   PAC_NUM
 };
 
-void gui_start(int argc, char** argv);
+void gui_start (int argc, char **argv);
 
 #endif

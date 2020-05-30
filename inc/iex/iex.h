@@ -49,22 +49,22 @@
  * Processes the IEX Deep data feed
  * @param {char*} file A location to a pcap file provded by IEX
  */
-enum RISKI_ERROR_CODE iex_parse_deep(char* file);
+enum RISKI_ERROR_CODE iex_parse_deep (char *file);
 
 /**
  * Represents the IEX exchange
  */
-struct exchange* iex_exchange;
+extern struct exchange *iex_exchange;
 
 /**
  * Stops processing
  */
-enum RISKI_ERROR_CODE iex_stop_parse();
+enum RISKI_ERROR_CODE iex_stop_parse ();
 
 /**
  * Must be set to 1 on interrup
  * otherwise will exit with error
  */
-int IEX_SIGNAL_INTER;
+extern int IEX_SIGNAL_INTER;
 
 #endif

@@ -20,8 +20,8 @@
  * @param {va_list} ... Arguments to give to printf
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE logger_info(const char* func, const char* filename,
-                                  int line, const char* fmt, ...);
+enum RISKI_ERROR_CODE logger_info (const char *func, const char *filename,
+                                   int line, const char *fmt, ...);
 
 /*
  * Logs items in the category of "info".
@@ -32,8 +32,8 @@ enum RISKI_ERROR_CODE logger_info(const char* func, const char* filename,
  * @param {va_list} ... Arguments to give to printf
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE logger_warning(const char* func, const char* filename,
-                                     int line, const char* fmt, ...);
+enum RISKI_ERROR_CODE logger_warning (const char *func, const char *filename,
+                                      int line, const char *fmt, ...);
 
 /*
  * Logs items in the category of "error".
@@ -45,9 +45,9 @@ enum RISKI_ERROR_CODE logger_warning(const char* func, const char* filename,
  * @param {va_list} ... Arguments to give to printf
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE logger_error(enum RISKI_ERROR_CODE err, const char* func,
-                                   const char* filename, int line,
-                                   const char* fmt, ...);
+enum RISKI_ERROR_CODE logger_error (enum RISKI_ERROR_CODE err,
+                                    const char *func, const char *filename,
+                                    int line, const char *fmt, ...);
 
 /*
  * Logs items in the category of "analysis".
@@ -61,9 +61,9 @@ enum RISKI_ERROR_CODE logger_error(enum RISKI_ERROR_CODE err, const char* func,
  * @return {enum RISKI_ERROR_CODE} The status
  */
 
-enum RISKI_ERROR_CODE logger_analysis(const char* security,
-                                      const char* analysis_name,
-                                      const char* func, const char* filename,
-                                      int line, const char* fmt, ...);
+enum RISKI_ERROR_CODE logger_analysis (const char *security,
+                                       const char *analysis_name,
+                                       const char *func, const char *filename,
+                                       int line, const char *fmt, ...);
 
 #endif

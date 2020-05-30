@@ -21,7 +21,7 @@ struct book;
 /**
  * Creates a new book
  */
-struct book* book_new();
+struct book *book_new ();
 
 /**
  * Updates the buy/sell side of the order book
@@ -30,16 +30,16 @@ struct book* book_new();
  * will delete the level, price, from the order book.
  * Side should either be BUY_SIDE or SELL_SIDE
  */
-void book_update(bool side, struct book* t, int64_t price, int64_t quantity);
+void book_update (bool side, struct book *t, int64_t price, int64_t quantity);
 
 /**
  * Used to correctly free a book
  */
-void book_free(struct book** t);
+void book_free (struct book **t);
 
 /**
  * Runs test on book
  */
-void test_book();
+void test_book ();
 
 #endif
