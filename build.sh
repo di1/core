@@ -8,7 +8,7 @@ LS_LEVEL=LS_DEBUG_LEVEL
 LSINFO Riski \(C\) Vittorio Papandrea
 
 
-LSINFO ==== BUILDING FRONTEND ====
+LSINFO ==== FINDING REQUIREMENTS ====
 
 NPMLOCATION=$(which npm 2> /dev/null)
 
@@ -38,7 +38,64 @@ else
   LSDEBUG clang++ location $CLANGLOCATION
 fi
 
+GITLOCATION=$(which git 2>/dev/null)
 
+if [[ $? == 1 ]]; then
+  LSERROR git is not installed
+  exit 1
+else
+  LSDEBUG git location $GITLOCATION
+fi
+
+CMAKELOCATION=$(which cmake 2>/dev/null)
+
+if [[ $? == 1 ]]; then
+  LSERROR cmake is not installed
+  exit 1
+else
+  LSDEBUG cmake location $CMAKELOCATION
+fi
+
+MAKELOCATION=$(which make 2>/dev/null)
+
+if [[ $? == 1 ]]; then
+  LSERROR make is not installed
+  exit 1
+else
+  LSDEBUG make location $MAKELOCATION
+fi
+
+LSINFO ==== FOUND REQUIREMENTS ====
+
+LSINFO ==== BUILDING LIBWEBSOCKETS ====
+
+if [[ -d "./libwebsockets/" ]]; then
+  cd libwebsockets
+  LSDEBUG in $(pwd)
+else
+  git clone https://libwebsockets.org/repo/libwebsockets
+  cd libwebsockets
+  LSDEBUG in $(pwd)
+fi
+
+git checkout v4.0-stable
+mkdir -p build/
+cd build/
+
+LSDEBUG in $(pwd)
+
+cmake ..
+make
+sudo make install
+
+cd ../../
+LSDEBUG in $(pwd)
+mv libwebsockets/cmake/FindLibWebSockets.cmake ./cmake/
+
+LSINFO ==== FINISHED LIBWEBSOCKETS ====
+
+LSINFO ==== BUILDING FRONTEND ====
+LSDEBUG in $(pwd)
 cd web/
 LSDEBUG in $(pwd)
 
@@ -60,11 +117,8 @@ LSINFO minimizing javascript for faster performance
 ./node_modules/.bin/uglifyjs main.js -o main.min.js 
 
 LSINFO ==== FINISHED FRONTEND ====
-
-echo
-echo
-
 LSINFO ==== BUILDING SERVER ====
+
 cd ../
 LSDEBUG in $(pwd)
 mkdir -p build/
