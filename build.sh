@@ -86,7 +86,7 @@ LSDEBUG in $(pwd)
 
 cmake ..
 make
-sudo make install
+make install
 
 cd ../../
 LSDEBUG in $(pwd)
