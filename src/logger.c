@@ -14,15 +14,15 @@ logger_info (const char *func, const char *filename, int line, const char *fmt,
       flockfile (stdout);
 
       // print the time
-      printf ("%04d-%02d-%02d/%02d:%02d:%02d/", (utc->tm_year + 1900),
+      printf ("[%04d-%02d-%02d %02d:%02d:%02d]", (utc->tm_year + 1900),
               (utc->tm_mon), (utc->tm_mday), (utc->tm_hour), (utc->tm_min),
               (utc->tm_sec));
 
       // type
-      printf ("INFO/");
+      printf ("[\x1b[34mINFO\x1b[0m]");
 
       // where
-      printf ("%s@%s:%d/", func, filename, line);
+      printf ("[%s@%s:%d] ", func, filename, line);
 
       // message
       va_list myargs;
@@ -46,15 +46,15 @@ logger_warning (const char *func, const char *filename, int line,
   flockfile (stdout);
 
   // print the time
-  printf ("%04d-%02d-%02d/%02d:%02d:%02d/", (utc->tm_year + 1900),
+  printf ("[%04d-%02d-%02d %02d:%02d:%02d]", (utc->tm_year + 1900),
           (utc->tm_mon), (utc->tm_mday), (utc->tm_hour), (utc->tm_min),
           (utc->tm_sec));
 
   // type
-  printf ("WARNING/");
+  printf ("[\x1b[33mWARNING\x1b[0m]");
 
   // where
-  printf ("%s@%s:%d/", func, filename, line);
+  printf ("[%s@%s:%d] ", func, filename, line);
 
   // message
   va_list myargs;
@@ -81,15 +81,15 @@ logger_analysis (const char *security, const char *analysis_name,
       flockfile (stdout);
 
       // print the time
-      printf ("%04d-%02d-%02d/%02d:%02d:%02d/", (utc->tm_year + 1900),
+      printf ("[%04d-%02d-%02d %02d:%02d:%02d]", (utc->tm_year + 1900),
               (utc->tm_mon), (utc->tm_mday), (utc->tm_hour), (utc->tm_min),
               (utc->tm_sec));
 
       // type
-      printf ("ANALYSIS/%s/%s/", analysis_name, security);
+      printf ("[\x1b[35mANALYSIS@%s:%s\x1b[0m]", analysis_name, security);
 
       // where
-      printf ("%s@%s:%d/", func, filename, line);
+      printf ("[%s@%s:%d] ", func, filename, line);
 
       // message
       va_list myargs;
