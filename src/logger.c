@@ -73,6 +73,9 @@ logger_analysis (const char *security, const char *analysis_name,
                  const char *func, const char *filename, int line,
                  const char *fmt, ...)
 {
+  // don't really know where to put this
+  // TODO find a place to put this
+  (void) analysis_name;
   if (!logger_quite)
     {
       time_t rawtime = time (&rawtime);
@@ -86,10 +89,10 @@ logger_analysis (const char *security, const char *analysis_name,
               (utc->tm_sec));
 
       // type
-      printf ("[\x1b[35mANALYSIS@%s:%s\x1b[0m]", analysis_name, security);
+      printf ("[\x1b[35mANALYSIS\x1b[0m][\x1b[35m%-10s\x1b[0m]", security);
 
       // where
-      printf ("[%s@%s:%d] ", func, filename, line);
+      printf ("[%s@%s:%d]", func, filename, line);
 
       // message
       va_list myargs;

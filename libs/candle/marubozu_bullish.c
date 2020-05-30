@@ -1,3 +1,5 @@
+#include "chart/chart.h"
+#include "logger.h"
 #include <api.h>
 
 const char* name = "Bullish Marubozu";
@@ -49,8 +51,19 @@ run(struct chart* cht, size_t idx)
 
       res->draw_data = (void*) data;
 
-      TRACE(chart_put_analysis(cht, idx, res));
+      char* sec_name = NULL;
+      TRACE(chart_get_name(cht, &sec_name));
+
+      logger_analysis(sec_name, name, __func__,
+          __FILENAME__, __LINE__, "%s" , " ");
+      TRACE(chart_put_analysis(cht, idx-1,res));
     }
 
   return RISKI_ERROR_CODE_NONE;
 }
+
+struct vtable exports = {
+  get_name,
+  get_author,
+  run
+};

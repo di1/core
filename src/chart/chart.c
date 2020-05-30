@@ -19,7 +19,6 @@ struct chart
   uint64_t last_update;
   struct candle **candles;
 
-
   pthread_mutex_t analysis_lock;
   struct analysis_result **analysis;
   char *name;
@@ -35,15 +34,19 @@ chart_get_name (struct chart *cht, char **name)
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE chart_analysis_lock(struct chart* cht) {
-  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  pthread_mutex_lock(&(cht->analysis_lock));
+enum RISKI_ERROR_CODE
+chart_analysis_lock (struct chart *cht)
+{
+  PTR_CHECK (cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  pthread_mutex_lock (&(cht->analysis_lock));
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart* cht) {
-  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  pthread_mutex_unlock(&(cht->analysis_lock));
+enum RISKI_ERROR_CODE
+chart_analysis_unlock (struct chart *cht)
+{
+  PTR_CHECK (cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  pthread_mutex_unlock (&(cht->analysis_lock));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -97,8 +100,8 @@ chart_new (uint64_t interval, char *name, struct chart **cht_)
   // Create the bins for the analysis results at each candle
   cht->analysis = (struct analysis_result **)malloc (
       sizeof (struct analysis_result *) * cht->num_candles_allocated);
-  
-  pthread_mutex_init(&(cht->analysis_lock), NULL); 
+
+  pthread_mutex_init (&(cht->analysis_lock), NULL);
 
   // Set each bin to null cause there is no analysis there yet
   for (size_t i = 0; i < cht->num_candles_allocated; ++i)

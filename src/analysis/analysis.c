@@ -1,4 +1,7 @@
+#include "api.h"
 #include <analysis/analysis.h>
+#include <dlfcn.h>
+#include <time.h>
 
 /*
  * The analysis info struct is the value of the linked list
@@ -34,6 +37,20 @@ struct analysis_list
   pthread_mutex_t can_remove;
   size_t _Atomic num_elements;
 };
+
+/*
+ * A list of loaded vtables
+ */
+struct analysis_functions
+{
+  size_t num_functions;
+  struct vtable **funs;
+};
+
+/*
+ * Loaded functions
+ */
+struct analysis_functions loaded_funs = { 0, NULL };
 
 /*
  * Keeps track of which bin the next request will go into.
@@ -162,13 +179,18 @@ analysis_thread_func (void *index)
       (void)start_index;
 
       size_t end_candle = inf->end_candle;
-      (void) end_candle;
 
       // aquire the analysis struct first
       chart_analysis_lock (cht);
 
       // group the analysis into sections from simplest to hardest
-      
+
+      // loop through each function
+      for (size_t i = 0; i < loaded_funs.num_functions; ++i)
+        {
+          TRACE_HAULT(loaded_funs.funs[i]->run (cht, end_candle));
+        }
+
       // release the analysis struct lock
       chart_analysis_unlock (cht);
       free (inf);
@@ -177,8 +199,73 @@ analysis_thread_func (void *index)
 }
 
 enum RISKI_ERROR_CODE
+analysis_load ()
+{
+  DIR *dir;
+  struct dirent *ent;
+  if ((dir = opendir ("./analysis/")) != NULL)
+    {
+      /* print all the files and directories within directory */
+      while ((ent = readdir (dir)) != NULL)
+        {
+          if (ent->d_type == 8) // file
+            {
+              TRACE (logger_info (__func__, __FILENAME__, __LINE__,
+                                  "trying to load library %s", ent->d_name));
+
+              void *handle;
+              char *loc = NULL;
+              loc = (char *)malloc ((12 + strlen (ent->d_name))
+                                    * sizeof (char));
+              strcpy (loc, "./analysis/");
+              strcat (loc, ent->d_name);
+              handle = dlopen (loc, RTLD_NOW);
+
+              if (!handle)
+                {
+                  printf ("handle bad %s\n", loc);
+                  fprintf (stderr, "dlopen failed: %s\n", dlerror ());
+                  exit (1);
+                }
+
+              struct vtable *dyn;
+              dyn = (struct vtable *)dlsym (handle, "exports");
+              if (!dyn)
+                {
+                  fprintf (stderr, "dlopen failed: %s\n", dlerror ());
+                  exit (1);
+                }
+
+              logger_info (__func__, __FILENAME__, __LINE__, "loaded %s by %s",
+                           dyn->get_name (), dyn->get_author ());
+
+              loaded_funs.num_functions += 1;
+              loaded_funs.funs = (struct vtable **)realloc (
+                  loaded_funs.funs,
+                  sizeof (struct vtable **) * loaded_funs.num_functions);
+              loaded_funs.funs[loaded_funs.num_functions-1] = dyn;
+            }
+        }
+      closedir (dir);
+    }
+  else
+    {
+      /* could not open directory */
+      return RISKI_ERROR_CODE_UNKNOWN;
+    }
+
+  logger_info (__func__, __FILENAME__, __LINE__, "loaded %lu analysis",
+               loaded_funs.funs);
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE
 analysis_init ()
 {
+
+  TRACE (analysis_load ());
+
   int numCPU = sysconf (_SC_NPROCESSORS_ONLN);
   // log_info("processor has %d processing threads", numCPU);
   TRACE (logger_info (__func__, __FILENAME__, __LINE__,
@@ -370,11 +457,10 @@ enum RISKI_ERROR_CODE
 chart_analysis_json (struct chart *cht, char **json)
 {
   // TODO
-  (void) cht;
-  (void) json;
+  (void)cht;
+  (void)json;
   return RISKI_ERROR_CODE_NONE;
 }
-
 
 enum RISKI_ERROR_CODE
 analysis_cleanup ()

@@ -75,9 +75,8 @@ struct chart;
 /*
  * Used to put an analysis result into the chart
  */
-enum RISKI_ERROR_CODE
-chart_put_analysis (struct chart *cht, size_t idx, struct analysis_result *res);
-
+enum RISKI_ERROR_CODE chart_put_analysis (struct chart *cht, size_t idx,
+                                          struct analysis_result *res);
 
 /*
  * Creates a new chart given the interval of data

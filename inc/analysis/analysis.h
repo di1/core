@@ -27,6 +27,16 @@ struct chart;
 #include <stdlib.h>
 #include <unistd.h>
 
+// dlopen and dynamic stuff to load up libraries
+#include <dlfcn.h>
+
+// used to find all the files in a folder
+#include <dirent.h>
+
+#ifndef API_
+#include <api.h>
+#endif
+
 /*
  * Private struct holding the needed information to perform an analysis
  */

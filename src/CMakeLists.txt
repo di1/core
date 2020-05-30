@@ -13,6 +13,8 @@ ADD_LIBRARY(string_builder string_builder.c)
 ADD_LIBRARY(error_codes error_codes.c)
 ADD_LIBRARY(logger logger.c)
 
+SET(CMAKE_ENABLE_EXPORTS TRUE)
+
 ADD_EXECUTABLE(riski main.c)
 TARGET_LINK_LIBRARIES(riski cjson
   string_builder oanda logger book iex chart security exchange server math
