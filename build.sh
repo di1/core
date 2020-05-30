@@ -78,4 +78,40 @@ CXX=$CLANGPPLOCATION
 cmake ..
 LSINFO running make
 make
+
+LSINFO organizing build
+
+cd ..
+LSDEBUG in $(pwd)
+rm -rf out/
+mkdir out/
+
+LSINFO copying executable
+cp build/src/riski out/
+LSINFO copying iex symbol list
+
+# TODO find an alternative to the symbols table
+cp symbols.csv out/
+
+
+LSINFO building minimal website dependencies
+mkdir out/web
+cp web/index.html out/web/
+cp web/main.min.js out/web
+cp -R web/img out/web/
+
+tree out/web
+
+mkdir out/analysis
+LSINFO copying dynamic analysis libraries
+for file in $(find ./build/libs/ -name "*.so"); do
+  LSINFO found library $file
+  cp $file out/analysis/
+done
+
+LSINFO creating symbolic link to compile_commands for developers that use
+LSINFO vim + ycm
+
+ln -s build/compile_commands.json ./ 2> /dev/null
+
 LSINFO ==== FINISHED SERVER ====
