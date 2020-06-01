@@ -75,7 +75,7 @@ logger_analysis (const char *security, const char *analysis_name,
 {
   // don't really know where to put this
   // TODO find a place to put this
-  (void) analysis_name;
+  (void)analysis_name;
   if (!logger_quite)
     {
       time_t rawtime = time (&rawtime);

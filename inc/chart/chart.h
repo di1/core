@@ -17,6 +17,9 @@
 #include <string_builder.h>
 #include <tracer.h>
 
+// for CHAR_BIT
+#include <limits.h>
+
 /*
  * The struct to represent a trend line
  * @param {size_t} start_index The starting candle
@@ -28,7 +31,6 @@ struct trend_line
   size_t end_index;
   size_t start_index;
   enum DIRECTION direction;
-  size_t score;
 };
 
 /*

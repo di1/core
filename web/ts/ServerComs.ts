@@ -115,7 +115,7 @@ class ServerComs { // eslint-disable-line no-unused-vars
       this.onfullchartreceived(<IChart>response);
     } else if (response['latestCandle']) {
       this.onlatestcandlereceived(<ILatestCandle>response);
-    } else if (response['analysis']) {
+    } else if (response['analysisFull']) {
       this.onanalysisreceived(<IAnalysis>response);
     }
   }

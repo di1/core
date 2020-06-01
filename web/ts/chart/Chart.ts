@@ -20,8 +20,9 @@ class Chart {// eslint-disable-line no-unused-vars
   /**
     Represents the exchange and symbol to pull data from
    */
-  private Exchange: string = 'OANDA';
-  private Symbol: string = 'EUR_USD';
+  private Exchange: string = 'IEX';
+  private Symbol: string = 'SPY';
+  private Server: string = 'ws://localhost:7681';
 
   /**
     Represents the color scheme
@@ -108,7 +109,7 @@ class Chart {// eslint-disable-line no-unused-vars
     this.Container.appendChild(this.CandleChart);
 
     // Create the socket connection
-    this.Socket = new ServerComs('ws://riski.sh:7681',
+    this.Socket = new ServerComs(this.Server,
         this.onsocketready.bind(this),
         this.onfullchartreceived.bind(this),
         this.onlatestcandlereceived.bind(this),
@@ -146,7 +147,8 @@ class Chart {// eslint-disable-line no-unused-vars
   private onlatestcandlereceived(cnd: ILatestCandle): void {
     if (this.ChartCandleView) {
       if (!this.ChartCandleView.chartPartialUpdate(cnd)) {
-        this.Socket.getFullChart(this.Exchange, this.Symbol);
+        this.Socket.getAnalysisData(this.Exchange, this.Symbol);
+        // this.Socket.getFullChart(this.Exchange, this.Symbol);
       } else {
         this.Socket.getLatestCandle(this.Exchange, this.Symbol);
       }
@@ -158,6 +160,9 @@ class Chart {// eslint-disable-line no-unused-vars
     @param {IAnalysis} anl The analysis data
    */
   private analysisreceivedfunc(anl: IAnalysis): void {
-
+    console.log(anl);
+    console.log(typeof(anl));
+    this.Socket.getFullChart(this.Exchange, this.Symbol);
+    console.log('?');
   }
 }

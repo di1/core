@@ -164,7 +164,7 @@ oanda_main_loop (SSL *conn, char *pricing_request_body)
             {
               logger_analysis (instrument_name_str, "FEED", __func__,
                                __FILENAME__, __LINE__,
-                               "forced to use closeout ask");
+                               "forced to use closeout bid");
               bid_str = cJSON_GetStringValue (instrument_closeout_bid);
             }
           // Find the . index in the str

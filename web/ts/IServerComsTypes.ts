@@ -21,19 +21,23 @@ interface ILatestCandle {
   latestCandle: ICandle;
 }
 
-interface Trend {
-  s: number;
-  e: number;
-  d: number;
+
+interface CandlePattern {
+  candlesSpanning: number;
+  shortCode: string;
+}
+
+interface TrendLine {
+  endIndex: number;
+  startIndex: number;
+  direction: number;
 }
 
 interface Analysis {
-  singleCandle: number[];
-  doubleCandle: number[];
-  trendLines: Trend[];
-  slopedLines: Trend[];
+  type: number;
+  data: Array<CandlePattern | TrendLine>;
 }
 
 interface IAnalysis {
-  analysis: Analysis;
+  fullAnalysis: Array<Analysis | null>;
 }

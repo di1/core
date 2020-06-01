@@ -188,7 +188,7 @@ analysis_thread_func (void *index)
       // loop through each function
       for (size_t i = 0; i < loaded_funs.num_functions; ++i)
         {
-          TRACE_HAULT(loaded_funs.funs[i]->run (cht, end_candle));
+          TRACE_HAULT (loaded_funs.funs[i]->run (cht, end_candle));
         }
 
       // release the analysis struct lock
@@ -236,15 +236,15 @@ analysis_load ()
                   exit (1);
                 }
 
-              TRACE(logger_analysis("N/A", dyn->get_name(), __func__,
-                  __FILENAME__, __LINE__, "Loaded %s by %s", 
-                  dyn->get_name(), dyn->get_author()));
+              TRACE (logger_analysis (
+                  "N/A", dyn->get_name (), __func__, __FILENAME__, __LINE__,
+                  "Loaded %s by %s", dyn->get_name (), dyn->get_author ()));
 
               loaded_funs.num_functions += 1;
               loaded_funs.funs = (struct vtable **)realloc (
                   loaded_funs.funs,
                   sizeof (struct vtable **) * loaded_funs.num_functions);
-              loaded_funs.funs[loaded_funs.num_functions-1] = dyn;
+              loaded_funs.funs[loaded_funs.num_functions - 1] = dyn;
             }
         }
       closedir (dir);
@@ -451,15 +451,6 @@ analysis_pop (struct analysis_list *bin, struct analysis_info **inf)
   PTR_CHECK (inf, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   *inf = element;
 
-  return RISKI_ERROR_CODE_NONE;
-}
-
-enum RISKI_ERROR_CODE
-chart_analysis_json (struct chart *cht, char **json)
-{
-  // TODO
-  (void)cht;
-  (void)json;
   return RISKI_ERROR_CODE_NONE;
 }
 

@@ -1,5 +1,7 @@
 #include <chart/chart.h>
 
+#define MAX_INT_STR_LEN ((CHAR_BIT * sizeof (int) - 1) / 3 + 2)
+
 /*
  * A struct representing the chart
  * @param {uint64_t} interval The interval between two candles
@@ -76,6 +78,178 @@ chart_put_analysis (struct chart *cht, size_t idx, struct analysis_result *res)
       // no analysis here so just set it to the given one
       cht->analysis[idx] = res;
     }
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE
+chart_analysis_trend_line_json (struct trend_line *tl, char **json)
+{
+  PTR_CHECK (tl, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK (json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  struct string_builder *sb = NULL;
+  TRACE (string_builder_new (&sb));
+
+  TRACE (string_builder_append (sb, "{"));
+  TRACE (string_builder_append (sb, "\"endIndex\":"));
+
+  char type_str[MAX_INT_STR_LEN];
+  sprintf (type_str, "%d", (int)tl->end_index);
+
+  TRACE (string_builder_append (sb, type_str));
+  TRACE (string_builder_append (sb, "\",\"startIndex\":\""));
+
+  sprintf (type_str, "%d", (int)tl->start_index);
+  TRACE (string_builder_append (sb, type_str));
+
+  TRACE (string_builder_append (sb, ",\"direction\":\""));
+
+  sprintf (type_str, "%d", (int)tl->direction);
+  TRACE (string_builder_append (sb, type_str));
+
+  TRACE (string_builder_append (sb, "\"}"));
+
+  char *sb_str = NULL;
+  TRACE (string_builder_str (sb, &sb_str));
+
+  *json = sb_str;
+
+  TRACE (string_builder_free (&sb));
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE
+chart_analysis_candle_pattern_json (struct candle_pattern *cp, char **json)
+{
+  PTR_CHECK (cp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK (json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  struct string_builder *sb = NULL;
+  TRACE (string_builder_new (&sb));
+
+  TRACE (string_builder_append (sb, "{"));
+  TRACE (string_builder_append (sb, "\"candlesSpanning\":"));
+
+  char type_str[MAX_INT_STR_LEN];
+  sprintf (type_str, "%d", (int)cp->candles_spanning);
+
+  TRACE (string_builder_append (sb, type_str));
+  TRACE (string_builder_append (sb, ",\"shortCode\":\""));
+  TRACE (string_builder_append (sb, cp->short_code));
+  TRACE (string_builder_append (sb, "\""));
+  TRACE (string_builder_append (sb, "}"));
+
+  char *sb_str = NULL;
+  TRACE (string_builder_str (sb, &sb_str));
+
+  *json = sb_str;
+
+  TRACE (string_builder_free (&sb));
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE
+chart_analysis_result_json (struct analysis_result *analysis, char **json)
+{
+  PTR_CHECK (analysis, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK (json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  struct string_builder *sb = NULL;
+  TRACE (string_builder_new (&sb));
+
+  /*
+   * {
+   *  "type": number,
+   *  "drawData": {
+   *    // could be candle_pattern | trend_line | ...
+   *  }
+   * }
+   */
+
+  TRACE (string_builder_append (sb, "{"));
+  TRACE (string_builder_append (sb, "\"type\":"));
+
+  // convert type integer to string
+  char type_str[MAX_INT_STR_LEN];
+  sprintf (type_str, "%d", analysis->type);
+
+  TRACE (string_builder_append (sb, type_str));
+  TRACE (string_builder_append (sb, ",\"data\":["));
+
+  while (analysis)
+    {
+      char *data_json = NULL;
+      switch (analysis->type)
+        {
+        case CANDLE_PATTERN:
+          TRACE (chart_analysis_candle_pattern_json (analysis->draw_data,
+                                                     &data_json));
+          break;
+        case TREND_LINE:
+          TRACE (chart_analysis_trend_line_json (analysis->draw_data,
+                                                 &data_json));
+          break;
+        }
+      TRACE (string_builder_append (sb, data_json));
+      if (analysis->next)
+        {
+          TRACE (string_builder_append (sb, ","));
+        }
+      analysis = analysis->next;
+    }
+
+  TRACE (string_builder_append (sb, "]}"));
+
+  char *jsn = NULL;
+  TRACE (string_builder_str (sb, &jsn));
+
+  *json = jsn;
+
+  TRACE (string_builder_free (&sb));
+
+  return RISKI_ERROR_CODE_NONE;
+}
+
+enum RISKI_ERROR_CODE
+chart_analysis_json (struct chart *cht, char **json)
+{
+  PTR_CHECK (cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+  PTR_CHECK (json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
+
+  struct string_builder *sb = NULL;
+  TRACE (string_builder_new (&sb));
+
+  TRACE (string_builder_append (sb, "{\"analysisFull\": ["));
+
+  for (size_t i = 0; i < cht->cur_candle - 1; ++i)
+    {
+      char *candle_analysis = NULL;
+      if (cht->analysis[i] == NULL)
+        {
+          TRACE (string_builder_append (sb, "null"));
+        }
+      else
+        {
+          TRACE (
+              chart_analysis_result_json (cht->analysis[i], &candle_analysis));
+          TRACE (string_builder_append (sb, candle_analysis));
+        }
+      if (i != cht->cur_candle - 2)
+        {
+          TRACE (string_builder_append (sb, ","));
+        }
+    }
+
+  TRACE (string_builder_append (sb, "]}"));
+
+  char *jsn = NULL;
+  TRACE (string_builder_str(sb, &jsn));
+  TRACE (string_builder_free(&sb));
+
+  *json = jsn;
+
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -304,3 +478,5 @@ chart_free (struct chart **cht)
 
   return RISKI_ERROR_CODE_NONE;
 }
+
+#undef MAX_INT_STR_LEN
