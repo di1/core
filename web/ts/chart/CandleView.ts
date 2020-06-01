@@ -358,4 +358,12 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     }
     this.Renderer.restore();
   }
+
+  /**
+    Updates the entire analysis database and forces redraw of entire chart
+    @param {IAnalysis} anl The analysis interface
+   */
+  public fullAnalysisUpdate(anl: IAnalysis): void {
+
+  }
 }

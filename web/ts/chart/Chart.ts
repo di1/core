@@ -160,9 +160,9 @@ class Chart {// eslint-disable-line no-unused-vars
     @param {IAnalysis} anl The analysis data
    */
   private analysisreceivedfunc(anl: IAnalysis): void {
-    console.log(anl);
-    console.log(typeof(anl));
+    if (this.ChartCandleView) {
+      this.ChartCandleView.fullAnalysisUpdate(anl);
+    }
     this.Socket.getFullChart(this.Exchange, this.Symbol);
-    console.log('?');
   }
 }
