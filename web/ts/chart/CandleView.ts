@@ -76,10 +76,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // capture the mousewheel callback for scrolling
     this.CanvasElement.onwheel = ((evt: WheelEvent) => {
       if (evt.deltaY < 0) {
-        this.CandleWidth += 4;
+        this.CandleWidth += 2;
         this.CandleSpacing = this.CandleWidth / 2;
       } else if (evt.deltaY > 0 && this.CandleWidth > 4) {
-        this.CandleWidth -= 4;
+        this.CandleWidth -= 2;
         this.CandleSpacing = this.CandleWidth / 2;
       }
       this.ForceRefresh = true;
@@ -389,7 +389,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
         case ANALYSIS_DATA_TYPE.CANDLE_PATTERN:
           const data: CandlePattern =
             analysis.data as CandlePattern;
-          this.drawCandlePattern(data, pt, cndIdx, lftCndIdx);
+          this.drawCandlePattern(data, pt, cndIdx, lftCndIdx, i);
           break;
         case ANALYSIS_DATA_TYPE.TREND_LINE:
           // TODO
@@ -405,9 +405,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     @param {LinearEquation} pt The linear equation used in the chart drawing.
     @param {number} cndIdx The left candle adjusted index
     @param {number} lftCndIdx The left most candle index
+    @param {number} lvl The level to draw the text at
    */
   private drawCandlePattern(pat: CandlePattern, pt: LinearEquation,
-      cndIdx: number, lftCndIdx: number): void {
+      cndIdx: number, lftCndIdx: number, lvl: number): void {
     // find maximum candle price
     let cndRngMax: number = Number.MIN_VALUE;
     let cndRngMin: number = Number.MAX_VALUE;
@@ -428,27 +429,30 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
          (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0;
 
     const height: number =
-      pt.eval(cndRngMax);
+      pt.eval(cndRngMax) - 0.5;
 
     this.Renderer.save();
     this.Renderer.fillStyle = '#9370DB80';
 
     const drawWidth: number = (pat.candlesSpanning) *
-      (this.CandleWidth + this.CandleSpacing) - this.CandleWidth / 2.0;
+      (this.CandleWidth + this.CandleSpacing);
     const drawHeight: number =
       pt.eval(cndRngMin) - pt.eval(cndRngMax);
 
-    this.Renderer.fillRect(xoffset+0.5, height+0.5, drawWidth, drawHeight);
+    this.Renderer.fillRect(xoffset - (this.CandleSpacing / 2.0), height,
+        drawWidth, drawHeight+0.5);
 
-    this.Renderer.fillStyle = '#9370DB';
+    this.Renderer.fillStyle = '#FFFFFF';
     this.Renderer.textBaseline = 'hanging';
     this.Renderer.font = (this.CandleWidth*2.0) + 'px Inconsolata';
 
     console.log(this.Renderer.font);
 
-    this.Renderer.fillText(pat.shortCode,
-        xoffset, pt.eval(cndRngMin) + 3);
-
+    for (let i: number = 0; i < pat.shortCode.length; ++i) {
+      this.Renderer.fillText(pat.shortCode[i],
+          xoffset + ((this.CandleWidth + this.CandleSpacing)*i) + 0.5,
+          pt.eval(cndRngMin) + (this.CandleWidth*2.0*lvl));
+    }
     this.Renderer.restore();
   }
 
