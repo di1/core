@@ -27,6 +27,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   // Private most up to date chart
   private FullChartData: IChart;
 
+  // Private most up to date analysis
+  // we initialize this this to its primitive JSON representation
+  private FullAnalaysisData: IAnalysis = {'analysisFull': []};
+
   // Draws a horizontal line every 15 minutes by default
   // this is default because we can only display minute candle data
   // (the only useful data)
@@ -336,6 +340,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
       this.Renderer.strokeStyle = drawColor;
       this.Renderer.stroke();
+
+      // draw the analysis
+      this.drawAnalysis(pt, adjidx, lftCndIdx);
     }
 
     // draw the price bar information about the current candle
@@ -360,10 +367,96 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   }
 
   /**
+    Draws all the analysis in the analysis bin associated with this candle.
+    @param {LinearEquation} pt The linear equation that is being used to
+    draw the chart.
+    @param {number} cndIdx The candle index adjusted for the left most candle.
+    @param {number} lftCndIdx The left candle index
+   */
+  private drawAnalysis(pt: LinearEquation, cndIdx: number,
+      lftCndIdx: number): void {
+    const trueCndIdx: number = cndIdx + lftCndIdx;
+    if (this.FullAnalaysisData.analysisFull[trueCndIdx] == null) {
+      // nothing to draw from this candle
+      return;
+    }
+    // not null loop through each draw function in the bin
+    const analysisBin: Analysis[] =
+      this.FullAnalaysisData.analysisFull[trueCndIdx] as Analysis[];
+    for (let i: number = 0; i < analysisBin.length; ++i) {
+      const analysis: Analysis = analysisBin[i];
+      switch (analysis.type) {
+        case ANALYSIS_DATA_TYPE.CANDLE_PATTERN:
+          const data: CandlePattern =
+            analysis.data as CandlePattern;
+          this.drawCandlePattern(data, pt, cndIdx, lftCndIdx);
+          break;
+        case ANALYSIS_DATA_TYPE.TREND_LINE:
+          // TODO
+          console.log('drawing trend line');
+          break;
+      }
+    }
+  }
+
+  /**
+    Draws a candle pattern
+    @param {CandlePattern} pat The candle pattern
+    @param {LinearEquation} pt The linear equation used in the chart drawing.
+    @param {number} cndIdx The left candle adjusted index
+    @param {number} lftCndIdx The left most candle index
+   */
+  private drawCandlePattern(pat: CandlePattern, pt: LinearEquation,
+      cndIdx: number, lftCndIdx: number): void {
+    // find maximum candle price
+    let cndRngMax: number = Number.MIN_VALUE;
+    let cndRngMin: number = Number.MAX_VALUE;
+
+    const trueCndIdx: number = cndIdx + lftCndIdx;
+    for (let i: number = trueCndIdx; i > trueCndIdx - pat.candlesSpanning;
+      --i) {
+      if (this.FullChartData.chart[i].candle.h > cndRngMax) {
+        cndRngMax = this.FullChartData.chart[i].candle.h;
+      }
+      if (this.FullChartData.chart[i].candle.l < cndRngMin) {
+        cndRngMin = this.FullChartData.chart[i].candle.l;
+      }
+    }
+    // draw a shaded region covering the number of candles
+    const xoffset: number =
+        ((cndIdx-pat.candlesSpanning+1) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0;
+
+    const height: number =
+      pt.eval(cndRngMax);
+
+    this.Renderer.save();
+    this.Renderer.fillStyle = '#9370DB80';
+
+    const drawWidth: number = (pat.candlesSpanning) *
+      (this.CandleWidth + this.CandleSpacing) - this.CandleWidth / 2.0;
+    const drawHeight: number =
+      pt.eval(cndRngMin) - pt.eval(cndRngMax);
+
+    this.Renderer.fillRect(xoffset+0.5, height+0.5, drawWidth, drawHeight);
+
+    this.Renderer.fillStyle = '#9370DB';
+    this.Renderer.textBaseline = 'hanging';
+    this.Renderer.font = (this.CandleWidth*2.0) + 'px Inconsolata';
+
+    console.log(this.Renderer.font);
+
+    this.Renderer.fillText(pat.shortCode,
+        xoffset, pt.eval(cndRngMin) + 3);
+
+    this.Renderer.restore();
+  }
+
+  /**
     Updates the entire analysis database and forces redraw of entire chart
     @param {IAnalysis} anl The analysis interface
    */
   public fullAnalysisUpdate(anl: IAnalysis): void {
-
+    this.FullAnalaysisData = anl;
   }
 }

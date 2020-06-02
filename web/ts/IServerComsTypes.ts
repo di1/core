@@ -1,3 +1,8 @@
+enum ANALYSIS_DATA_TYPE {// eslint-disable-line no-unused-vars
+  CANDLE_PATTERN = 0, // eslint-disable-line no-unused-vars
+  TREND_LINE = 1// eslint-disable-line no-unused-vars
+}
+
 interface Candle {
   o: number;
   h: number;
@@ -34,10 +39,10 @@ interface TrendLine {
 }
 
 interface Analysis {
-  type: number;
-  data: Array<CandlePattern | TrendLine>;
+  type: ANALYSIS_DATA_TYPE;
+  data: CandlePattern | TrendLine;
 }
 
 interface IAnalysis {
-  fullAnalysis: Array<Analysis | null>;
+  analysisFull: Array<Array<Analysis> | null>;
 }

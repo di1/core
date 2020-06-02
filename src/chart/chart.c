@@ -160,26 +160,33 @@ chart_analysis_result_json (struct analysis_result *analysis, char **json)
   TRACE (string_builder_new (&sb));
 
   /*
-   * {
-   *  "type": number,
-   *  "drawData": {
-   *    // could be candle_pattern | trend_line | ...
-   *  }
-   * }
+   * [
+   *   {
+   *    "type": number,
+   *    "drawData": {
+   *      // could be candle_pattern | trend_line | ...
+   *    }
+   *   },
+   *   .
+   *   .
+   *   .
+   * ]
    */
 
-  TRACE (string_builder_append (sb, "{"));
-  TRACE (string_builder_append (sb, "\"type\":"));
-
-  // convert type integer to string
-  char type_str[MAX_INT_STR_LEN];
-  sprintf (type_str, "%d", analysis->type);
-
-  TRACE (string_builder_append (sb, type_str));
-  TRACE (string_builder_append (sb, ",\"data\":["));
+  TRACE (string_builder_append (sb, "["));
 
   while (analysis)
     {
+
+      TRACE (string_builder_append (sb, "{\"type\":"));
+
+      // convert type integer to string
+      char type_str[MAX_INT_STR_LEN];
+      sprintf (type_str, "%d", analysis->type);
+
+      TRACE (string_builder_append (sb, type_str));
+      TRACE (string_builder_append (sb, ",\"data\":"));
+
       char *data_json = NULL;
       switch (analysis->type)
         {
@@ -193,6 +200,8 @@ chart_analysis_result_json (struct analysis_result *analysis, char **json)
           break;
         }
       TRACE (string_builder_append (sb, data_json));
+      TRACE (string_builder_append (sb, "}"));
+
       if (analysis->next)
         {
           TRACE (string_builder_append (sb, ","));
@@ -200,7 +209,7 @@ chart_analysis_result_json (struct analysis_result *analysis, char **json)
       analysis = analysis->next;
     }
 
-  TRACE (string_builder_append (sb, "]}"));
+  TRACE (string_builder_append (sb, "]"));
 
   char *jsn = NULL;
   TRACE (string_builder_str (sb, &jsn));
@@ -245,8 +254,8 @@ chart_analysis_json (struct chart *cht, char **json)
   TRACE (string_builder_append (sb, "]}"));
 
   char *jsn = NULL;
-  TRACE (string_builder_str(sb, &jsn));
-  TRACE (string_builder_free(&sb));
+  TRACE (string_builder_str (sb, &jsn));
+  TRACE (string_builder_free (&sb));
 
   *json = jsn;
 
