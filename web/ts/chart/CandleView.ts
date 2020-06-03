@@ -309,7 +309,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       this.Renderer.beginPath();
 
       // compute the drawing color based on if the candle is going up or down
-      const drawColor: string = (curCnd.o > curCnd.c) ? '#FF3333' : '#BAE67E';
+      const drawColor: string = (curCnd.o > curCnd.c) ? DarkTheme.error :
+        DarkTheme.string;
+
       this.Renderer.strokeStyle = drawColor;
       this.Renderer.fillStyle = drawColor;
       // compute the height
@@ -481,8 +483,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const drawHeight: number =
       pt.eval(cndRngMin) - pt.eval(cndRngMax);
 
-    this.Renderer.fillRect(xoffset - (this.CandleSpacing / 2.0), height,
-        drawWidth, drawHeight+0.5);
+    if (pat.candlesSpanning != 1) {
+      this.Renderer.fillRect(xoffset - (this.CandleSpacing / 2.0), height,
+          drawWidth, drawHeight+0.5);
+    }
 
     this.Renderer.fillStyle = '#FFFFFF';
     this.Renderer.textBaseline = 'hanging';
