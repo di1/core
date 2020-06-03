@@ -14,5 +14,5 @@ window.onload = () => {
   document.body.style.left = '0';
   document.body.style.fontFamily = '\'Inconsolata\', monospace';
 
-  new Chart('OANDA', 'USD_EUR', DarkTheme);
+  new Chart('OANDA', 'EUR_USD', DarkTheme);
 };
