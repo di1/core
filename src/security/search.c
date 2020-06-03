@@ -51,12 +51,9 @@ search_init (char *csv_db)
       db_search.data[db_search.n - 1].symbol = strdup (tok);
       tok = strtok (NULL, ",");
       db_search.data[db_search.n - 1].full_name = strdup (tok);
-      printf("%s %s\n", db_search.data[db_search.n - 1].full_name,
-          db_search.data[db_search.n - 1].symbol);
     }
 
   fclose (fp);
-  exit(1);
   return RISKI_ERROR_CODE_NONE;
 }
 
