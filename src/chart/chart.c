@@ -481,6 +481,28 @@ chart_free (struct chart **cht)
     }
   free ((*cht)->candles);
   // TODO free the analysis lists
+  
+  for (size_t i = 0; i < (*cht)->num_candles_allocated; ++i) {
+    // clear the linked list
+    if ((*cht)->analysis[i]) {
+      struct analysis_result *next = (*cht)->analysis[i];
+      while (next) {
+        struct analysis_result *tmp_next = next->next;
+        switch (next->type) {
+          case CANDLE_PATTERN:
+            free(((struct candle_pattern*) (next->draw_data))->short_code);
+            free(next->draw_data);
+            break;
+          case TREND_LINE:
+            free(next->draw_data);
+            break;
+        }
+        free(next);
+        next = tmp_next;
+      }
+    }
+  }
+
   free ((*cht)->analysis);
   free ((*cht));
   *cht = NULL;

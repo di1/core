@@ -41,13 +41,14 @@ struct analysis_list
 struct analysis_functions
 {
   size_t num_functions;
+  void **handles;
   struct vtable **funs;
 };
 
 /*
  * Loaded functions
  */
-struct analysis_functions loaded_funs = { 0, NULL };
+struct analysis_functions loaded_funs = { 0, NULL, NULL};
 
 /*
  * Keeps track of which bin the next request will go into.
@@ -242,6 +243,13 @@ analysis_load ()
                   loaded_funs.funs,
                   sizeof (struct vtable **) * loaded_funs.num_functions);
               loaded_funs.funs[loaded_funs.num_functions - 1] = dyn;
+
+              loaded_funs.handles = (void **)realloc (
+                  loaded_funs.handles, sizeof(void*) * loaded_funs.num_functions);
+
+              loaded_funs.handles[loaded_funs.num_functions - 1] = handle;
+
+              free(loc);
             }
         }
       closedir (dir);
@@ -465,5 +473,13 @@ analysis_cleanup ()
     }
   free (thread_operations);
   free (threads);
+  free (loaded_funs.funs);
+
+  for (size_t i = 0; i < loaded_funs.num_functions; ++i)
+  {
+    dlclose(loaded_funs.handles[i]);
+  }
+  free(loaded_funs.handles);
+
   return RISKI_ERROR_CODE_NONE;
 }
