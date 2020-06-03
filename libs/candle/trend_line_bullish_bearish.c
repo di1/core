@@ -59,12 +59,6 @@ find_trend_line (struct chart *cht, size_t num_candles, enum DIRECTION type)
       TRACE (get_working_value (confirmation_candle,
                                 &confirmation_working_value, type));
 
-      // not my job don't care
-      if (confirmation_working_value == candle_first_working_value)
-        {
-          continue;
-        }
-
       // Create a line between the last candle and last candle - width
       struct linear_equation *eq = linear_equation_new (
           slope_first_point, candle_first_working_value,
