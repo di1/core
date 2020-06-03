@@ -167,7 +167,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // compute the display latency
     this.DisplayLatency = frameEndTime - frameBeginTime;
-    console.log('Display Latency: ' + this.DisplayLatency + 'ms');
+    // console.log('Display Latency: ' + this.DisplayLatency + 'ms');
   }
 
   /**
@@ -387,16 +387,58 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       const analysis: Analysis = analysisBin[i];
       switch (analysis.type) {
         case ANALYSIS_DATA_TYPE.CANDLE_PATTERN:
-          const data: CandlePattern =
-            analysis.data as CandlePattern;
-          this.drawCandlePattern(data, pt, cndIdx, lftCndIdx, i);
+          this.drawCandlePattern(analysis.data as CandlePattern,
+              pt, cndIdx, lftCndIdx, i);
           break;
         case ANALYSIS_DATA_TYPE.TREND_LINE:
-          // TODO
-          console.log('drawing trend line');
+          this.drawTrendLine(analysis.data as TrendLine, pt, cndIdx, lftCndIdx);
           break;
       }
     }
+  }
+
+  /**
+    Draws a trend line
+    @param {CandlePattern} pat The candle pattern
+    @param {LinearEquation} pt The linear equation used in the chart drawing.
+    @param {number} cndIdx The left candle adjusted index
+    @param {number} lftCndIdx The left most candle index
+    @param {number} lvl The level to draw the text at
+   */
+  private drawTrendLine(pat: TrendLine, pt: LinearEquation, cndIdx: number,
+      lftCndIdx: number): void {
+    // The start and end height numbers
+    let st: number = 0;
+    let eh: number = 0;
+
+    // Choose different start and end height based on numbers
+    switch (pat.direction) {
+      case TREND_LINE_DIRECTION.SUPPORT:
+        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.l);
+        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.l);
+        break;
+      case TREND_LINE_DIRECTION.RESISTANCE:
+        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.h);
+        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.h);
+        break;
+    }
+
+    const xoffsetStart: number =
+        (((pat.startIndex - lftCndIdx) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0) +
+         (this.CandleWidth / 2.0);
+    const xoffsetEnd: number =
+        (((pat.endIndex - lftCndIdx) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0) +
+         (this.CandleWidth / 2.0);
+
+    this.Renderer.save();
+    this.Renderer.strokeStyle = '#9370DB80';
+    this.Renderer.lineWidth = 2;
+    this.Renderer.moveTo(xoffsetStart, st);
+    this.Renderer.lineTo(xoffsetEnd, eh);
+    this.Renderer.stroke();
+    this.Renderer.restore();
   }
 
   /**
@@ -445,8 +487,6 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.fillStyle = '#FFFFFF';
     this.Renderer.textBaseline = 'hanging';
     this.Renderer.font = (this.CandleWidth*2.0) + 'px Inconsolata';
-
-    console.log(this.Renderer.font);
 
     for (let i: number = 0; i < pat.shortCode.length; ++i) {
       this.Renderer.fillText(pat.shortCode[i],

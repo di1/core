@@ -33,9 +33,8 @@ struct chart;
 // used to find all the files in a folder
 #include <dirent.h>
 
-#ifndef API_
 #include <api.h>
-#endif
+#include <math/linear_equation.h>
 
 /*
  * Private struct holding the needed information to perform an analysis

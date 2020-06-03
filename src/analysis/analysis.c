@@ -1,7 +1,4 @@
-#include "api.h"
 #include <analysis/analysis.h>
-#include <dlfcn.h>
-#include <time.h>
 
 /*
  * The analysis info struct is the value of the linked list

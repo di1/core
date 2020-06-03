@@ -1,1 +1,1 @@
-ADD_LIBRARY(math linear_equation.c integral.c)
+ADD_LIBRARY(math SHARED linear_equation.c integral.c)

@@ -3,6 +3,11 @@ enum ANALYSIS_DATA_TYPE {// eslint-disable-line no-unused-vars
   TREND_LINE = 1// eslint-disable-line no-unused-vars
 }
 
+enum TREND_LINE_DIRECTION {// eslint-disable-line no-unused-vars
+  SUPPORT = 0, // eslint-disable-line no-unused-vars
+  RESISTANCE = 1// eslint-disable-line no-unused-vars
+}
+
 interface Candle {
   o: number;
   h: number;

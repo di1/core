@@ -5,6 +5,8 @@
 #include <chart/chart.h>
 #endif
 
+#include <math/linear_equation.h>
+
 #include <chart/candle.h>
 #include <error_codes.h>
 #include <tracer.h>

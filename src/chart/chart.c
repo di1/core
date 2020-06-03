@@ -97,17 +97,17 @@ chart_analysis_trend_line_json (struct trend_line *tl, char **json)
   sprintf (type_str, "%d", (int)tl->end_index);
 
   TRACE (string_builder_append (sb, type_str));
-  TRACE (string_builder_append (sb, "\",\"startIndex\":\""));
+  TRACE (string_builder_append (sb, ",\"startIndex\":"));
 
   sprintf (type_str, "%d", (int)tl->start_index);
   TRACE (string_builder_append (sb, type_str));
 
-  TRACE (string_builder_append (sb, ",\"direction\":\""));
+  TRACE (string_builder_append (sb, ",\"direction\":"));
 
   sprintf (type_str, "%d", (int)tl->direction);
   TRACE (string_builder_append (sb, type_str));
 
-  TRACE (string_builder_append (sb, "\"}"));
+  TRACE (string_builder_append (sb, "}"));
 
   char *sb_str = NULL;
   TRACE (string_builder_str (sb, &sb_str));
