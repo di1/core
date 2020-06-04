@@ -4,7 +4,7 @@
   "description": "The front end gui for the riski chart analyzer",
   "dependencies": {
     "ayu": "^7.2.2",
-    "typescript": "^3.9.3",
+    "typescript": "^3.9.5",
     "uglify-js": "^3.9.4"
   },
   "devDependencies": {

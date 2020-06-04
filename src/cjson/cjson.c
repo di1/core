@@ -135,13 +135,15 @@ static int case_insensitive_strcmp(const unsigned char *string1,
     return 0;
   }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
   for (; tolower(*string1) == tolower(*string2); (void)string1++, string2++) {
     if (*string1 == '\0') {
       return 0;
     }
   }
-
   return tolower(*string1) - tolower(*string2);
+#pragma clang diagnostic pop
 }
 
 typedef struct internal_hooks {

@@ -20,7 +20,7 @@ FIND_PACKAGE(Threads REQUIRED)
 FIND_PACKAGE(OpenSSL REQUIRED)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-ADD_COMPILE_OPTIONS("-g" "-O0" "-Wall" "-Wextra" "-Werror"
+ADD_COMPILE_OPTIONS("-g" "-Ofast" "-Wall" "-Wextra" "-Werror"
   "-Wpedantic" "-Weverything")
 
 INCLUDE_DIRECTORIES(
