@@ -32,18 +32,6 @@ enum RISKI_ERROR_CODE chart_get_name(struct chart *cht, char **name) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE chart_analysis_lock(struct chart *cht) {
-  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  pthread_mutex_lock(&(cht->analysis_lock));
-  return RISKI_ERROR_CODE_NONE;
-}
-
-enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart *cht) {
-  PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  pthread_mutex_unlock(&(cht->analysis_lock));
-  return RISKI_ERROR_CODE_NONE;
-}
-
 enum RISKI_ERROR_CODE chart_put_analysis(struct chart *cht, size_t idx,
                                          struct analysis_result *res) {
   RANGE_CHECK(idx, 0, cht->cur_candle, RISKI_ERROR_CODE_INVALID_RANGE,
@@ -51,6 +39,7 @@ enum RISKI_ERROR_CODE chart_put_analysis(struct chart *cht, size_t idx,
 
   res->next = NULL;
 
+  pthread_mutex_lock(&cht->analysis_lock);
   // check if there is already an analysis here
   if (cht->analysis[idx]) {
     // get the last element in the list
@@ -65,6 +54,7 @@ enum RISKI_ERROR_CODE chart_put_analysis(struct chart *cht, size_t idx,
     // no analysis here so just set it to the given one
     cht->analysis[idx] = res;
   }
+  pthread_mutex_unlock(&cht->analysis_lock);
   return RISKI_ERROR_CODE_NONE;
 }
 

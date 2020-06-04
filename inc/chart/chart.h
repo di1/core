@@ -143,14 +143,14 @@ enum RISKI_ERROR_CODE chart_latest_candle(struct chart *cht, char **json);
  * @param {struct chart*} A chart
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE chart_analysis_lock(struct chart *cht);
+// enum RISKI_ERROR_CODE chart_analysis_lock(struct chart *cht);
 
 /*
  * Releases the analysis lock, (blocking)
  * @param {struct chart*} cht A chart
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart *cht);
+// enum RISKI_ERROR_CODE chart_analysis_unlock(struct chart *cht);
 
 /*
  * Sets a candle tag with a single candle pattern

@@ -131,7 +131,7 @@ static void *analysis_thread_func(void *index) {
     size_t end_candle = inf->end_candle;
 
     // aquire the analysis struct first
-    chart_analysis_lock(cht);
+    // chart_analysis_lock(cht);
 
     // group the analysis into sections from simplest to hardest
 
@@ -147,7 +147,7 @@ static void *analysis_thread_func(void *index) {
     }
 
     // release the analysis struct lock
-    chart_analysis_unlock(cht);
+    // chart_analysis_unlock(cht);
     free(inf);
   }
   return NULL;
