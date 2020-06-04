@@ -4,7 +4,7 @@
 #include <iex/iex.h>
 
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Werror"
+#pragma clang diagnostic ignored "-Wdocumentation"
 #include <libwebsockets.h>
 #pragma clang diagnostic pop
 
