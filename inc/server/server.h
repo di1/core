@@ -5,6 +5,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation"
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
 #include <libwebsockets.h>
 #pragma clang diagnostic pop
 
