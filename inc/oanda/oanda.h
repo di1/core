@@ -22,6 +22,6 @@ extern struct exchange *exchange_oanda;
 /*
  * Connectes to the live oanda feed for forex data
  */
-enum RISKI_ERROR_CODE oanda_live (char *token);
+enum RISKI_ERROR_CODE oanda_live(char *token);
 
 #endif

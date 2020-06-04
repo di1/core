@@ -21,7 +21,7 @@
  * @param {enum SINGLE_CANDLE_PATTERNS*} res The result
  * @param {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE is_bullish_engulfing (size_t idx, struct chart *cht,
-                                            enum DOUBLE_CANDLE_PATTERNS *res);
+enum RISKI_ERROR_CODE is_bullish_engulfing(size_t idx, struct chart *cht,
+                                           enum DOUBLE_CANDLE_PATTERNS *res);
 
 #endif

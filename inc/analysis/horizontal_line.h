@@ -22,7 +22,7 @@ struct chart;
  * @param {size_t} end_candle_index The last validated candle
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE find_horizontal_line (struct chart *cht,
-                                            size_t end_candle_index);
+enum RISKI_ERROR_CODE find_horizontal_line(struct chart *cht,
+                                           size_t end_candle_index);
 
 #endif

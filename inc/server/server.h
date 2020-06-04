@@ -9,6 +9,6 @@
 
 extern int SERVER_INTERRUPTED;
 
-void *server_start (void *);
+void *server_start(void *);
 
 #endif

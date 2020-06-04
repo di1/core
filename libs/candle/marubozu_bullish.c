@@ -1,18 +1,15 @@
 #include <api.h>
 
-const char* name = "Bullish Marubozu";
-const char* author = "Vittorio Papandrea";
+static const char* name = "Bullish Marubozu";
+static const char* author = "Vittorio Papandrea";
 
-char*
-get_name()
-{
-  return (char*) name;
+const char* get_name() {
+  return name;
 }
 
-char*
-get_author()
+const char* get_author()
 {
-  return (char*) author;
+  return author;
 }
 
 enum RISKI_ERROR_CODE
@@ -53,7 +50,7 @@ run(struct chart* cht, size_t idx)
       TRACE(chart_get_name(cht, &sec_name));
 
       logger_analysis(sec_name, name, __func__,
-          __FILENAME__, __LINE__, "%s" , " ");
+          FILENAME_SHORT, __LINE__, "%s" , " ");
       TRACE(chart_put_analysis(cht, idx-1,res));
     }
 

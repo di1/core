@@ -16,7 +16,8 @@ interface Candle {
   s: number;
   e: number;
   v: number;
-
+  b: number;
+  a: number;
 }
 
 interface ICandle {

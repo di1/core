@@ -19,8 +19,8 @@
  * @param {double*} res Will set *res to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE integral_chart (struct chart *cht, size_t a, size_t b,
-                                      double *res);
+enum RISKI_ERROR_CODE integral_chart(struct chart *cht, size_t a, size_t b,
+                                     double *res);
 
 /*
  * Compute the integral of a line between a, b
@@ -30,8 +30,8 @@ enum RISKI_ERROR_CODE integral_chart (struct chart *cht, size_t a, size_t b,
  * @param {double*} res Will set *res to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE integral_line (struct linear_equation *eq, size_t a,
-                                     size_t b, double *res);
+enum RISKI_ERROR_CODE integral_line(struct linear_equation *eq, size_t a,
+                                    size_t b, double *res);
 
 /*
  * Compute the integral of a horizontal line
@@ -41,7 +41,6 @@ enum RISKI_ERROR_CODE integral_line (struct linear_equation *eq, size_t a,
  * @param {double*} res Will set *res to the result
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE integral_const (size_t c, size_t a, size_t b,
-                                      double *res);
+enum RISKI_ERROR_CODE integral_const(size_t c, size_t a, size_t b, double *res);
 
 #endif

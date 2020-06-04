@@ -1,18 +1,14 @@
 #include <api.h>
 
-const char* name = "Bullish Engulfing";
-const char* author = "Vittorio Papandrea";
+static const char* name = "Bullish Engulfing";
+static const char* author = "Vittorio Papandrea";
 
-char*
-get_name()
-{
-  return (char*) name;
+const char* get_name() {
+  return name;
 }
 
-char*
-get_author()
-{
-  return (char*) author;
+const char* get_author() {
+  return author;
 }
 
 enum RISKI_ERROR_CODE
@@ -55,8 +51,8 @@ run (struct chart *cht, size_t idx)
     }
 
   // compute body size
-  size_t cnd1_body_size = cnd1_c - cnd1_o;
-  size_t cnd2_body_size = cnd2_o - cnd2_c;
+  int64_t cnd1_body_size = cnd1_c - cnd1_o;
+  int64_t cnd2_body_size = cnd2_o - cnd2_c;
 
   // make sure the first body is longer than the second candle
   if (cnd1_body_size <= cnd2_body_size)
@@ -71,7 +67,7 @@ run (struct chart *cht, size_t idx)
       TRACE(chart_get_name(cht, &sec_name));
 
       logger_analysis(sec_name, name, __func__,
-          __FILENAME__, __LINE__, "%s" , " ");
+          FILENAME_SHORT, __LINE__, "%s" , " ");
 
       struct analysis_result *res =
         (struct analysis_result*) malloc(sizeof(struct analysis_result) * 1);

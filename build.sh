@@ -126,8 +126,8 @@ cd build
 LSDEBUG in $(pwd)
 LSINFO running cmake
 
-CC=$CLANGLOCATION
-CXX=$CLANGPPLOCATION
+export CC=$CLANGLOCATION
+export CXX=$CLANGPPLOCATION
 
 cmake ..
 LSINFO running make

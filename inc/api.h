@@ -11,15 +11,16 @@
 #include <error_codes.h>
 #include <tracer.h>
 
-struct vtable
-{
-  char *(*get_name) (void);
-  char *(*get_author) (void);
-  enum RISKI_ERROR_CODE (*run) (struct chart *cht, size_t idx);
+struct vtable {
+  const char *(*get_name)(void);
+  const char *(*get_author)(void);
+  enum RISKI_ERROR_CODE (*run)(struct chart *cht, size_t idx);
 };
 
-char *get_author ();
-char *get_name ();
-enum RISKI_ERROR_CODE run (struct chart *cht, size_t idx);
+const char *get_author(void);
+const char *get_name(void);
 
+enum RISKI_ERROR_CODE run(struct chart *cht, size_t idx);
+
+extern struct vtable exports;
 #endif

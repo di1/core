@@ -21,16 +21,14 @@
 
 /* one of these created for each message */
 
-struct msg
-{
+struct msg {
   void *payload; /* is malloc'd */
   size_t len;
 };
 
 /* one of these is created for each client connecting to us */
 
-struct per_session_data__minimal
-{
+struct per_session_data__minimal {
   struct per_session_data__minimal *pss_list;
   struct lws *wsi;
   int last; /* the last message number we sent */
@@ -39,8 +37,7 @@ struct per_session_data__minimal
 };
 
 /* one of these is created for each vhost our protocol is used with */
-struct per_vhost_data__minimal
-{
+struct per_vhost_data__minimal {
   struct lws_context *context;
   struct lws_vhost *vhost;
   const struct lws_protocols *protocol;
@@ -49,11 +46,14 @@ struct per_vhost_data__minimal
 
   struct msg amsg; /* the one pending message... */
   int current;     /* the current message number we are caching */
+
+  /* There are 4 unused bytes in this struct */
+  char _p1[4];
 };
 
 /* destroys the message when everyone has had a copy of it */
-#define LWS_PLUGIN_PROTOCOL_MINIMAL                                           \
-  {                                                                           \
-    "lws-minimal", callback_minimal,                                          \
-        sizeof (struct per_session_data__minimal), 128, 0, NULL, 0            \
+#define LWS_PLUGIN_PROTOCOL_MINIMAL                                            \
+  {                                                                            \
+    "lws-minimal", callback_minimal, sizeof(struct per_session_data__minimal), \
+        128, 0, NULL, 0                                                        \
   }
