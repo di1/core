@@ -19,7 +19,7 @@
  * @param {char*} csv_db The database to read from
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE search_init(char* csv_db);
+enum RISKI_ERROR_CODE search_init(char *csv_db);
 
 /*
  * Given a limmited character set find the best 10 matches.
@@ -27,11 +27,11 @@ enum RISKI_ERROR_CODE search_init(char* csv_db);
  * @param {char**} json Will set *json to the best 10 matches
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE search_search(char* seq, char** json);
+enum RISKI_ERROR_CODE search_search(char *seq, char **json);
 
 /*
  * Frees the serach interface
  */
-enum RISKI_ERROR_CODE search_free();
+enum RISKI_ERROR_CODE search_free(void);
 
 #endif

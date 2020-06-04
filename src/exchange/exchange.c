@@ -3,7 +3,7 @@
 /*
  * The number of securities that have been added to the exchange
  */
-size_t num_securities = 0;
+static size_t num_securities = 0;
 
 /*
  * Linked list for the hash bins
@@ -11,8 +11,8 @@ size_t num_securities = 0;
  * @param {struct ll*} next The next element in the list
  */
 struct ll {
-  struct security* val;
-  struct ll* next;
+  struct security *val;
+  struct ll *next;
 };
 
 /*
@@ -21,19 +21,19 @@ struct ll {
  * @param {struct ll} A fixed number of bins for the hashmap
  */
 struct exchange {
-  char* name;
+  char *name;
   struct ll entries[SECURITY_HASH_MODULE_VAL];
 };
 
-enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange) {
+enum RISKI_ERROR_CODE exchange_new(char *name, struct exchange **exchange) {
   PTR_CHECK(name, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(exchange, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  char* n = (char*)malloc((strlen(name) + 1) * sizeof(char));
+  char *n = (char *)malloc((strlen(name) + 1) * sizeof(char));
   PTR_CHECK(n, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   strcpy(n, name);
 
-  struct exchange* e = (struct exchange*)calloc(1, sizeof(struct exchange));
+  struct exchange *e = (struct exchange *)calloc(1, sizeof(struct exchange));
   PTR_CHECK(e, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   e->name = n;
 
@@ -41,15 +41,15 @@ enum RISKI_ERROR_CODE exchange_new(char* name, struct exchange** exchange) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
+enum RISKI_ERROR_CODE exchange_put(struct exchange *e, char *name,
                                    uint64_t interval) {
-  struct security* s = NULL;
+  struct security *s = NULL;
   TRACE(security_new(name, interval, &s));
 
   size_t index = 0;
   TRACE(security_get_hash(s, &index));
 
-  struct ll* val = &e->entries[index];
+  struct ll *val = &e->entries[index];
   if (val->val == NULL) {
     val->val = s;
   } else {
@@ -57,7 +57,7 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
       val = val->next;
     }
 
-    struct ll* next_entry = (struct ll*)malloc(1 * sizeof(struct ll));
+    struct ll *next_entry = (struct ll *)malloc(1 * sizeof(struct ll));
     PTR_CHECK(next_entry, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
     next_entry->next = NULL;
     next_entry->val = s;
@@ -67,21 +67,21 @@ enum RISKI_ERROR_CODE exchange_put(struct exchange* e, char* name,
 
   num_securities += 1;
   if (num_securities % 200 == 0)
-    TRACE(logger_info(__func__, __FILENAME__, __LINE__,
+    TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
                       "~%lu securities monitored", num_securities));
 
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name,
-                                   struct security** sec) {
+enum RISKI_ERROR_CODE exchange_get(struct exchange *e, char *name,
+                                   struct security **sec) {
   PTR_CHECK(e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(sec, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   size_t hash = 0;
   TRACE(security_hash(name, &hash));
 
-  struct ll* bin_list = &e->entries[hash];
+  struct ll *bin_list = &e->entries[hash];
 
   while (bin_list != NULL) {
     if (bin_list->val == NULL) {
@@ -102,7 +102,7 @@ enum RISKI_ERROR_CODE exchange_get(struct exchange* e, char* name,
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE exchange_free(struct exchange** e) {
+enum RISKI_ERROR_CODE exchange_free(struct exchange **e) {
   PTR_CHECK(e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(*e, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -112,9 +112,9 @@ enum RISKI_ERROR_CODE exchange_free(struct exchange** e) {
     if ((*e)->entries[i].val != NULL) {
       TRACE(security_free(&((*e)->entries[i].val)));
       if ((*e)->entries[i].next != NULL) {
-        struct ll* cur = (*e)->entries[i].next;
+        struct ll *cur = (*e)->entries[i].next;
         while (cur != NULL) {
-          struct ll* tmp = cur;
+          struct ll *tmp = cur;
           cur = cur->next;
           TRACE(security_free(&tmp->val));
           free(tmp);

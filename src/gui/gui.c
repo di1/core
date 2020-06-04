@@ -1,14 +1,14 @@
 #include <gui/gui.h>
 
-GtkListStore* store = NULL;
+GtkListStore *store = NULL;
 
-static void activate(GtkApplication* app, gpointer user_data) {
+static void activate(GtkApplication *app, gpointer user_data) {
   (void)user_data;
 
   /*
    * Create an application
    */
-  GtkWidget* window;
+  GtkWidget *window;
   window = gtk_application_window_new(app);
   gtk_window_set_title(GTK_WINDOW(window), "Riski");
 
@@ -30,7 +30,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
    * |         |        |
    * |=========|========|
    */
-  GtkWidget* grid_layout;
+  GtkWidget *grid_layout;
   grid_layout = gtk_grid_new();
 
   gtk_grid_insert_row(GTK_GRID(grid_layout), 0);
@@ -48,13 +48,13 @@ static void activate(GtkApplication* app, gpointer user_data) {
   store = gtk_list_store_new(PAC_NUM, G_TYPE_STRING, G_TYPE_STRING,
                              G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-  GtkWidget* tree;
+  GtkWidget *tree;
   tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
   g_object_unref(G_OBJECT(store));
 
-  GtkTreeViewColumn* column;
-  GtkCellRenderer* renderer;
+  GtkTreeViewColumn *column;
+  GtkCellRenderer *renderer;
 
   /*
    * Create the columns
@@ -87,7 +87,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
   /*
    * Insert the treeview into a scroll view
    */
-  GtkWidget* sw = NULL;
+  GtkWidget *sw = NULL;
   sw = gtk_scrolled_window_new(NULL, NULL);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_NEVER,
                                  GTK_POLICY_AUTOMATIC);
@@ -102,7 +102,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
    */
   gtk_grid_attach(GTK_GRID(grid_layout), sw, 0, 1, 1, 1);
 
-  GtkWidget* chart_area = gtk_drawing_area_new();
+  GtkWidget *chart_area = gtk_drawing_area_new();
   gtk_grid_attach(GTK_GRID(grid_layout), chart_area, 1, 0, 2, 2);
 
   gtk_container_add(GTK_CONTAINER(window), grid_layout);
@@ -110,8 +110,8 @@ static void activate(GtkApplication* app, gpointer user_data) {
   gtk_widget_show_all(window);
 }
 
-void gui_start(int argc, char** argv) {
-  GtkApplication* app;
+void gui_start(int argc, char **argv) {
+  GtkApplication *app;
   int status;
 
   app = gtk_application_new("io.riski", G_APPLICATION_FLAGS_NONE);

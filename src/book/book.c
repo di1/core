@@ -22,15 +22,15 @@ struct book {
   int64_t sells_len;
 
   // Hold the buys side
-  struct level* buys;
+  struct level *buys;
 
   // Hold the sells side
-  struct level* sells;
+  struct level *sells;
 };
 
-struct book* book_new() {
+struct book *book_new() {
   // Allocate a new book
-  struct book* t = (struct book*)(malloc(1 * sizeof(struct book)));
+  struct book *t = (struct book *)(malloc(1 * sizeof(struct book)));
 
   // set number of buys and sells to 0
   t->buys_len = 0;
@@ -43,11 +43,11 @@ struct book* book_new() {
 }
 
 // removes a price lvl from the lvl array
-void remove_lvl(struct level** lvls, int64_t index, int64_t count) {
+static void remove_lvl(struct level **lvls, int64_t index, int64_t count) {
   // delete the price lvl
   // tmp array
-  struct level* lvl_tmp =
-      (struct level*)(malloc((count - 1) * sizeof(struct level)));
+  struct level *lvl_tmp =
+      (struct level *)(malloc((uint64_t)(count - 1) * sizeof(struct level)));
   // copy the left side
   for (int64_t i = 0; i < index; ++i) {
     lvl_tmp[i] = (*lvls)[i];
@@ -70,11 +70,11 @@ void remove_lvl(struct level** lvls, int64_t index, int64_t count) {
   }
 }
 
-void insert_at(struct level** lvls, int64_t len, int64_t at, struct level lvl) {
+static void insert_at(struct level **lvls, int64_t len, int64_t at, struct level lvl) {
   len += 1;
 
   // create a new array
-  struct level* new_lvl = (struct level*)(malloc(len * sizeof(struct level)));
+  struct level *new_lvl = (struct level *)(malloc((uint64_t)len * sizeof(struct level)));
 
   // put the new data inside
   new_lvl[at] = lvl;
@@ -93,19 +93,19 @@ void insert_at(struct level** lvls, int64_t len, int64_t at, struct level lvl) {
   *lvls = new_lvl;
 }
 
-void book_update(bool side, struct book* t, int64_t price, int64_t quantity) {
+void book_update(bool side, struct book *t, int64_t price, int64_t quantity) {
   /*
    * note that order books will always be ordered from least to greatest
    * [100,101,102,103,104,105,106]
    */
 
-  struct level** lvls = (side) ? &t->buys : &t->sells;
-  int64_t* count = (side) ? &t->buys_len : &t->sells_len;
+  struct level **lvls = (side) ? &t->buys : &t->sells;
+  int64_t *count = (side) ? &t->buys_len : &t->sells_len;
 
   // there are no elements in this list
   if (*count == 0) {
     // no prices in lvls so just make a new one
-    *lvls = realloc(*lvls, ((*count) + 1) * sizeof(struct level));
+    *lvls = realloc(*lvls, (uint64_t)((*count) + 1) * sizeof(struct level));
     (*lvls)[0].price = price;
     (*lvls[0]).quantity = quantity;
     *count = (*count) + 1;
@@ -119,7 +119,8 @@ void book_update(bool side, struct book* t, int64_t price, int64_t quantity) {
   while (start <= end) {
     int64_t cur = (start + end) / 2;
 
-    if (cur >= *count) break;
+    if (cur >= *count)
+      break;
 
     // because of fixed point math, we can compare these
     // floating point numbers
@@ -151,11 +152,13 @@ void book_update(bool side, struct book* t, int64_t price, int64_t quantity) {
   *count += 1;
 }
 
-void book_free(struct book** t) {
-  if ((*t)->buys_len != 0) free((*t)->buys);
+void book_free(struct book **t) {
+  if ((*t)->buys_len != 0)
+    free((*t)->buys);
   (*t)->buys = NULL;
 
-  if ((*t)->sells_len != 0) free((*t)->sells);
+  if ((*t)->sells_len != 0)
+    free((*t)->sells);
   (*t)->sells = NULL;
 
   free(*t);

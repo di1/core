@@ -1,3 +1,13 @@
+enum ANALYSIS_DATA_TYPE {// eslint-disable-line no-unused-vars
+  CANDLE_PATTERN = 0, // eslint-disable-line no-unused-vars
+  TREND_LINE = 1// eslint-disable-line no-unused-vars
+}
+
+enum TREND_LINE_DIRECTION {// eslint-disable-line no-unused-vars
+  SUPPORT = 0, // eslint-disable-line no-unused-vars
+  RESISTANCE = 1// eslint-disable-line no-unused-vars
+}
+
 interface Candle {
   o: number;
   h: number;
@@ -6,7 +16,8 @@ interface Candle {
   s: number;
   e: number;
   v: number;
-
+  b: number;
+  a: number;
 }
 
 interface ICandle {
@@ -21,19 +32,23 @@ interface ILatestCandle {
   latestCandle: ICandle;
 }
 
-interface Trend {
-  s: number;
-  e: number;
-  d: number;
+
+interface CandlePattern {
+  candlesSpanning: number;
+  shortCode: string;
+}
+
+interface TrendLine {
+  endIndex: number;
+  startIndex: number;
+  direction: number;
 }
 
 interface Analysis {
-  singleCandle: number[];
-  doubleCandle: number[];
-  trendLines: Trend[];
-  slopedLines: Trend[];
+  type: ANALYSIS_DATA_TYPE;
+  data: CandlePattern | TrendLine;
 }
 
 interface IAnalysis {
-  analysis: Analysis;
+  analysisFull: Array<Array<Analysis> | null>;
 }

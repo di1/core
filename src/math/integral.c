@@ -1,7 +1,7 @@
 #include <math/integral.h>
 
-enum RISKI_ERROR_CODE integral_chart(struct chart* cht, size_t a, size_t b,
-                                     double* res) {
+enum RISKI_ERROR_CODE integral_chart(struct chart *cht, size_t a, size_t b,
+                                     double *res) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -9,7 +9,7 @@ enum RISKI_ERROR_CODE integral_chart(struct chart* cht, size_t a, size_t b,
 
   int64_t summation = 0;
 
-  struct candle* c = NULL;
+  struct candle *c = NULL;
   int64_t close = 0;
 
   TRACE(chart_get_candle(cht, a, &c));
@@ -39,16 +39,16 @@ enum RISKI_ERROR_CODE integral_chart(struct chart* cht, size_t a, size_t b,
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE integral_line(struct linear_equation* eq, size_t a,
-                                    size_t b, double* res) {
+enum RISKI_ERROR_CODE integral_line(struct linear_equation *eq, size_t a,
+                                    size_t b, double *res) {
   PTR_CHECK(eq, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   COMPARISON_CHECK(a, b, <, RISKI_ERROR_CODE_COMPARISON_FAIL, RISKI_ERROR_TEXT);
 
   size_t width = b - a;
-  int64_t tb = linear_equation_eval(eq, b);
-  int64_t ta = linear_equation_eval(eq, a);
+  int64_t tb = linear_equation_eval(eq, (int64_t)b);
+  int64_t ta = linear_equation_eval(eq, (int64_t)a);
 
   double integral = (double)width * ((double)tb + ((double)(ta - tb) / 2.0));
 
@@ -58,7 +58,7 @@ enum RISKI_ERROR_CODE integral_line(struct linear_equation* eq, size_t a,
 }
 
 enum RISKI_ERROR_CODE integral_const(size_t c, size_t a, size_t b,
-                                     double* res) {
+                                     double *res) {
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   COMPARISON_CHECK(a, b, <, RISKI_ERROR_CODE_COMPARISON_FAIL, RISKI_ERROR_TEXT);
 

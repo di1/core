@@ -1,6 +1,6 @@
 #include <error_codes.h>
 
-const char* RISKI_ERROR_TEXT[14] = {"NONE",
+const char *RISKI_ERROR_TEXT[14] = {"NONE",
                                     "NULL_PTR",
                                     "MALLOC_ERROR",
                                     "JSON_CREATION",

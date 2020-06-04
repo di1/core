@@ -5,6 +5,7 @@ compile_commands.json
 vgcore.*
 *.js
 3rdparty/
+libwebsockets/
 web/node_modules/
 web/package-lock.json
 *.log
@@ -15,3 +16,4 @@ key.oanda
 doc/
 *.png
 *.pdf
+out/

@@ -14,6 +14,6 @@ enum PRICE_ACTION_COLUMNS {
   PAC_NUM
 };
 
-void gui_start(int argc, char** argv);
+void gui_start(int argc, char **argv);
 
 #endif

@@ -6,8 +6,8 @@
  * @param {char*} full_name The entire company name; eg APPLE INC
  */
 struct csv_data {
-  char* symbol;
-  char* full_name;
+  char *symbol;
+  char *full_name;
 };
 
 /*
@@ -17,15 +17,15 @@ struct csv_data {
  */
 struct db {
   size_t n;
-  struct csv_data* data;
+  struct csv_data *data;
 };
 
-struct db db_search;
+static struct db db_search;
 
-enum RISKI_ERROR_CODE search_init(char* csv_db) {
+enum RISKI_ERROR_CODE search_init(char *csv_db) {
   PTR_CHECK(csv_db, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  FILE* fp = fopen(csv_db, "r");
+  FILE *fp = fopen(csv_db, "r");
   PTR_CHECK(fp, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   db_search.data = NULL;
@@ -35,9 +35,9 @@ enum RISKI_ERROR_CODE search_init(char* csv_db) {
   char line[1024];
 
   while (fgets(line, 1024, fp)) {
-    char* tok = NULL;
+    char *tok = NULL;
     db_search.n += 1;
-    db_search.data = (struct csv_data*)(realloc(
+    db_search.data = (struct csv_data *)(realloc(
         db_search.data, sizeof(struct csv_data) * db_search.n));
 
     PTR_CHECK(db_search.data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -52,14 +52,14 @@ enum RISKI_ERROR_CODE search_init(char* csv_db) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
+enum RISKI_ERROR_CODE search_search(char *seq, char **json) {
   // TODO use tree data structure instead (much faster)
 
   PTR_CHECK(seq, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(json, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(db_search.data, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  struct string_builder* sb = NULL;
+  struct string_builder *sb = NULL;
   TRACE(string_builder_new(&sb));
 
   TRACE(string_builder_append(sb, "["));
@@ -76,7 +76,7 @@ enum RISKI_ERROR_CODE search_search(char* seq, char** json) {
 
   TRACE(string_builder_append(sb, "]"));
 
-  char* dat = NULL;
+  char *dat = NULL;
   TRACE(string_builder_str(sb, &dat));
   TRACE(string_builder_free(&sb));
 

@@ -16,7 +16,7 @@ struct string_builder;
  * @return {struct string_builder*} A string builder object
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb);
+enum RISKI_ERROR_CODE string_builder_new(struct string_builder **sb);
 
 /*
  * Appends a null terminated c string to the data inside
@@ -26,7 +26,7 @@ enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb);
  * @param {size_t} n The length of c
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb, char* c);
+enum RISKI_ERROR_CODE string_builder_append(struct string_builder *sb, char *c);
 
 /*
  * Gets the string built by the string builder. The *c pointer is
@@ -35,13 +35,13 @@ enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb, char* c);
  * @param {char**} c A pointer to a char* array
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE string_builder_str(struct string_builder* sb, char** c);
+enum RISKI_ERROR_CODE string_builder_str(struct string_builder *sb, char **c);
 
 /*
  * Frees a string builder object including the string it represents
  * @param {struct string_builder*} sb The string builder to free
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE string_builder_free(struct string_builder** sb);
+enum RISKI_ERROR_CODE string_builder_free(struct string_builder **sb);
 
 #endif

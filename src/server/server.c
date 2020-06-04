@@ -58,7 +58,7 @@ static const struct lws_http_mount mount = {
 };
 #pragma GCC diagnostic push
 
-void sigint_handler(int sig) {
+static void sigint_handler(int sig) {
   (void)sig;
   SERVER_INTERRUPTED = 1;
   IEX_SIGNAL_INTER = 1;
@@ -74,99 +74,102 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
           lws_get_vhost(wsi), lws_get_protocol(wsi));
   int m;
 
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wswitch-enum"
   switch (reason) {
-    case LWS_CALLBACK_PROTOCOL_INIT:
-      vhd =
-          lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi), lws_get_protocol(wsi),
+  case LWS_CALLBACK_PROTOCOL_INIT:
+    vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi), lws_get_protocol(wsi),
                                       sizeof(struct per_vhost_data__minimal));
-      vhd->context = lws_get_context(wsi);
-      vhd->protocol = lws_get_protocol(wsi);
-      vhd->vhost = lws_get_vhost(wsi);
+    vhd->context = lws_get_context(wsi);
+    vhd->protocol = lws_get_protocol(wsi);
+    vhd->vhost = lws_get_vhost(wsi);
+    break;
+
+  case LWS_CALLBACK_ESTABLISHED:
+    /* add ourselves to the list of live pss held in the vhd */
+    lws_ll_fwd_insert(pss, pss_list, vhd->pss_list)
+    pss->wsi = wsi;
+    pss->last = vhd->current;
+    pss->current = pss->last;
+    break;
+
+  case LWS_CALLBACK_CLOSED:
+    /* remove our closing pss from the list of live pss */
+    if (pss->amsg.payload) {
+      struct msg *msg = &pss->amsg;
+      free(msg->payload);
+      msg->payload = NULL;
+      msg->len = 0;
+    }
+
+    lws_ll_fwd_remove(struct per_session_data__minimal, pss_list, pss,
+                      vhd->pss_list)
+    break;
+
+  case LWS_CALLBACK_SERVER_WRITEABLE:
+
+    if (!pss->amsg.payload)
       break;
 
-    case LWS_CALLBACK_ESTABLISHED:
-      /* add ourselves to the list of live pss held in the vhd */
-      lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
-      pss->wsi = wsi;
-      pss->last = vhd->current;
-      pss->current = pss->last;
+    if (pss->last == pss->current)
       break;
 
-    case LWS_CALLBACK_CLOSED:
-      /* remove our closing pss from the list of live pss */
-      if (pss->amsg.payload) {
-        struct msg *msg = &pss->amsg;
-        free(msg->payload);
-        msg->payload = NULL;
-        msg->len = 0;
-      }
+    /* notice we allowed for LWS_PRE in the payload already */
+    m = lws_write(pss->wsi, ((unsigned char *)pss->amsg.payload) + LWS_PRE,
+                  pss->amsg.len, LWS_WRITE_TEXT);
+    if (m < (int)vhd->amsg.len) {
+      lwsl_err("ERROR %d writing to ws\n", m);
+      return -1;
+    }
 
-      lws_ll_fwd_remove(struct per_session_data__minimal, pss_list, pss,
-                        vhd->pss_list);
+    free(pss->amsg.payload);
+    pss->amsg.payload = NULL;
+    pss->amsg.len = 0;
+
+    pss->current = pss->last;
+    break;
+
+  case LWS_CALLBACK_RECEIVE:
+    if (vhd->amsg.payload) {
+      struct msg *msg = &vhd->amsg;
+      free(msg->payload);
+      msg->payload = NULL;
+      msg->len = 0;
+    }
+
+    if (pss->amsg.payload) {
+      struct msg *msg = &pss->amsg;
+      free(msg->payload);
+      msg->payload = NULL;
+      msg->len = 0;
+    }
+
+    char *response = NULL;
+    TRACE_HAULT(parse_message(in, len, &response));
+    if (!response)
       break;
+    size_t response_len = strlen(response);
 
-    case LWS_CALLBACK_SERVER_WRITEABLE:
-
-      if (!pss->amsg.payload) break;
-
-      if (pss->last == pss->current) break;
-
-      /* notice we allowed for LWS_PRE in the payload already */
-      m = lws_write(pss->wsi, ((unsigned char *)pss->amsg.payload) + LWS_PRE,
-                    pss->amsg.len, LWS_WRITE_TEXT);
-      if (m < (int)vhd->amsg.len) {
-        lwsl_err("ERROR %d writing to ws\n", m);
-        return -1;
-      }
-
-      free(pss->amsg.payload);
-      pss->amsg.payload = NULL;
-      pss->amsg.len = 0;
-
-      pss->current = pss->last;
+    pss->amsg.len = response_len;
+    /* notice we over-allocate by LWS_PRE */
+    pss->amsg.payload = malloc(LWS_PRE + response_len);
+    if (!pss->amsg.payload) {
+      lwsl_user("OOM: dropping\n");
       break;
+    }
 
-    case LWS_CALLBACK_RECEIVE:
-      if (vhd->amsg.payload) {
-        struct msg *msg = &vhd->amsg;
-        free(msg->payload);
-        msg->payload = NULL;
-        msg->len = 0;
-      }
+    memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
+    pss->last++;
+    vhd->current++;
 
-      if (pss->amsg.payload) {
-        struct msg *msg = &pss->amsg;
-        free(msg->payload);
-        msg->payload = NULL;
-        msg->len = 0;
-      }
+    free(response);
 
-      char *response = NULL;
-      TRACE(parse_message(in, len, &response));
-      if (!response) break;
-      size_t response_len = strlen(response);
-
-      pss->amsg.len = response_len;
-      /* notice we over-allocate by LWS_PRE */
-      pss->amsg.payload = malloc(LWS_PRE + response_len);
-      if (!pss->amsg.payload) {
-        lwsl_user("OOM: dropping\n");
-        break;
-      }
-
-      memcpy((char *)pss->amsg.payload + LWS_PRE, response, response_len);
-      pss->last++;
-      vhd->current++;
-
-      free(response);
-
-      lws_callback_on_writable(pss->wsi);
-      break;
-
-    default:
-      break;
-      free(pss->amsg.payload);
+    lws_callback_on_writable(pss->wsi);
+    break;
+  default:
+    break;
   }
+  #pragma clang diagnostic pop
 
   return 0;
 }
@@ -190,7 +193,7 @@ void *server_start(void *s) {
   // lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use
   // TLS / https)\n");
   TRACE_HAULT(
-      logger_info(__func__, __FILENAME__, __LINE__, "start http & ws server"));
+      logger_info(__func__, FILENAME_SHORT, __LINE__, "start http & ws server"));
 
   memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
   info.port = 7681;
@@ -207,7 +210,8 @@ void *server_start(void *s) {
     return NULL;
   }
 
-  while (n >= 0 && !SERVER_INTERRUPTED) n = lws_service(context, 0);
+  while (n >= 0 && !SERVER_INTERRUPTED)
+    n = lws_service(context, 0);
 
   lws_context_destroy(context);
   return 0;

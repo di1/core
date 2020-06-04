@@ -8,12 +8,12 @@ struct string_builder {
   size_t len;
 
   // The character buffer
-  char* c;
+  char *c;
 };
 
-enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb) {
-  struct string_builder* sb_ =
-      (struct string_builder*)malloc(1 * sizeof(struct string_builder));
+enum RISKI_ERROR_CODE string_builder_new(struct string_builder **sb) {
+  struct string_builder *sb_ =
+      (struct string_builder *)malloc(1 * sizeof(struct string_builder));
 
   PTR_CHECK(sb, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
@@ -26,8 +26,8 @@ enum RISKI_ERROR_CODE string_builder_new(struct string_builder** sb) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb,
-                                            char* c) {
+enum RISKI_ERROR_CODE string_builder_append(struct string_builder *sb,
+                                            char *c) {
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -38,13 +38,13 @@ enum RISKI_ERROR_CODE string_builder_append(struct string_builder* sb,
     return RISKI_ERROR_CODE_NONE;
   }
   sb->allocated_size += strlen(c) + 2;
-  sb->c = (char*)realloc(sb->c, sb->allocated_size * sizeof(char));
+  sb->c = (char *)realloc(sb->c, sb->allocated_size * sizeof(char));
   PTR_CHECK(sb->c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
   strcat(sb->c, c);
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE string_builder_str(struct string_builder* sb, char** c) {
+enum RISKI_ERROR_CODE string_builder_str(struct string_builder *sb, char **c) {
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
@@ -56,7 +56,7 @@ enum RISKI_ERROR_CODE string_builder_str(struct string_builder* sb, char** c) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE string_builder_free(struct string_builder** sb) {
+enum RISKI_ERROR_CODE string_builder_free(struct string_builder **sb) {
   // Make sure sb is a valid pointer
   PTR_CHECK(sb, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(*sb, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);

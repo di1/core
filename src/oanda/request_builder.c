@@ -1,10 +1,10 @@
 #include <oanda/request_builder.h>
 
-enum RISKI_ERROR_CODE oanda_v20_v3_accounts(char* host, char* api_key,
-                                            char** res) {
+enum RISKI_ERROR_CODE oanda_v20_v3_accounts(char *host, char *api_key,
+                                            char **res) {
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  struct string_builder* sb;
+  struct string_builder *sb;
   TRACE(string_builder_new(&sb));
 
   TRACE(string_builder_append(sb, "GET /v3/accounts HTTP/1.1\r\n"));
@@ -27,14 +27,14 @@ enum RISKI_ERROR_CODE oanda_v20_v3_accounts(char* host, char* api_key,
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE oanda_v20_v3_accounts_instruments(char* host,
-                                                        char* api_key,
-                                                        char** res,
-                                                        char* account_id) {
+enum RISKI_ERROR_CODE oanda_v20_v3_accounts_instruments(char *host,
+                                                        char *api_key,
+                                                        char **res,
+                                                        char *account_id) {
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(account_id, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  struct string_builder* sb;
+  struct string_builder *sb;
   TRACE(string_builder_new(&sb));
 
   TRACE(string_builder_append(sb, "GET /v3/accounts/"));
@@ -59,23 +59,24 @@ enum RISKI_ERROR_CODE oanda_v20_v3_accounts_instruments(char* host,
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE oanda_v20_v3_accounts_pricing(char* host, char* api_key,
-                                                    char** instrument_name,
-                                                    size_t num_instruments,
-                                                    char* account_id,
-                                                    char** res) {
+enum RISKI_ERROR_CODE oanda_v20_v3_accounts_pricing(char *host, char *api_key,
+                                                    char **instrument_name,
+                                                    int num_instruments,
+                                                    char *account_id,
+                                                    char **res) {
   PTR_CHECK(res, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(account_id, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  struct string_builder* sb;
+  struct string_builder *sb;
   TRACE(string_builder_new(&sb));
 
   TRACE(string_builder_append(sb, "GET /v3/accounts/"));
   TRACE(string_builder_append(sb, account_id));
   TRACE(string_builder_append(sb, "/pricing?instruments="));
-  for (size_t i = 0; i < num_instruments; ++i) {
+  for (int i = 0; i < num_instruments; ++i) {
     TRACE(string_builder_append(sb, instrument_name[i]));
-    if (i != num_instruments - 1) TRACE(string_builder_append(sb, ","));
+    if (i != num_instruments - 1)
+      TRACE(string_builder_append(sb, ","));
   }
 
   TRACE(string_builder_append(sb, " HTTP/1.1\r\n"));

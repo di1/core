@@ -26,6 +26,6 @@ enum RISKI_ERROR_CODE {
 /*
  * The RISKI error texts
  */
-extern const char* RISKI_ERROR_TEXT[14];
+extern const char *RISKI_ERROR_TEXT[14];
 
 #endif

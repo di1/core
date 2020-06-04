@@ -6,7 +6,7 @@ const DarkTheme: ITheme = { // eslint-disable-line no-unused-vars
   'tag': '#5CCFE6',
   'func': '#FFD580',
   'entity': '#73D0FF',
-  'string': '#BAE67E',
+  'string': '#138808',
   'regexp': '#95E6CB',
   'markup': '#F28779',
   'keyword': '#FFA759',

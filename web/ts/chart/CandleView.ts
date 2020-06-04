@@ -27,6 +27,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   // Private most up to date chart
   private FullChartData: IChart;
 
+  // Private most up to date analysis
+  // we initialize this this to its primitive JSON representation
+  private FullAnalaysisData: IAnalysis = {'analysisFull': []};
+
   // Draws a horizontal line every 15 minutes by default
   // this is default because we can only display minute candle data
   // (the only useful data)
@@ -72,10 +76,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // capture the mousewheel callback for scrolling
     this.CanvasElement.onwheel = ((evt: WheelEvent) => {
       if (evt.deltaY < 0) {
-        this.CandleWidth += 4;
+        this.CandleWidth += 2;
         this.CandleSpacing = this.CandleWidth / 2;
       } else if (evt.deltaY > 0 && this.CandleWidth > 4) {
-        this.CandleWidth -= 4;
+        this.CandleWidth -= 2;
         this.CandleSpacing = this.CandleWidth / 2;
       }
       this.ForceRefresh = true;
@@ -163,7 +167,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // compute the display latency
     this.DisplayLatency = frameEndTime - frameBeginTime;
-    console.log('Display Latency: ' + this.DisplayLatency + 'ms');
+    // console.log('Display Latency: ' + this.DisplayLatency + 'ms');
   }
 
   /**
@@ -305,7 +309,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       this.Renderer.beginPath();
 
       // compute the drawing color based on if the candle is going up or down
-      const drawColor: string = (curCnd.o > curCnd.c) ? '#FF3333' : '#BAE67E';
+      const drawColor: string = (curCnd.o > curCnd.c) ? DarkTheme.error :
+        DarkTheme.string;
+
       this.Renderer.strokeStyle = drawColor;
       this.Renderer.fillStyle = drawColor;
       // compute the height
@@ -336,6 +342,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
       this.Renderer.strokeStyle = drawColor;
       this.Renderer.stroke();
+
+      // draw the analysis
+      this.drawAnalysis(pt, adjidx, lftCndIdx);
     }
 
     // draw the price bar information about the current candle
@@ -357,5 +366,145 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
           ylvl + 0.5);
     }
     this.Renderer.restore();
+  }
+
+  /**
+    Draws all the analysis in the analysis bin associated with this candle.
+    @param {LinearEquation} pt The linear equation that is being used to
+    draw the chart.
+    @param {number} cndIdx The candle index adjusted for the left most candle.
+    @param {number} lftCndIdx The left candle index
+   */
+  private drawAnalysis(pt: LinearEquation, cndIdx: number,
+      lftCndIdx: number): void {
+    const trueCndIdx: number = cndIdx + lftCndIdx;
+    if (this.FullAnalaysisData.analysisFull[trueCndIdx] == null) {
+      // nothing to draw from this candle
+      return;
+    }
+    // not null loop through each draw function in the bin
+    const analysisBin: Analysis[] =
+      this.FullAnalaysisData.analysisFull[trueCndIdx] as Analysis[];
+    for (let i: number = 0; i < analysisBin.length; ++i) {
+      const analysis: Analysis = analysisBin[i];
+      switch (analysis.type) {
+        case ANALYSIS_DATA_TYPE.CANDLE_PATTERN:
+          this.drawCandlePattern(analysis.data as CandlePattern,
+              pt, cndIdx, lftCndIdx, i);
+          break;
+        case ANALYSIS_DATA_TYPE.TREND_LINE:
+          this.drawTrendLine(analysis.data as TrendLine, pt, cndIdx, lftCndIdx);
+          break;
+      }
+    }
+  }
+
+  /**
+    Draws a trend line
+    @param {CandlePattern} pat The candle pattern
+    @param {LinearEquation} pt The linear equation used in the chart drawing.
+    @param {number} cndIdx The left candle adjusted index
+    @param {number} lftCndIdx The left most candle index
+    @param {number} lvl The level to draw the text at
+   */
+  private drawTrendLine(pat: TrendLine, pt: LinearEquation, cndIdx: number,
+      lftCndIdx: number): void {
+    // The start and end height numbers
+    let st: number = 0;
+    let eh: number = 0;
+
+    // Choose different start and end height based on numbers
+    switch (pat.direction) {
+      case TREND_LINE_DIRECTION.SUPPORT:
+        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.l);
+        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.l);
+        break;
+      case TREND_LINE_DIRECTION.RESISTANCE:
+        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.h);
+        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.h);
+        break;
+    }
+
+    const xoffsetStart: number =
+        (((pat.startIndex - lftCndIdx) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0) +
+         (this.CandleWidth / 2.0);
+    const xoffsetEnd: number =
+        (((pat.endIndex - lftCndIdx) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0) +
+         (this.CandleWidth / 2.0);
+
+    this.Renderer.save();
+    this.Renderer.strokeStyle = '#9370DB80';
+    this.Renderer.lineWidth = 2;
+    this.Renderer.moveTo(xoffsetStart, st);
+    this.Renderer.lineTo(xoffsetEnd, eh);
+    this.Renderer.stroke();
+    this.Renderer.restore();
+  }
+
+  /**
+    Draws a candle pattern
+    @param {CandlePattern} pat The candle pattern
+    @param {LinearEquation} pt The linear equation used in the chart drawing.
+    @param {number} cndIdx The left candle adjusted index
+    @param {number} lftCndIdx The left most candle index
+    @param {number} lvl The level to draw the text at
+   */
+  private drawCandlePattern(pat: CandlePattern, pt: LinearEquation,
+      cndIdx: number, lftCndIdx: number, lvl: number): void {
+    // find maximum candle price
+    let cndRngMax: number = Number.MIN_VALUE;
+    let cndRngMin: number = Number.MAX_VALUE;
+
+    const trueCndIdx: number = cndIdx + lftCndIdx;
+    for (let i: number = trueCndIdx; i > trueCndIdx - pat.candlesSpanning;
+      --i) {
+      if (this.FullChartData.chart[i].candle.h > cndRngMax) {
+        cndRngMax = this.FullChartData.chart[i].candle.h;
+      }
+      if (this.FullChartData.chart[i].candle.l < cndRngMin) {
+        cndRngMin = this.FullChartData.chart[i].candle.l;
+      }
+    }
+    // draw a shaded region covering the number of candles
+    const xoffset: number =
+        ((cndIdx-pat.candlesSpanning+1) *
+         (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0;
+
+    const height: number =
+      pt.eval(cndRngMax) - 0.5;
+
+    this.Renderer.save();
+    this.Renderer.fillStyle = '#9370DB80';
+
+    const drawWidth: number = (pat.candlesSpanning) *
+      (this.CandleWidth + this.CandleSpacing);
+    const drawHeight: number =
+      pt.eval(cndRngMin) - pt.eval(cndRngMax);
+
+    if (pat.candlesSpanning != 1) {
+      this.Renderer.fillRect(xoffset - (this.CandleSpacing / 2.0), height,
+          drawWidth, drawHeight+0.5);
+    }
+
+    this.Renderer.fillStyle = '#FFFFFF';
+    this.Renderer.textBaseline = 'hanging';
+    this.Renderer.font = (this.CandleWidth*2.0) + 'px Inconsolata';
+
+    for (let i: number = 0; i < pat.shortCode.length; ++i) {
+      this.Renderer.fillText(pat.shortCode[i],
+          xoffset + ((this.CandleWidth + this.CandleSpacing)*i) + 0.5,
+          pt.eval(cndRngMin) + (this.CandleWidth*2.0*lvl));
+    }
+    this.Renderer.restore();
+  }
+
+  /**
+    Updates the entire analysis database and forces redraw of entire chart
+    @param {IAnalysis} anl The analysis interface
+   */
+  public fullAnalysisUpdate(anl: IAnalysis): void {
+    this.FullAnalaysisData = anl;
   }
 }

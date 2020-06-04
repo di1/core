@@ -34,8 +34,8 @@ struct security;
  * @param {struct security**} sec Sets *sec to the newly created security
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_new(char* name, uint64_t interval,
-                                   struct security** sec);
+enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval,
+                                   struct security **sec);
 
 /*
  * Updates the order book associated with the security.
@@ -50,7 +50,7 @@ enum RISKI_ERROR_CODE security_new(char* name, uint64_t interval,
  * @param {int64_t} price The price level
  * @param {int64_t} quantity The quantity on the price level
  */
-enum RISKI_ERROR_CODE security_book_update(struct security* sec, bool side,
+enum RISKI_ERROR_CODE security_book_update(struct security *sec, bool side,
                                            int64_t price, int64_t quantity);
 
 /*
@@ -60,7 +60,7 @@ enum RISKI_ERROR_CODE security_book_update(struct security* sec, bool side,
  * @param {char**} json Sets *json to the resulting json
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_get_chart(struct security* sec, char** json);
+enum RISKI_ERROR_CODE security_get_chart(struct security *sec, char **json);
 
 /*
  * Returns a json representation of the analysis
@@ -69,7 +69,7 @@ enum RISKI_ERROR_CODE security_get_chart(struct security* sec, char** json);
  * @param {char**} json Sets *json to the resulting json
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_get_analysis(struct security* sec, char** json);
+enum RISKI_ERROR_CODE security_get_analysis(struct security *sec, char **json);
 
 /*
  * Returns the latest candle of a given security
@@ -77,8 +77,8 @@ enum RISKI_ERROR_CODE security_get_analysis(struct security* sec, char** json);
  * @param {char**} json Sets *json to the resulting json
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_get_latest_candle(struct security* sec,
-                                                 char** json);
+enum RISKI_ERROR_CODE security_get_latest_candle(struct security *sec,
+                                                 char **json);
 
 /*
  * Updates the chart given a fixed point number, which must be of the same
@@ -89,7 +89,7 @@ enum RISKI_ERROR_CODE security_get_latest_candle(struct security* sec,
  * @param {uint64_t} ts The timestamp
  * @return {enum RISKI_ERROR_CODE}
  */
-enum RISKI_ERROR_CODE security_chart_update(struct security* sec, int64_t price,
+enum RISKI_ERROR_CODE security_chart_update(struct security *sec, int64_t price,
                                             uint64_t ts);
 
 /*
@@ -97,7 +97,7 @@ enum RISKI_ERROR_CODE security_chart_update(struct security* sec, int64_t price,
  * @param {struct security**} sec The security to free
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_free(struct security** sec);
+enum RISKI_ERROR_CODE security_free(struct security **sec);
 
 /*
  * Gets the hashed index of the security
@@ -106,7 +106,7 @@ enum RISKI_ERROR_CODE security_free(struct security** sec);
  * @param {size_t*} index *index will be set to the bin
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_hash(char* n1, size_t* index);
+enum RISKI_ERROR_CODE security_hash(char *n1, size_t *index);
 
 /*
  * Gets the hash value (index) given a security
@@ -114,7 +114,7 @@ enum RISKI_ERROR_CODE security_hash(char* n1, size_t* index);
  * @param {struct security*} s The security
  * @param {size_t*} hash The security hash
  */
-enum RISKI_ERROR_CODE security_get_hash(struct security* s, size_t* hash);
+enum RISKI_ERROR_CODE security_get_hash(struct security *s, size_t *hash);
 
 /*
  * Compares the two security name
@@ -123,6 +123,6 @@ enum RISKI_ERROR_CODE security_get_hash(struct security* s, size_t* hash);
  * @param {bool*} res *res is set to true if n1 is the same name as n2
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_cmp(char* n1, struct security* n2, bool* res);
+enum RISKI_ERROR_CODE security_cmp(char *n1, struct security *n2, bool *res);
 
 #endif

@@ -46,6 +46,9 @@ struct per_vhost_data__minimal {
 
   struct msg amsg; /* the one pending message... */
   int current;     /* the current message number we are caching */
+
+  /* There are 4 unused bytes in this struct */
+  char _p1[4];
 };
 
 /* destroys the message when everyone has had a copy of it */
