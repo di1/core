@@ -60,7 +60,7 @@ enum RISKI_ERROR_CODE security_get_chart(struct security *sec, char **json) {
 
   pthread_mutex_lock(&(sec->m_chart_update));
   char *dat = NULL;
-  TRACE(chart_json(sec->cht, &dat));
+  chart_json(sec->cht, &dat);
   pthread_mutex_unlock(&(sec->m_chart_update));
 
   *json = dat;
