@@ -128,12 +128,12 @@ enum RISKI_ERROR_CODE security_book_update(struct security *sec, bool side,
 }
 
 // this is just an abstraction on the chart update function
-enum RISKI_ERROR_CODE security_chart_update(struct security *sec, int64_t price,
-                                            uint64_t ts) {
+enum RISKI_ERROR_CODE security_chart_update(struct security *sec, int64_t price, int64_t bid,
+    int64_t ask, uint64_t ts) {
   PTR_CHECK(sec, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   pthread_mutex_lock(&(sec->m_chart_update));
-  chart_update(sec->cht, price, ts);
+  chart_update(sec->cht, price, bid, ask, ts);
   pthread_mutex_unlock(&(sec->m_chart_update));
 
   return RISKI_ERROR_CODE_NONE;

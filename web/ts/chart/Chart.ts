@@ -132,7 +132,7 @@ class Chart {// eslint-disable-line no-unused-vars
     successfully.
    */
   private onsocketready(): any {
-    console.log('Connected to ws://' + document.domain + ':7681');
+    console.log('Connected to ws://localhost:7681');
 
     // start up the chart candle view
     this.Socket.getFullChart(this.Exchange, this.Symbol);

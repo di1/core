@@ -26,8 +26,8 @@ struct candle {
   uint64_t volume;
 };
 
-enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
-                                 struct candle **cnd) {
+enum RISKI_ERROR_CODE candle_new(int64_t price, int64_t bid, int64_t ask,
+    uint64_t time, struct candle **cnd) {
   struct candle *c = (struct candle *)malloc(1 * sizeof(struct candle));
   PTR_CHECK(c, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
 
@@ -37,8 +37,8 @@ enum RISKI_ERROR_CODE candle_new(int64_t price, uint64_t time,
   c->close = price;
   c->start_time = time;
   c->end_time = time;
-  c->best_ask = price;
-  c->best_bid = price;
+  c->best_ask = bid;
+  c->best_bid = ask;
   c->volume = 0;
   *cnd = c;
 
@@ -62,16 +62,19 @@ CREATE_CANDLE_GET_FUNCTION(candle_end, uint64_t, end_time)
 
 #undef CREATE_CANDLE_GET_FUNCTION
 
-enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price,
-                                    uint64_t time) {
+enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price, int64_t bid,
+    int64_t ask, uint64_t time) {
   PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
+  c->volume += 1;
   // set the close time only if the last price time
-  // is greater than the most recent price
+  // is greater than the most recent price also the same applies for best
+  // bid and ask
   if (time >= c->end_time) {
-    c->volume += 1;
     c->end_time = time;
     c->close = price;
+    c->best_bid = bid;
+    c->best_ask = ask;
   }
 
   // update the high and low

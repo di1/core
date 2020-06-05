@@ -269,8 +269,8 @@ enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name, int precision,
   return RISKI_ERROR_CODE_NONE;
 }
 
-static enum RISKI_ERROR_CODE chart_new_candle(struct chart *cht,
-                                              int64_t price) {
+static enum RISKI_ERROR_CODE chart_new_candle(struct chart *cht, int64_t lst,
+                                              int64_t bid, int64_t ask) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   if (cht->cur_candle >= cht->num_candles_allocated) {
@@ -289,7 +289,8 @@ static enum RISKI_ERROR_CODE chart_new_candle(struct chart *cht,
     }
   }
 
-  TRACE(candle_new(price, cht->last_update, &cht->candles[cht->cur_candle]));
+  TRACE(candle_new(lst, bid, ask,
+        cht->last_update, &cht->candles[cht->cur_candle]));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -303,7 +304,7 @@ enum RISKI_ERROR_CODE chart_get_candle(struct chart *cht, size_t index,
 }
 
 enum RISKI_ERROR_CODE chart_update(struct chart *cht, int64_t price,
-                                   uint64_t ts) {
+    int64_t bid, int64_t ask, uint64_t ts) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // convert ts into the start time of its coorisponding candle
@@ -315,7 +316,7 @@ enum RISKI_ERROR_CODE chart_update(struct chart *cht, int64_t price,
   if (cht->last_update == 0) {
     // sync the first candle to the closest minute
     cht->last_update = ts;
-    TRACE(chart_new_candle(cht, price));
+    TRACE(chart_new_candle(cht, price, bid, ask));
     return RISKI_ERROR_CODE_NONE;
   }
 
@@ -333,19 +334,19 @@ enum RISKI_ERROR_CODE chart_update(struct chart *cht, int64_t price,
 
         int64_t close = 0;
         TRACE(candle_close(cht->candles[cht->cur_candle - 1], &close));
-        TRACE(chart_new_candle(cht, close));
+        TRACE(chart_new_candle(cht, close, close, close));
       }
     }
 
     cht->last_update = ts;
     cht->cur_candle += 1;
-    chart_new_candle(cht, price);
+    chart_new_candle(cht, price, bid, ask);
 
     // queue up analysis on the newly finalized chart
     TRACE(analysis_push(cht, 0, cht->cur_candle));
   } else {
     // update the current candle
-    TRACE(candle_update(cht->candles[cht->cur_candle], price, ts));
+    TRACE(candle_update(cht->candles[cht->cur_candle], price, bid, ask, ts));
   }
 
   return RISKI_ERROR_CODE_NONE;

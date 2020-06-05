@@ -225,8 +225,17 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
         gmin = this.FullChartData.chart.candles[i].candle.l;
       }
     }
+    if (this.FullChartData.chart.candles[chtLength - 1].candle.b < gmin) {
+      gmin = this.FullChartData.chart.candles[chtLength - 1].candle.b;
+    }
+    if (this.FullChartData.chart.candles[chtLength - 1].candle.a > gmax) {
+      gmax = this.FullChartData.chart.candles[chtLength - 1].candle.a;
+    }
+
     const precision: number = this.FullChartData.chart.precision;
-    return [gmin - (gmin % precision), gmax + (gmax % precision)];
+    gmin -= (gmin % precision);
+    gmax += (precision - (gmax % precision));
+    return [gmin, gmax];
   }
 
   /**
@@ -245,12 +254,13 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.font = '14px Inconsolata';
     this.Renderer.textBaseline = 'middle';
 
-    const precision: number = this.FullChartData.chart.precision;
+    console.log(pmax + ',' + pmin);
 
-    const tickInc = ((pmax - pmin) / (precision*precision));
+    // find the smallest divisor larger than precision but a factor of precision
+
     this.Renderer.beginPath();
     for (let i: number = pmin;
-      i <= pmax; i += tickInc) {
+      i <= pmax; i += 1) {
       const ylvl: number = pt.eval(i);
       this.Renderer.moveTo(0.5, ylvl + 0.5);
       this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
@@ -352,19 +362,26 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // draw the price bar information about the current candle
     if (curCnd) {
-      const ylvl: number = pt.eval(curCnd.c);
+      let ylvl: number = pt.eval(curCnd.b);
+      this.Renderer.fillStyle = 'purple';
       this.Renderer.fillRect(this.Width+2.5, ylvl-7, this.CandleViewWidthOffset,
           14);
-
-      if (this.Renderer.fillStyle == '#FF3333') {
-        this.Renderer.fillStyle = '#3c3c3c';
-      } else {
-        this.Renderer.fillStyle = '#481e81';
-      }
+      this.Renderer.fillStyle = 'white';
       this.Renderer.textAlign = 'left';
       this.Renderer.textBaseline = 'middle';
       this.Renderer.font = '14px Inconsolata';
-      this.Renderer.fillText(' ' + this.priceToText(curCnd.c),
+      this.Renderer.fillText(' ' + this.priceToText(curCnd.b),
+          this.Width, ylvl + 0.5);
+
+      ylvl = pt.eval(curCnd.a);
+      this.Renderer.fillStyle = 'purple';
+      this.Renderer.fillRect(this.Width+2.5, ylvl-7, this.CandleViewWidthOffset,
+          14);
+      this.Renderer.fillStyle = 'white';
+      this.Renderer.textAlign = 'left';
+      this.Renderer.textBaseline = 'middle';
+      this.Renderer.font = '14px Inconsolata';
+      this.Renderer.fillText(' ' + this.priceToText(curCnd.a),
           this.Width,
           ylvl + 0.5);
     }

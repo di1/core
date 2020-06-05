@@ -83,14 +83,16 @@ enum RISKI_ERROR_CODE security_get_latest_candle(struct security *sec,
 /*
  * Updates the chart given a fixed point number, which must be of the same
  * type given to the order book, and a timestamp in a time unit that is the
- * same as the interval
+ * same as the interval. Chart values are based on the bid, set ask to -1
+ * if ask value is unknown.
  * @param {struct security*} sec The security
  * @param {int64_t} price The price
  * @param {uint64_t} ts The timestamp
  * @return {enum RISKI_ERROR_CODE}
  */
 enum RISKI_ERROR_CODE security_chart_update(struct security *sec, int64_t price,
-                                            uint64_t ts);
+    int64_t bid,
+    int64_t ask, uint64_t ts);
 
 /*
  * Frees the security struct

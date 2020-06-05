@@ -119,13 +119,21 @@ static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_bo
           cJSON_GetObjectItem(instrument_price_data, "instrument");
       cJSON *instrument_bids =
           cJSON_GetObjectItem(instrument_price_data, "bids");
+      cJSON *instrument_asks =
+          cJSON_GetObjectItem(instrument_price_data, "asks");
       cJSON *instrument_closeout_bid =
           cJSON_GetObjectItem(instrument_price_data, "closeoutBid");
+      cJSON *instrument_closeout_ask =
+          cJSON_GetObjectItem(instrument_price_data, "closeoutAsk");
 
       char *instrument_name_str = cJSON_GetStringValue(instrument_name);
 
       int num_bids = cJSON_GetArraySize(instrument_bids);
+      int num_asks = cJSON_GetArraySize(instrument_asks);
+
       char *bid_str = NULL;
+      char *ask_str = NULL;
+
       if (num_bids != 0) {
         const cJSON *instrument_best_bid =
             cJSON_GetArrayItem(instrument_bids, 0);
@@ -136,13 +144,35 @@ static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_bo
                         __LINE__, "forced to use closeout bid");
         bid_str = cJSON_GetStringValue(instrument_closeout_bid);
       }
-      // Find the . index in the str
+
+      if (num_asks != 0) {
+        const cJSON *instrument_best_ask =
+            cJSON_GetArrayItem(instrument_asks, 0);
+        cJSON *ask_object = cJSON_GetObjectItem(instrument_best_ask, "price");
+        ask_str = cJSON_GetStringValue(ask_object);
+      } else {
+        logger_analysis(instrument_name_str, "FEED", __func__, FILENAME_SHORT,
+                        __LINE__, "forced to use closeout ask");
+        bid_str = cJSON_GetStringValue(instrument_closeout_ask);
+      }
+
+      // Find the . index in the str for bid
       size_t idxToDel = 0;
       while (bid_str[idxToDel] != '.')
         idxToDel += 1;
       memmove(&bid_str[idxToDel], &bid_str[idxToDel + 1],
               strlen(bid_str) - idxToDel);
       int64_t bid = (int64_t)atoi(bid_str);
+
+      // Do the same for the ask
+      idxToDel = 0;
+      while (ask_str[idxToDel] != '.')
+        idxToDel += 1;
+      memmove(&ask_str[idxToDel], &ask_str[idxToDel + 1],
+              strlen(ask_str) - idxToDel);
+      int64_t ask = (int64_t)atoi(ask_str);
+
+
       struct security *sec = NULL;
       TRACE(exchange_get(exchange_oanda, instrument_name_str, &sec));
       cJSON *ts = cJSON_GetObjectItem(instrument_price_data, "time");
@@ -155,7 +185,7 @@ static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_bo
               strlen(ts_str) - idxToDel);
 
       uint64_t ts_nanosecond = strtoul(ts_str, NULL, 10);
-      TRACE(security_chart_update(sec, bid, ts_nanosecond));
+      TRACE(security_chart_update(sec, bid, bid, ask, ts_nanosecond));
     }
     cJSON_Delete(price_update_json);
 

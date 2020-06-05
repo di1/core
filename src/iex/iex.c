@@ -358,7 +358,8 @@ reget_security:
     goto reget_security;
   }
 
-  TRACE(security_chart_update(cur_sec, payload_data->price,
+  TRACE(security_chart_update(cur_sec, payload_data->price, payload_data->price,
+        payload_data->price,
                               payload_data->timestamp));
   
   free(st);
