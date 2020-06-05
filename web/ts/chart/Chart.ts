@@ -22,7 +22,10 @@ class Chart {// eslint-disable-line no-unused-vars
    */
   private Exchange: string = 'IEX';
   private Symbol: string = 'SPY';
+  private ExchangeSymbolChange: boolean = false;
+
   private Server: string = 'ws://riski.sh:7681';
+
 
   /**
     Represents the color scheme
@@ -77,6 +80,14 @@ class Chart {// eslint-disable-line no-unused-vars
 
     this.ChartOptionsSearchInput.value = this.Exchange + ':' +
       this.Symbol;
+
+    this.ChartOptionsSearchInput.onkeypress = ((evt: KeyboardEvent) => {
+      if (evt.keyCode == 13) { // enter
+        this.Exchange = this.ChartOptionsSearchInput.value.split(':')[0];
+        this.Symbol = this.ChartOptionsSearchInput.value.split(':')[1];
+        this.ExchangeSymbolChange = true;
+      }
+    });
 
     this.ChartOptions.appendChild(this.ChartOptionsSearchInput);
 
@@ -145,6 +156,11 @@ class Chart {// eslint-disable-line no-unused-vars
     @param {ILatestCandle} cnd The latest candle
    */
   private onlatestcandlereceived(cnd: ILatestCandle): void {
+    if (this.ExchangeSymbolChange) {
+      this.ExchangeSymbolChange = false;
+      this.Socket.getFullChart(this.Exchange, this.Symbol);
+      return;
+    }
     if (this.ChartCandleView) {
       if (!this.ChartCandleView.chartPartialUpdate(cnd)) {
         this.Socket.getAnalysisData(this.Exchange, this.Symbol);
@@ -160,6 +176,11 @@ class Chart {// eslint-disable-line no-unused-vars
     @param {IAnalysis} anl The analysis data
    */
   private analysisreceivedfunc(anl: IAnalysis): void {
+    if (this.ExchangeSymbolChange) {
+      this.ExchangeSymbolChange = false;
+      this.Socket.getFullChart(this.Exchange, this.Symbol);
+      return;
+    }
     if (this.ChartCandleView) {
       this.ChartCandleView.fullAnalysisUpdate(anl);
     }
