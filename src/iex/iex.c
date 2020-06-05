@@ -209,9 +209,11 @@ static enum RISKI_ERROR_CODE parse_security_directory_message(const void *payloa
 
   char *st = NULL;
   TRACE(symbol_sanitize(payload_data->symbol, 8, &st));
+
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
                     "security directory message for %s", st));
 
+  free(st);
   // TODO do something with this information
   // TODO https://iextrading.com/docs/IEX%20DEEP%20Specification.pdf
   // TODO page 8
@@ -295,6 +297,7 @@ static enum RISKI_ERROR_CODE parse_security_event_message(const void *payload) {
   }
 
   // TODO might want to do more with this
+  free(st);
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -326,6 +329,8 @@ reget_security:
 
   TRACE(security_book_update(cur_sec, side, payload_data->price,
                              payload_data->size));
+
+  free(st);
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -355,6 +360,8 @@ reget_security:
 
   TRACE(security_chart_update(cur_sec, payload_data->price,
                               payload_data->timestamp));
+  
+  free(st);
   return RISKI_ERROR_CODE_NONE;
 }
 

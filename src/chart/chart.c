@@ -173,6 +173,8 @@ chart_analysis_result_json(struct analysis_result *analysis, char **json) {
     TRACE(string_builder_append(sb, data_json));
     TRACE(string_builder_append(sb, "}"));
 
+    free(data_json);
+
     if (analysis->next) {
       TRACE(string_builder_append(sb, ","));
     }
@@ -207,6 +209,9 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart *cht, char **json) {
     } else {
       TRACE(chart_analysis_result_json(cht->analysis[i], &candle_analysis));
       TRACE(string_builder_append(sb, candle_analysis));
+
+      free(candle_analysis);
+
     }
     if (i != cht->cur_candle - 2) {
       TRACE(string_builder_append(sb, ","));
