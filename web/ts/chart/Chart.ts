@@ -22,7 +22,7 @@ class Chart {// eslint-disable-line no-unused-vars
    */
   private Exchange: string = 'IEX';
   private Symbol: string = 'SPY';
-  private Server: string = 'ws://localhost:7681';
+  private Server: string = 'ws://riski.sh:7681';
 
   /**
     Represents the color scheme
