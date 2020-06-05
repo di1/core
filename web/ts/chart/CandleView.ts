@@ -258,12 +258,16 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // find the smallest divisor larger than precision but a factor of precision
 
+    const precision: number = this.FullChartData.chart.precision;
+
     this.Renderer.beginPath();
     for (let i: number = pmin;
       i <= pmax; i += 1) {
       const ylvl: number = pt.eval(i);
-      this.Renderer.moveTo(0.5, ylvl + 0.5);
-      this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
+      if (i % precision == 0) {
+        this.Renderer.moveTo(0.5, ylvl + 0.5);
+        this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
+      }
 
       if (i == pmin) {
         this.Renderer.textBaseline = 'bottom';
@@ -274,9 +278,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       }
 
       this.Renderer.textAlign = 'left';
-      this.Renderer.fillText(' ' + this.priceToText(i),
-          this.Width,
-          ylvl + 0.5);
+      if (i % precision == 0 || i == pmin || i == pmax) {
+        this.Renderer.fillText(' ' + this.priceToText(i),
+            this.Width,
+            ylvl + 0.5);
+      }
     }
     this.Renderer.stroke();
     this.Renderer.restore();
