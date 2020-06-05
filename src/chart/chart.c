@@ -21,6 +21,11 @@ struct chart {
   struct candle **candles;
   pthread_mutex_t analysis_lock;
   struct analysis_result **analysis;
+  int precision;
+
+  // 4 unused bytes in this structure
+  char _p1[4];
+
   char *name;
 };
 
@@ -229,7 +234,7 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart *cht, char **json) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name,
+enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name, int precision,
                                 struct chart **cht_) {
   PTR_CHECK(name, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(cht_, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -241,6 +246,7 @@ enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name,
   cht->num_candles_allocated = 1440;
   cht->cur_candle = 0;
   cht->last_update = 0;
+  cht->precision = precision;
 
   // Create a list of candles pre allocated for 1 days worth
   cht->candles = (struct candle **)malloc((cht->num_candles_allocated) *
@@ -356,38 +362,37 @@ enum RISKI_ERROR_CODE chart_json(struct chart *cht, char **json) {
     return RISKI_ERROR_CODE_NONE;
   }
 
+  struct string_builder *sb = NULL;
+  TRACE(string_builder_new(&sb));
+
   size_t num_candles = cht->cur_candle + 1;
-  // chart proto = {"chart":[c1,c2,c3,c4...]}
 
-  // allocate enough space to hold each candle
-  size_t total_json_size = JSON_CANDLE_MAX_LEN * num_candles;
+  TRACE(string_builder_append(sb, "{\"chart\": {\"precision\":"));
 
-  // add (num_candles-1) commas
-  total_json_size += (num_candles - 1);
-
-  // add room for {"chart":[]}
-  total_json_size += 12;
-
-  // add room for null character
-  total_json_size += 1;
-
-  char *buf = (char *)calloc(total_json_size, sizeof(char));
-  PTR_CHECK(buf, RISKI_ERROR_CODE_MALLOC_ERROR, RISKI_ERROR_TEXT);
-  strcat(buf, "{\"chart\":[\x0");
-
+#define MAX_INT_STR_LEN ((CHAR_BIT * sizeof(int) - 1) / 3 + 2)
+  char type_str[MAX_INT_STR_LEN];
+  sprintf(type_str, "%d", cht->precision);
+#undef MAX_INT_STR_LEN
+  TRACE(string_builder_append(sb, type_str));
+  TRACE(string_builder_append(sb, ", \"candles\": ["));
+  
   char *tmp_candle_json = NULL;
   for (size_t i = 0; i < num_candles; ++i) {
     TRACE(candle_json(cht->candles[i], &tmp_candle_json));
-    strcat(buf, tmp_candle_json);
-    if (i != num_candles - 1)
-      strcat(buf, ",\x0");
-
+    TRACE(string_builder_append(sb, tmp_candle_json));
+    if (i != num_candles - 1) {
+      TRACE(string_builder_append(sb, ","));
+    }
     free(tmp_candle_json);
     tmp_candle_json = NULL;
   }
-  strcat(buf, "]}\x0");
+  TRACE(string_builder_append(sb, "]}}"));
+ 
+  char *buf = NULL;
+  TRACE(string_builder_str(sb, &buf)); 
   *json = buf;
 
+  TRACE(string_builder_free(&sb));
   return RISKI_ERROR_CODE_NONE;
 }
 

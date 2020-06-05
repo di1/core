@@ -240,8 +240,11 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
     const cJSON *instrument = cJSON_GetArrayItem(instruments_array, i);
     cJSON *displayName = cJSON_GetObjectItem(instrument, "name");
     oanda_tradeble_instruments[i] = strdup(cJSON_GetStringValue(displayName));
+    cJSON *precision_json = cJSON_GetObjectItem(instrument, "displayPrecision");
+    int precision = (int)(cJSON_GetNumberValue(precision_json));
+    printf("%s precision=%d\n", oanda_tradeble_instruments[i], precision);
     TRACE(exchange_put(exchange_oanda, oanda_tradeble_instruments[i],
-                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS, precision));
   }
   cJSON_Delete(instruments_json);
 

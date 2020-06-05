@@ -24,7 +24,7 @@ class Chart {// eslint-disable-line no-unused-vars
   private Symbol: string = 'SPY';
   private ExchangeSymbolChange: boolean = false;
 
-  private Server: string = 'ws://riski.sh:7681';
+  private Server: string = 'ws://localhost:7681';
 
 
   /**

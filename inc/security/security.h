@@ -34,7 +34,7 @@ struct security;
  * @param {struct security**} sec Sets *sec to the newly created security
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval,
+enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval, int precision,
                                    struct security **sec);
 
 /*

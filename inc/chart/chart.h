@@ -92,7 +92,7 @@ enum RISKI_ERROR_CODE chart_put_analysis(struct chart *cht, size_t idx,
  * @param {struct chart**} cht A pointer to the resulting struct pointer
  * @return {enum RISKI_ERROR_CODE} The status
  */
-enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name,
+enum RISKI_ERROR_CODE chart_new(uint64_t interval, char *name, int precision,
                                 struct chart **cht);
 
 /*

@@ -323,7 +323,7 @@ reget_security:
 
   if (cur_sec == NULL) {
     TRACE(exchange_put(iex_exchange, st,
-                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS, 4));
     goto reget_security;
   }
 
@@ -354,7 +354,7 @@ reget_security:
 
   if (cur_sec == NULL) {
     TRACE(exchange_put(iex_exchange, st,
-                       SECURITY_INTERVAL_MINUTE_NANOSECONDS));
+                       SECURITY_INTERVAL_MINUTE_NANOSECONDS, 4));
     goto reget_security;
   }
 

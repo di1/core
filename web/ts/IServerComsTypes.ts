@@ -24,8 +24,13 @@ interface ICandle {
   candle: Candle;
 }
 
+interface Chart {
+  precision: number;
+  candles: ICandle[];
+}
+
 interface IChart {
-  chart: ICandle[];
+  chart: Chart;
 }
 
 interface ILatestCandle {

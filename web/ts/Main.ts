@@ -14,5 +14,5 @@ window.onload = () => {
   document.body.style.left = '0';
   document.body.style.fontFamily = '\'Inconsolata\', monospace';
 
-  new Chart('OANDA', 'USD_JPY', DarkTheme);
+  new Chart('IEX', 'SPY', DarkTheme);
 };

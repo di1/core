@@ -42,9 +42,9 @@ enum RISKI_ERROR_CODE exchange_new(char *name, struct exchange **exchange) {
 }
 
 enum RISKI_ERROR_CODE exchange_put(struct exchange *e, char *name,
-                                   uint64_t interval) {
+                                   uint64_t interval, int precision) {
   struct security *s = NULL;
-  TRACE(security_new(name, interval, &s));
+  TRACE(security_new(name, interval, precision, &s));
 
   size_t index = 0;
   TRACE(security_get_hash(s, &index));

@@ -92,7 +92,7 @@ enum RISKI_ERROR_CODE security_cmp(char *n1, struct security *s, bool *res) {
 }
 
 // creates a new security
-enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval,
+enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval, int precision,
                                    struct security **sec) {
   PTR_CHECK(name, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
   PTR_CHECK(sec, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
@@ -109,7 +109,7 @@ enum RISKI_ERROR_CODE security_new(char *name, uint64_t interval,
 
   sec_->name = n;
   sec_->b = book_new();
-  TRACE(chart_new(interval, n, &(sec_->cht)));
+  TRACE(chart_new(interval, n, precision, &(sec_->cht)));
   sec_->hash = hash((unsigned char *)n);
   pthread_mutex_init(&(sec_->m_chart_update), NULL);
 

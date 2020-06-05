@@ -38,9 +38,6 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
   private CandleViewWidthOffset: number;
 
-  private Precision: number = 100000.0;
-  private FixedCount: number = 5;
-
   // This gets set to true if a resize or major change of candles happens
   private ForceRefresh: boolean = false;
 
@@ -100,7 +97,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     @return {string} The string representation of the number
    */
   private priceToText(price: number): string {
-    return ' ' + (price / this.Precision).toFixed(this.FixedCount);
+    return (price / Math.pow(10, this.FullChartData.chart.precision))
+        .toFixed(this.FullChartData.chart.precision);
   }
 
   /**
@@ -138,8 +136,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // Determine the left most candle index. If we can't fit everything
     // we will have to change the left most candle starting index
     let lftCndIdx: number = 0;
-    if (numberVisibleCandles < this.FullChartData.chart.length) {
-      lftCndIdx = this.FullChartData.chart.length - numberVisibleCandles;
+    if (numberVisibleCandles < this.FullChartData.chart.candles.length) {
+      lftCndIdx =
+        this.FullChartData.chart.candles.length - numberVisibleCandles;
     }
 
     // Now we will draw a grid of vertical lines to represent the spaces
@@ -179,14 +178,15 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     is needed.
    */
   public chartPartialUpdate(cnd: ILatestCandle): boolean {
-    const chtLgt: number = this.FullChartData.chart.length;
-    const lstCnd: Candle = this.FullChartData.chart[chtLgt-1].candle;
+    const chtLgt: number = this.FullChartData.chart.candles.length;
+    const lstCnd: Candle = this.FullChartData.chart.candles[chtLgt-1].candle;
     if (lstCnd.s == cnd.latestCandle.candle.s) {
       if ((this.ForceRefresh) || (lstCnd.o != cnd.latestCandle.candle.o ||
           lstCnd.h != cnd.latestCandle.candle.h ||
           lstCnd.l != cnd.latestCandle.candle.l ||
           lstCnd.c != cnd.latestCandle.candle.c)) {
-        this.FullChartData.chart[chtLgt-1].candle = cnd.latestCandle.candle;
+        this.FullChartData.chart.candles[chtLgt-1].candle =
+        cnd.latestCandle.candle;
         this.draw();
         this.ForceRefresh = false;
       }
@@ -216,16 +216,17 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     let gmin: number = Number.MAX_VALUE;
     let gmax: number = Number.MIN_VALUE;
 
-    const chtLength: number = this.FullChartData.chart.length;
+    const chtLength: number = this.FullChartData.chart.candles.length;
     for (let i: number = lftCndIdx; i < chtLength; ++i) {
-      if (this.FullChartData.chart[i].candle.h > gmax) {
-        gmax = this.FullChartData.chart[i].candle.h;
+      if (this.FullChartData.chart.candles[i].candle.h > gmax) {
+        gmax = this.FullChartData.chart.candles[i].candle.h;
       }
-      if (this.FullChartData.chart[i].candle.l < gmin) {
-        gmin = this.FullChartData.chart[i].candle.l;
+      if (this.FullChartData.chart.candles[i].candle.l < gmin) {
+        gmin = this.FullChartData.chart.candles[i].candle.l;
       }
     }
-    return [gmin, gmax];
+    const precision: number = this.FullChartData.chart.precision;
+    return [gmin - (gmin % precision), gmax + (gmax % precision)];
   }
 
   /**
@@ -241,27 +242,29 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.fillStyle = '#B3B1AD';
     this.Renderer.lineWidth = 0.3;
 
-    this.Renderer.font = '16px Inconsolata';
+    this.Renderer.font = '14px Inconsolata';
     this.Renderer.textBaseline = 'middle';
 
-    const numTicks: number = 20.0;
-    const tickInc: number = (pmax - pmin) / numTicks;
+    const precision: number = this.FullChartData.chart.precision;
+
+    const tickInc = ((pmax - pmin) / (precision*precision));
     this.Renderer.beginPath();
-    for (let i: number = pmin; i <= pmax; i += tickInc) {
+    for (let i: number = pmin;
+      i <= pmax; i += tickInc) {
       const ylvl: number = pt.eval(i);
       this.Renderer.moveTo(0.5, ylvl + 0.5);
       this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
 
       if (i == pmin) {
         this.Renderer.textBaseline = 'bottom';
-      } else if ((i + tickInc) >= pmax) {
+      } else if (i == pmax) {
         this.Renderer.textBaseline = 'hanging';
       } else {
         this.Renderer.textBaseline = 'middle';
       }
 
       this.Renderer.textAlign = 'left';
-      this.Renderer.fillText(this.priceToText(i),
+      this.Renderer.fillText(' ' + this.priceToText(i),
           this.Width,
           ylvl + 0.5);
     }
@@ -300,10 +303,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.save();
 
     const chtLength: number =
-      this.FullChartData.chart.length;
+      this.FullChartData.chart.candles.length;
     let curCnd: Candle | null = null;
     for (let i: number = lftCndIdx; i < chtLength; ++i) {
-      curCnd = this.FullChartData.chart[i].candle;
+      curCnd = this.FullChartData.chart.candles[i].candle;
       const adjidx: number = i - lftCndIdx;
 
       this.Renderer.beginPath();
@@ -350,8 +353,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // draw the price bar information about the current candle
     if (curCnd) {
       const ylvl: number = pt.eval(curCnd.c);
-      this.Renderer.fillRect(this.Width+2.5, ylvl-8, this.CandleViewWidthOffset,
-          16);
+      this.Renderer.fillRect(this.Width+2.5, ylvl-7, this.CandleViewWidthOffset,
+          14);
 
       if (this.Renderer.fillStyle == '#FF3333') {
         this.Renderer.fillStyle = '#3c3c3c';
@@ -360,8 +363,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       }
       this.Renderer.textAlign = 'left';
       this.Renderer.textBaseline = 'middle';
-      this.Renderer.font = '16px Inconsolata';
-      this.Renderer.fillText(this.priceToText(curCnd.c),
+      this.Renderer.font = '14px Inconsolata';
+      this.Renderer.fillText(' ' + this.priceToText(curCnd.c),
           this.Width,
           ylvl + 0.5);
     }
@@ -416,12 +419,12 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // Choose different start and end height based on numbers
     switch (pat.direction) {
       case TREND_LINE_DIRECTION.SUPPORT:
-        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.l);
-        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.l);
+        st = pt.eval(this.FullChartData.chart.candles[pat.startIndex].candle.l);
+        eh = pt.eval(this.FullChartData.chart.candles[pat.endIndex].candle.l);
         break;
       case TREND_LINE_DIRECTION.RESISTANCE:
-        st = pt.eval(this.FullChartData.chart[pat.startIndex].candle.h);
-        eh = pt.eval(this.FullChartData.chart[pat.endIndex].candle.h);
+        st = pt.eval(this.FullChartData.chart.candles[pat.startIndex].candle.h);
+        eh = pt.eval(this.FullChartData.chart.candles[pat.endIndex].candle.h);
         break;
     }
 
@@ -460,11 +463,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const trueCndIdx: number = cndIdx + lftCndIdx;
     for (let i: number = trueCndIdx; i > trueCndIdx - pat.candlesSpanning;
       --i) {
-      if (this.FullChartData.chart[i].candle.h > cndRngMax) {
-        cndRngMax = this.FullChartData.chart[i].candle.h;
+      if (this.FullChartData.chart.candles[i].candle.h > cndRngMax) {
+        cndRngMax = this.FullChartData.chart.candles[i].candle.h;
       }
-      if (this.FullChartData.chart[i].candle.l < cndRngMin) {
-        cndRngMin = this.FullChartData.chart[i].candle.l;
+      if (this.FullChartData.chart.candles[i].candle.l < cndRngMin) {
+        cndRngMin = this.FullChartData.chart.candles[i].candle.l;
       }
     }
     // draw a shaded region covering the number of candles

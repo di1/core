@@ -23,7 +23,7 @@ enum RISKI_ERROR_CODE exchange_new(char *name, struct exchange **exchange);
  * and can be found in security.h
  */
 enum RISKI_ERROR_CODE exchange_put(struct exchange *e, char *name,
-                                   uint64_t interval);
+                                   uint64_t interval, int precision);
 
 /*
  * Gets a security given its name
