@@ -274,6 +274,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
       const ylvl: number = pt.eval(i);
 
+      if (i % 50 == 0) {
+        this.Renderer.lineWidth = 1;
+      } else {
+        this.Renderer.lineWidth = 0.3;
+      }
       this.Renderer.moveTo(0.5, ylvl + 0.5);
       this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
       this.Renderer.textAlign = 'left';
