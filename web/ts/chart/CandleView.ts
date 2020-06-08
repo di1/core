@@ -300,9 +300,16 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.strokeStyle = '#B3B1AD';
     this.Renderer.lineWidth = 0.3;
     this.Renderer.beginPath();
+
+    for (let i: number = 0; i < this.FullChartData.chart.candles.length;
+      ++i) {
+      console.log(this.FullChartData.chart.candles[i].candle.s);
+    }
     for (let i: number = 0; i <= this.Width;
       i += ((this.CandleWidth + this.CandleSpacing)*
                this.HorizontalLineInterval)) {
+      // draw a line every 20 minutes
+
       this.Renderer.moveTo(i+0.5, 0.5);
       this.Renderer.lineTo(i+0.5, this.Height+0.5);
     }
