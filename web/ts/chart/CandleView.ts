@@ -343,10 +343,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.textAlign = 'left';
     if (ylvl <= 6) {
       this.Renderer.textBaseline = 'hanging';
-      ylvl += 3;
     } else if (ylvl >= this.Height) {
       this.Renderer.textBaseline = 'bottom';
-      ylvl -= 3;
     } else {
       this.Renderer.textBaseline = 'middle';
     }
