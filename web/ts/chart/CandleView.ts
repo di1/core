@@ -325,13 +325,14 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   private drawPriceBarBox(pt: LinearEquation, price: number,
       boxFillColor: string, textStrokeColor: string, lineWidth: number): void {
     this.Renderer.beginPath();
-    const ylvl: number = pt.eval(price);
+    let ylvl: number = pt.eval(price);
     this.Renderer.fillStyle = boxFillColor;
 
     if (ylvl <= 6) {
       this.Renderer.fillRect(this.Width+2.5, ylvl,
           this.CandleViewWidthOffset, 12);
     } else if (ylvl >= (this.Height - 6)) {
+      ylvl = this.Height;
       this.Renderer.fillRect(this.Width+2.5, ylvl - 12,
           this.CandleViewWidthOffset, 12);
     } else {
@@ -342,8 +343,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.textAlign = 'left';
     if (ylvl <= 6) {
       this.Renderer.textBaseline = 'hanging';
+      ylvl += 3;
     } else if (ylvl >= this.Height) {
       this.Renderer.textBaseline = 'bottom';
+      ylvl -= 3;
     } else {
       this.Renderer.textBaseline = 'middle';
     }
