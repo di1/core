@@ -328,8 +328,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const ylvl: number = pt.eval(price);
     this.Renderer.fillStyle = boxFillColor;
 
-    if (ylvl <= 6 || ylvl >= (this.Height - 6)) {
+    if (ylvl <= 6) {
       this.Renderer.fillRect(this.Width+2.5, ylvl,
+          this.CandleViewWidthOffset, 12);
+    } else if (ylvl >= (this.Height - 6)) {
+      this.Renderer.fillRect(this.Width+2.5, ylvl - 12,
           this.CandleViewWidthOffset, 12);
     } else {
       this.Renderer.fillRect(this.Width+2.5, ylvl-6,
