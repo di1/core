@@ -287,7 +287,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       i <= pmax; i += 1) {
       // draw a major axis every 5 pips to show order book levels
       if (i % 50 == 0) {
-        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.3);
+        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.4);
       }
     }
   }
