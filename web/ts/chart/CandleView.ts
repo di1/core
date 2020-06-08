@@ -350,7 +350,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
         this.Width, ylvl + 0.5);
 
     this.Renderer.strokeStyle = boxFillColor;
-    this.Renderer.lineWidth = 0.5;
+    this.Renderer.lineWidth = lineWidth;
     this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
     this.Renderer.lineTo(0, ylvl + 0.5);
     this.Renderer.closePath();
