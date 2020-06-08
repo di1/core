@@ -228,7 +228,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       gmax = this.FullChartData.chart.candles[chtLength - 1].candle.a;
     }
 
-    const precision: number = this.FullChartData.chart.precision;
+    const precision: number = this.FullChartData.chart.precision * 10;
     gmin -= (gmin % precision);
     gmax += (precision - (gmax % precision));
     return [gmin, gmax];
