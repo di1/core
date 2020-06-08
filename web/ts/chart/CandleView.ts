@@ -341,18 +341,20 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     }
     this.Renderer.fillStyle = textStrokeColor;
     this.Renderer.textAlign = 'left';
+    this.Renderer.font = '12px Inconsolata';
     if (ylvl <= 6) {
       this.Renderer.textBaseline = 'hanging';
+      this.Renderer.fillText(' ' + this.priceToText(price),
+          this.Width, ylvl + 3);
     } else if (ylvl >= this.Height) {
       this.Renderer.textBaseline = 'bottom';
+      this.Renderer.fillText(' ' + this.priceToText(price),
+          this.Width, ylvl + 0.5);
     } else {
       this.Renderer.textBaseline = 'middle';
+      this.Renderer.fillText(' ' + this.priceToText(price),
+          this.Width, ylvl + 0.5);
     }
-
-    this.Renderer.font = '12px Inconsolata';
-    this.Renderer.fillText(' ' + this.priceToText(price),
-        this.Width, ylvl + 0.5);
-
     this.Renderer.strokeStyle = boxFillColor;
     this.Renderer.lineWidth = lineWidth;
     this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
