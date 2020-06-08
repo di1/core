@@ -287,7 +287,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       i <= pmax; i += 1) {
       // draw a major axis every 5 pips to show order book levels
       if (i % 50 == 0) {
-        this.drawPriceBarBox(pt, i, DarkTheme.ui, DarkTheme.fg);
+        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.fg, 0.5);
       }
     }
   }
@@ -320,9 +320,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     @param {number} price The price to draw this at
     @param {string} boxFillColor The box color and line color
     @param {string} textStrokeColor The color of the text
+    @param {string} lineWidth The line width to draw the line at
    */
   private drawPriceBarBox(pt: LinearEquation, price: number,
-      boxFillColor: string, textStrokeColor: string): void {
+      boxFillColor: string, textStrokeColor: string, lineWidth: number): void {
     this.Renderer.beginPath();
     const ylvl: number = pt.eval(price);
     this.Renderer.fillStyle = boxFillColor;
@@ -410,7 +411,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     if (curCnd) {
       const pbars: number[] = [curCnd.a, curCnd.b];
       for (let i: number = 0; i < pbars.length; ++i) {
-        this.drawPriceBarBox(pt, pbars[i], 'purple', 'white');
+        this.drawPriceBarBox(pt, pbars[i], 'purple', 'white', 0.5);
       }
     }
   }
