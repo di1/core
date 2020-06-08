@@ -183,7 +183,6 @@ static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_bo
         idxToDel += 1;
       memmove(&ts_str[idxToDel], &ts_str[idxToDel + 1],
               strlen(ts_str) - idxToDel);
-
       uint64_t ts_nanosecond = strtoull(ts_str, NULL, 10);
       TRACE(security_chart_update(sec, bid, bid, ask, ts_nanosecond));
     }

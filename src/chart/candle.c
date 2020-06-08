@@ -1,6 +1,6 @@
 #include <chart/candle.h>
 
-#define MAX_INT_STR_LEN ((CHAR_BIT * sizeof(int) - 1) / 3 + 2)
+#define MAX_INT_STR_LEN ((CHAR_BIT * sizeof(uint64_t) - 1) / 3 + 2)
 
 /*
  * Represents a candle
@@ -122,39 +122,39 @@ enum RISKI_ERROR_CODE candle_json(struct candle *c, char **json) {
   TRACE(string_builder_append(sb, "{\"candle\":{"));
 
   TRACE(string_builder_append(sb, "\"o\":"));
-  sprintf(type_str, "%d", (int)c->open);
+  sprintf(type_str, "%ld", c->open);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"h\":"));
-  sprintf(type_str, "%d", (int)c->high);
+  sprintf(type_str, "%ld", c->high);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"l\":"));
-  sprintf(type_str, "%d", (int)c->low);
+  sprintf(type_str, "%ld", c->low);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"c\":"));
-  sprintf(type_str, "%d", (int)c->close);
+  sprintf(type_str, "%ld", c->close);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"s\":"));
-  sprintf(type_str, "%d", (int)c->start_time);
+  sprintf(type_str, "%lu", c->start_time);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"e\":"));
-  sprintf(type_str, "%d", (int)c->end_time);
+  sprintf(type_str, "%lu", c->end_time);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"v\":"));
-  sprintf(type_str, "%d", (int)c->volume);
+  sprintf(type_str, "%lu", c->volume);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"b\":"));
-  sprintf(type_str, "%d", (int)c->best_bid);
+  sprintf(type_str, "%ld", c->best_bid);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, ",\"a\":"));
-  sprintf(type_str, "%d", (int)c->best_ask);
+  sprintf(type_str, "%ld", c->best_ask);
   TRACE(string_builder_append(sb, type_str));
 
   TRACE(string_builder_append(sb, "}}"));
