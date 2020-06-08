@@ -101,7 +101,7 @@ sub BuildFrontEnd {
 sub TransferToOut {
   chdir($perl_script_path);
 
-  copy("./build/src/riski", "out/") or die;
+  copy("./build/src/riski", "out/") or warn 'riski is probably already running, skipping...';
   chmod(0755, "./out/riski");
 
   copy("./symbols.csv", "out/") or die;
