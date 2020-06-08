@@ -141,7 +141,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // Now we will draw a grid of vertical lines to represent the spaces
     // between the candles.
-    this.drawHorizontalGrid();
+    this.drawHorizontalGrid(lftCndIdx);
 
     // Compute the transformation function to convert candle price data
     // to screen values.
@@ -294,29 +294,36 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
   /**
     Draws horizontal lines marking the candles
+    @param {number} lftCndIdx The left most candle
    */
-  private drawHorizontalGrid(): void {
+  private drawHorizontalGrid(lftCndIdx: number): void {
     this.Renderer.beginPath();
     this.Renderer.strokeStyle = '#B3B1AD';
     this.Renderer.lineWidth = 0.3;
     this.Renderer.beginPath();
 
-    for (let i: number = 0; i < this.FullChartData.chart.candles.length;
-      ++i) {
-      console.log(this.FullChartData.chart.candles[i].candle.s);
-    }
-    for (let i: number = 0; i <= this.Width;
-      i += ((this.CandleWidth + this.CandleSpacing)*
-               this.HorizontalLineInterval)) {
-      // draw a line every 20 minutes
-
-      this.Renderer.moveTo(i+0.5, 0.5);
-      this.Renderer.lineTo(i+0.5, this.Height+0.5);
+    let i: number = lftCndIdx;
+    let xoffset: number = 0;
+    for (; i < this.FullChartData.chart.candles.length; ++i) {
+      const cndDate: Date =
+          new Date(this.FullChartData.chart.candles[i].candle.s / 1000000);
+      if (cndDate.getMinutes() % 20 == 0) {
+        xoffset = ((i-lftCndIdx) * (this.CandleWidth + this.CandleSpacing));
+        break;
+      }
     }
 
-    // draw the last line for the price bar
+    while (xoffset < this.Width) {
+      this.Renderer.moveTo(xoffset + 0.5, 0.5);
+      this.Renderer.lineTo(xoffset + 0.5, this.Height + 0.5);
+      i += 20;
+      xoffset = ((i-lftCndIdx) * (this.CandleWidth + this.CandleSpacing));
+    }
+
+    this.Renderer.strokeStyle = DarkTheme.fg;
     this.Renderer.moveTo(this.Width + 0.5, 0.5);
-    this.Renderer.lineTo(this.Width + 0.5, this.Height+0.5);
+    this.Renderer.lineTo(this.Width + 0.5, this.Height + 0.5);
+    // draw the last line for the price bar
     this.Renderer.closePath();
     this.Renderer.stroke();
   }
