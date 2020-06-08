@@ -273,12 +273,6 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       }
 
       const ylvl: number = pt.eval(i);
-
-      if (i % 50 == 0) {
-        this.Renderer.lineWidth = 1;
-      } else {
-        this.Renderer.lineWidth = 0.3;
-      }
       this.Renderer.moveTo(0.5, ylvl + 0.5);
       this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
       this.Renderer.textAlign = 'left';
@@ -288,6 +282,14 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     }
     this.Renderer.closePath();
     this.Renderer.stroke();
+
+    for (let i: number = pmin;
+      i <= pmax; i += 1) {
+        // draw a major axis every 5 pips to show order book levels
+        if (i % 50 == 0) {
+          this.drawPriceBarBox(pt, i, DarkTheme.ui, DarkTheme.fg);
+        }
+      }
   }
 
   /**
@@ -308,6 +310,41 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // draw the last line for the price bar
     this.Renderer.moveTo(this.Width + 0.5, 0.5);
     this.Renderer.lineTo(this.Width + 0.5, this.Height+0.5);
+    this.Renderer.closePath();
+    this.Renderer.stroke();
+  }
+
+  private drawPriceBarBox(pt: LinearEquation, price: number,
+    boxFillColor: string, textStrokeColor: string) {
+    this.Renderer.beginPath();
+    const ylvl: number = pt.eval(price);
+    this.Renderer.fillStyle = boxFillColor;
+
+    if (ylvl <= 6 || ylvl >= (this.Height - 6)) {
+      this.Renderer.fillRect(this.Width+2.5, ylvl,
+          this.CandleViewWidthOffset, 12);
+    } else {
+      this.Renderer.fillRect(this.Width+2.5, ylvl-6,
+          this.CandleViewWidthOffset, 12);
+    }
+    this.Renderer.fillStyle = textStrokeColor;
+    this.Renderer.textAlign = 'left';
+    if (ylvl <= 6) {
+      this.Renderer.textBaseline = 'hanging';
+    } else if (ylvl >= this.Height) {
+      this.Renderer.textBaseline = 'bottom';
+    } else {
+      this.Renderer.textBaseline = 'middle';
+    }
+
+    this.Renderer.font = '12px Inconsolata';
+    this.Renderer.fillText(' ' + this.priceToText(price),
+        this.Width, ylvl + 0.5);
+
+    this.Renderer.strokeStyle = boxFillColor;
+    this.Renderer.lineWidth = 0.5;
+    this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+    this.Renderer.lineTo(0, ylvl + 0.5);
     this.Renderer.closePath();
     this.Renderer.stroke();
   }
@@ -366,36 +403,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     if (curCnd) {
       const pbars: number[] = [curCnd.a, curCnd.b];
       for (let i: number = 0; i < pbars.length; ++i) {
-        this.Renderer.beginPath();
-        const ylvl: number = pt.eval(pbars[i]);
-        this.Renderer.fillStyle = 'purple';
-
-        if (ylvl <= 6 || ylvl >= (this.Height - 6)) {
-          this.Renderer.fillRect(this.Width+2.5, ylvl,
-              this.CandleViewWidthOffset, 12);
-        } else {
-          this.Renderer.fillRect(this.Width+2.5, ylvl-6,
-              this.CandleViewWidthOffset, 12);
-        }
-        this.Renderer.fillStyle = 'white';
-        this.Renderer.textAlign = 'left';
-        if (ylvl <= 6) {
-          this.Renderer.textBaseline = 'hanging';
-        } else if (ylvl >= this.Height) {
-          this.Renderer.textBaseline = 'bottom';
-        } else {
-          this.Renderer.textBaseline = 'middle';
-        }
-        this.Renderer.font = '12px Inconsolata';
-        this.Renderer.fillText(' ' + this.priceToText(pbars[i]),
-            this.Width, ylvl + 0.5);
-
-        this.Renderer.strokeStyle = 'purple';
-        this.Renderer.lineWidth = 0.5;
-        this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
-        this.Renderer.lineTo(0, ylvl + 0.5);
-        this.Renderer.closePath();
-        this.Renderer.stroke();
+        this.drawPriceBarBox(pt, pbars[i], 'purple', 'white');
       }
     }
   }
