@@ -45,6 +45,8 @@ sub Clean {
 
   mkdir("out/");
   mkdir("out/web");
+  mkdir("out/analysis/");
+
 
   mkdir("build/");
 }
@@ -98,12 +100,20 @@ sub BuildFrontEnd {
 
 sub TransferToOut {
   chdir($perl_script_path);
+
   copy("./build/src/riski", "out/") or die;
   chmod(0755, "./out/riski");
+
   copy("./symbols.csv", "out/") or die;
   copy("./web/main.min.js", "out/web/") or die;
   copy("./web/index.html", "out/web/") or die;
+
   dircopy("./web/img/", "out/web/img/") or die;
+
+  my @libs = <"./build/libs/*.so">;
+  foreach (@libs) {
+    copy("$_", "out/analysis/") or die;
+  }
 }
 
 my $begin_time = time();
