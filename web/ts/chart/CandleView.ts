@@ -34,8 +34,9 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
   // Draws a horizontal line every 15 minutes by default
   // this is default because we can only display minute candle data
   // (the only useful data)
-  private HorizontalLineInterval: number = 15;
+  private HorizontalLineInterval: number = 20;
 
+  // How must space to leave to the right of the candle
   private CandleViewWidthOffset: number;
 
   // This gets set to true if a resize or major change of candles happens
@@ -108,9 +109,6 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // keep track of how long it takes to draw a frame
     const frameBeginTime: number = Date.now();
 
-    // clear everything
-    this.Renderer.save();
-
     const newWidth: number =
       this.CanvasElement.getBoundingClientRect().width;
     const newHeight: number =
@@ -158,8 +156,6 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
 
     // Draw the candles
     this.drawCandles(pt, lftCndIdx);
-
-    this.Renderer.restore();
 
     // get the time it took to draw this frame
     const frameEndTime: number = Date.now();
@@ -246,53 +242,50 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
    */
   private drawVerticalGrid(pt: LinearEquation, pmin: number,
       pmax: number): void {
-    this.Renderer.save();
+    this.Renderer.beginPath();
     this.Renderer.strokeStyle = '#B3B1AD';
     this.Renderer.fillStyle = '#B3B1AD';
     this.Renderer.lineWidth = 0.3;
 
-    this.Renderer.font = '14px Inconsolata';
+    this.Renderer.font = '12px Inconsolata';
     this.Renderer.textBaseline = 'middle';
-
-    console.log(pmax + ',' + pmin);
 
     // find the smallest divisor larger than precision but a factor of precision
 
     const precision: number = this.FullChartData.chart.precision;
 
-    this.Renderer.beginPath();
-    for (let i: number = pmin;
-      i <= pmax; i += 1) {
-      const ylvl: number = pt.eval(i);
-      if (i % precision == 0) {
-        this.Renderer.moveTo(0.5, ylvl + 0.5);
-        this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
-      }
+    let tickInc: number = Math.floor((pmax - pmin) / 20);
+    tickInc = tickInc - (tickInc % precision);
 
+    for (let i: number = pmin;
+      i <= pmax; i += tickInc) {
       if (i == pmin) {
         this.Renderer.textBaseline = 'bottom';
-      } else if (i == pmax) {
+      } else if (i + tickInc > pmax) {
         this.Renderer.textBaseline = 'hanging';
+        i = pmax;
       } else {
         this.Renderer.textBaseline = 'middle';
       }
 
+      const ylvl: number = pt.eval(i);
+
+      this.Renderer.moveTo(0.5, ylvl + 0.5);
+      this.Renderer.lineTo(this.Width + 2.5, ylvl + 0.5);
       this.Renderer.textAlign = 'left';
-      if (i % precision == 0 || i == pmin || i == pmax) {
-        this.Renderer.fillText(' ' + this.priceToText(i),
-            this.Width,
-            ylvl + 0.5);
-      }
+      this.Renderer.fillText(' ' + this.priceToText(i),
+          this.Width,
+          ylvl + 0.5);
     }
+    this.Renderer.closePath();
     this.Renderer.stroke();
-    this.Renderer.restore();
   }
 
   /**
     Draws horizontal lines marking the candles
    */
   private drawHorizontalGrid(): void {
-    this.Renderer.save();
+    this.Renderer.beginPath();
     this.Renderer.strokeStyle = '#B3B1AD';
     this.Renderer.lineWidth = 0.3;
     this.Renderer.beginPath();
@@ -306,8 +299,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     // draw the last line for the price bar
     this.Renderer.moveTo(this.Width + 0.5, 0.5);
     this.Renderer.lineTo(this.Width + 0.5, this.Height+0.5);
+    this.Renderer.closePath();
     this.Renderer.stroke();
-    this.Renderer.restore();
   }
 
   /**
@@ -316,23 +309,20 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     @param {number} lftCndIdx The starting index
    */
   private drawCandles(pt: LinearEquation, lftCndIdx: number): void {
-    this.Renderer.save();
-
     const chtLength: number =
       this.FullChartData.chart.candles.length;
     let curCnd: Candle | null = null;
     for (let i: number = lftCndIdx; i < chtLength; ++i) {
       curCnd = this.FullChartData.chart.candles[i].candle;
       const adjidx: number = i - lftCndIdx;
+      this.drawAnalysis(pt, adjidx, lftCndIdx);
 
-      this.Renderer.beginPath();
-
-      // compute the drawing color based on if the candle is going up or down
       const drawColor: string = (curCnd.o > curCnd.c) ? DarkTheme.error :
         DarkTheme.string;
-
+      this.Renderer.beginPath();
       this.Renderer.strokeStyle = drawColor;
       this.Renderer.fillStyle = drawColor;
+
       // compute the height
       const hght: number = (curCnd.o > curCnd.c) ?
         pt.eval(curCnd.c) - pt.eval(curCnd.o) :
@@ -352,46 +342,52 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       } else {
         this.Renderer.moveTo(xoffset, tl);
         this.Renderer.lineTo(xoffset + this.CandleWidth, tl);
+        this.Renderer.stroke();
       }
 
       this.Renderer.moveTo(((xoffset) + this.CandleWidth / 2.0) + 0.5,
           pt.eval(curCnd.h) + 0.5);
       this.Renderer.lineTo(((xoffset) + this.CandleWidth / 2.0) + 0.5,
           pt.eval(curCnd.l));
-
-      this.Renderer.strokeStyle = drawColor;
+      this.Renderer.closePath();
       this.Renderer.stroke();
-
-      // draw the analysis
-      this.drawAnalysis(pt, adjidx, lftCndIdx);
     }
 
     // draw the price bar information about the current candle
     if (curCnd) {
-      let ylvl: number = pt.eval(curCnd.b);
-      this.Renderer.fillStyle = 'purple';
-      this.Renderer.fillRect(this.Width+2.5, ylvl-7, this.CandleViewWidthOffset,
-          14);
-      this.Renderer.fillStyle = 'white';
-      this.Renderer.textAlign = 'left';
-      this.Renderer.textBaseline = 'middle';
-      this.Renderer.font = '14px Inconsolata';
-      this.Renderer.fillText(' ' + this.priceToText(curCnd.b),
-          this.Width, ylvl + 0.5);
+      const pbars: number[] = [curCnd.a, curCnd.b];
+      for (let i: number = 0; i < pbars.length; ++i) {
+        this.Renderer.beginPath();
+        const ylvl: number = pt.eval(pbars[i]);
+        this.Renderer.fillStyle = 'purple';
 
-      ylvl = pt.eval(curCnd.a);
-      this.Renderer.fillStyle = 'purple';
-      this.Renderer.fillRect(this.Width+2.5, ylvl-7, this.CandleViewWidthOffset,
-          14);
-      this.Renderer.fillStyle = 'white';
-      this.Renderer.textAlign = 'left';
-      this.Renderer.textBaseline = 'middle';
-      this.Renderer.font = '14px Inconsolata';
-      this.Renderer.fillText(' ' + this.priceToText(curCnd.a),
-          this.Width,
-          ylvl + 0.5);
+        if (ylvl <= 6 || ylvl >= (this.Height - 6)) {
+          this.Renderer.fillRect(this.Width+2.5, ylvl,
+              this.CandleViewWidthOffset, 12);
+        } else {
+          this.Renderer.fillRect(this.Width+2.5, ylvl-6,
+              this.CandleViewWidthOffset, 12);
+        }
+        this.Renderer.fillStyle = 'white';
+        this.Renderer.textAlign = 'left';
+        if (ylvl <= 6) {
+          this.Renderer.textBaseline = 'hanging';
+        } else if (ylvl >= this.Height) {
+          this.Renderer.textBaseline = 'bottom';
+        } else {
+          this.Renderer.textBaseline = 'middle';
+        }
+        this.Renderer.font = '12px Inconsolata';
+        this.Renderer.fillText(' ' + this.priceToText(pbars[i]),
+            this.Width, ylvl + 0.5);
+
+        this.Renderer.strokeStyle = 'purple';
+        this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+        this.Renderer.lineTo(0, ylvl + 0.5);
+        this.Renderer.closePath();
+        this.Renderer.stroke();
+      }
     }
-    this.Renderer.restore();
   }
 
   /**
@@ -460,13 +456,13 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
          (this.CandleWidth + this.CandleSpacing)) + this.CandleSpacing / 2.0) +
          (this.CandleWidth / 2.0);
 
-    this.Renderer.save();
+    this.Renderer.beginPath();
     this.Renderer.strokeStyle = '#9370DB80';
     this.Renderer.lineWidth = 2;
     this.Renderer.moveTo(xoffsetStart, st);
     this.Renderer.lineTo(xoffsetEnd, eh);
+    this.Renderer.closePath();
     this.Renderer.stroke();
-    this.Renderer.restore();
   }
 
   /**
@@ -501,7 +497,7 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     const height: number =
       pt.eval(cndRngMax) - 0.5;
 
-    this.Renderer.save();
+    this.Renderer.beginPath();
     this.Renderer.fillStyle = '#9370DB80';
 
     const drawWidth: number = (pat.candlesSpanning) *
@@ -523,7 +519,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
           xoffset + ((this.CandleWidth + this.CandleSpacing)*i) + 0.5,
           pt.eval(cndRngMin) + (this.CandleWidth*2.0*lvl));
     }
-    this.Renderer.restore();
+    this.Renderer.closePath();
+    this.Renderer.stroke();
   }
 
   /**

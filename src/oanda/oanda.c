@@ -275,6 +275,9 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
     printf("%s precision=%d\n", oanda_tradeble_instruments[i], precision);
     TRACE(exchange_put(exchange_oanda, oanda_tradeble_instruments[i],
                        SECURITY_INTERVAL_MINUTE_NANOSECONDS, precision));
+
+    // get the candles we have missed
+
   }
   cJSON_Delete(instruments_json);
 
