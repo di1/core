@@ -346,20 +346,27 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       this.Renderer.textBaseline = 'hanging';
       this.Renderer.fillText(' ' + this.priceToText(price),
           this.Width, ylvl + 2.5);
+      this.Renderer.strokeStyle = boxFillColor;
+      this.Renderer.lineWidth = lineWidth;
+      this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+      this.Renderer.lineTo(0, ylvl + 0.5);
     } else if (ylvl >= this.Height) {
       this.Renderer.textBaseline = 'bottom';
       this.Renderer.fillText(' ' + this.priceToText(price),
           this.Width, ylvl + 0.5);
+      this.Renderer.strokeStyle = boxFillColor;
+      this.Renderer.lineWidth = lineWidth;
+      this.Renderer.moveTo(this.Width+2.5, ylvl - 0.5);
+      this.Renderer.lineTo(0, ylvl - 0.5);
     } else {
       this.Renderer.textBaseline = 'middle';
+      this.Renderer.strokeStyle = boxFillColor;
+      this.Renderer.lineWidth = lineWidth;
+      this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+      this.Renderer.lineTo(0, ylvl + 0.5);
       this.Renderer.fillText(' ' + this.priceToText(price),
           this.Width, ylvl + 0.5);
     }
-
-    this.Renderer.strokeStyle = boxFillColor;
-    this.Renderer.lineWidth = lineWidth;
-    this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
-    this.Renderer.lineTo(0, ylvl + 0.5);
     this.Renderer.closePath();
     this.Renderer.stroke();
   }
