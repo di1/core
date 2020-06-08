@@ -257,6 +257,10 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     let tickInc: number = Math.floor((pmax - pmin) / 20);
     tickInc = tickInc - (tickInc % precision);
 
+    if (tickInc == 0) {
+      tickInc += precision*2;
+    }
+
     for (let i: number = pmin;
       i <= pmax; i += tickInc) {
       if (i == pmin) {
