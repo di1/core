@@ -287,7 +287,8 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
       i <= pmax; i += 1) {
       // draw a major axis every 5 pips to show order book levels
       if (i % 50 == 0) {
-        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.4);
+        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.4,
+            false);
       }
     }
   }
@@ -335,9 +336,11 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     @param {string} boxFillColor The box color and line color
     @param {string} textStrokeColor The color of the text
     @param {string} lineWidth The line width to draw the line at
+    @param {boolean} line Default true, if set to false will not draw line
    */
   private drawPriceBarBox(pt: LinearEquation, price: number,
-      boxFillColor: string, textStrokeColor: string, lineWidth: number): void {
+      boxFillColor: string, textStrokeColor: string, lineWidth: number,
+      line: boolean = true): void {
     this.Renderer.beginPath();
     let ylvl: number = pt.eval(price);
     this.Renderer.fillStyle = boxFillColor;
@@ -362,22 +365,28 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
           this.Width, ylvl + 2.5);
       this.Renderer.strokeStyle = boxFillColor;
       this.Renderer.lineWidth = lineWidth;
-      this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
-      this.Renderer.lineTo(0, ylvl + 0.5);
+      if (line) {
+        this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+        this.Renderer.lineTo(0, ylvl + 0.5);
+      }
     } else if (ylvl >= this.Height) {
       this.Renderer.textBaseline = 'bottom';
       this.Renderer.fillText(' ' + this.priceToText(price),
           this.Width, ylvl + 0.5);
       this.Renderer.strokeStyle = boxFillColor;
       this.Renderer.lineWidth = lineWidth;
-      this.Renderer.moveTo(this.Width+2.5, ylvl - 0.5);
-      this.Renderer.lineTo(0, ylvl - 0.5);
+      if (line) {
+        this.Renderer.moveTo(this.Width+2.5, ylvl - 0.5);
+        this.Renderer.lineTo(0, ylvl - 0.5);
+      }
     } else {
       this.Renderer.textBaseline = 'middle';
       this.Renderer.strokeStyle = boxFillColor;
       this.Renderer.lineWidth = lineWidth;
-      this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
-      this.Renderer.lineTo(0, ylvl + 0.5);
+      if (line) {
+        this.Renderer.moveTo(this.Width+2.5, ylvl + 0.5);
+        this.Renderer.lineTo(0, ylvl + 0.5);
+      }
       this.Renderer.fillText(' ' + this.priceToText(price),
           this.Width, ylvl + 0.5);
     }
