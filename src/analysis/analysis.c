@@ -156,9 +156,11 @@ static void *analysis_thread_func(void *index) {
 static enum RISKI_ERROR_CODE analysis_load() {
   DIR *dir;
   struct dirent *ent;
+
   if ((dir = opendir("./analysis/")) != NULL) {
     /* print all the files and directories within directory */
     while ((ent = readdir(dir)) != NULL) {
+      printf("%s\n", ent->d_name);
       if (ent->d_type == 8) // file
       {
         TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
@@ -189,6 +191,7 @@ static enum RISKI_ERROR_CODE analysis_load() {
                               dyn->get_author()));
 
         loaded_funs.num_functions += 1;
+        printf("%lu", loaded_funs.num_functions);
         loaded_funs.funs = (struct vtable **)realloc(
             loaded_funs.funs,
             sizeof(struct vtable **) * loaded_funs.num_functions);
@@ -209,7 +212,7 @@ static enum RISKI_ERROR_CODE analysis_load() {
   }
 
   logger_info(__func__, FILENAME_SHORT, __LINE__, "loaded %lu analysis",
-              loaded_funs.funs);
+              loaded_funs.num_functions);
 
   return RISKI_ERROR_CODE_NONE;
 }

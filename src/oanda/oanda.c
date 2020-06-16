@@ -1,3 +1,4 @@
+#include "cjson/cjson.h"
 #include <oanda/oanda.h>
 
 static char *oanda_working_account = NULL;
@@ -221,9 +222,27 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
 
   // perform the SSL/TLS handshake with the server - when on the
   // server side, this would use SSL_accept()
+
+ if(!X509_VERIFY_PARAM_set1_host(SSL_get0_param(conn), "api-fxpractice.oanda.com", 0)) abort();
   int err = SSL_connect(conn);
-  if (err != 1)
-    abort(); // handle error
+  if (err <=0)
+  {
+         int errcode = SSL_get_error(conn, err);
+    switch(errcode)
+     {
+        case SSL_ERROR_NONE: break;        // Cannot happen if err <=0
+        case SSL_ERROR_ZERO_RETURN: fprintf(stderr,"SSL connect returned 0.");break;
+        case SSL_ERROR_WANT_READ: fprintf(stderr,"SSL connect: Read Error.");break;
+        case SSL_ERROR_WANT_WRITE: fprintf(stderr,"SSL connect: Write Error.");break;
+        case SSL_ERROR_WANT_CONNECT: fprintf(stderr,"SSL connect: Error connect."); break;
+        case SSL_ERROR_WANT_ACCEPT: fprintf(stderr,"SSL connect: Error accept."); break;
+        case SSL_ERROR_WANT_X509_LOOKUP: fprintf(stderr,"SSL connect error: X509 lookup."); break;
+        case SSL_ERROR_SYSCALL: fprintf(stderr,"SSL connect: Error in system call."); break;
+        case SSL_ERROR_SSL: fprintf(stderr,"SSL connect: Protocol Error."); break;
+        default: fprintf(stderr,"Failed SSL connect.");
+     }
+    exit(0);
+  }
 
   /*
    * Get the working account id
@@ -240,6 +259,7 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
     const char *id_str = cJSON_GetStringValue(_id);
     oanda_working_account = strdup(id_str);
   }
+  printf("%s\n", cJSON_Print(account_json));
   free(http_get_accounts);
 
   cJSON_Delete(account_json);
@@ -271,10 +291,8 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
     oanda_tradeble_instruments[i] = strdup(cJSON_GetStringValue(displayName));
     cJSON *precision_json = cJSON_GetObjectItem(instrument, "displayPrecision");
     int precision = (int)(cJSON_GetNumberValue(precision_json));
-    printf("%s precision=%d\n", oanda_tradeble_instruments[i], precision);
     TRACE(exchange_put(exchange_oanda, oanda_tradeble_instruments[i],
                        SECURITY_INTERVAL_MINUTE_NANOSECONDS, precision));
-
     // get the candles we have missed
 
   }
