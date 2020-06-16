@@ -16,7 +16,7 @@ my $make_path;
 my $clang_path;
 my $perl_script_path = cwd;
 my $npm_path;
-my $clang_format;
+my $clang_format = 0;
 
 my $do_clean = 1;
 my $no_lint = 0;
@@ -34,7 +34,7 @@ sub VerifyPrerequisits {
   $make_path = can_run('make') or die 'cmake is not installed!';
   $clang_path = can_run('clang') or die 'clang is not installed!';
   $npm_path = can_run('npm') or  die 'npm is not installed!';
-  $clang_format = can_run('clang-format') or die 'clang-format is not installed!';
+  $clang_format = can_run('clang-format') or warn 'clang-format is not installed!';
 }
 
 # Removes all used folders and builds the folder tree again
@@ -75,14 +75,16 @@ sub LintHCode {
 
 sub BuildRiskiServer {
   chdir($perl_script_path);
-  find({
-      wanted => \&LintCCode,
-      no_chdir => 1
-    }, "src/");
-  find({
-      wanted => \&LintHCode,
-      no_chdir => 1
-    }, "inc/");
+  if ($clang_format ne 0) {
+    find({
+        wanted => \&LintCCode,
+        no_chdir => 1
+      }, "src/");
+    find({
+        wanted => \&LintHCode,
+        no_chdir => 1
+      }, "inc/");
+  }
 
   chdir('build/');
 
