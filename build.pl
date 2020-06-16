@@ -76,7 +76,7 @@ sub LintHCode {
 
 sub BuildRiskiServer {
   chdir($perl_script_path);
-  if ($clang_format ne 0) {
+  if ($clang_format) {
     find({
         wanted => \&LintCCode,
         no_chdir => 1
