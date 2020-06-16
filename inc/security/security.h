@@ -91,8 +91,8 @@ enum RISKI_ERROR_CODE security_get_latest_candle(struct security *sec,
  * @return {enum RISKI_ERROR_CODE}
  */
 enum RISKI_ERROR_CODE security_chart_update(struct security *sec, int64_t price,
-    int64_t bid,
-    int64_t ask, uint64_t ts);
+                                            int64_t bid, int64_t ask,
+                                            uint64_t ts);
 
 /*
  * Frees the security struct

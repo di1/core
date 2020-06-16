@@ -112,7 +112,7 @@ enum RISKI_ERROR_CODE chart_free(struct chart **cht);
  * @return {enum RISKI_ERROR_CODE} The status
  */
 enum RISKI_ERROR_CODE chart_update(struct chart *cht, int64_t price,
-    int64_t bid, int64_t ask, uint64_t ts);
+                                   int64_t bid, int64_t ask, uint64_t ts);
 
 /*
  * Sets *name to the name of the chart

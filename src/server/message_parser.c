@@ -1,7 +1,7 @@
 #include <server/message_parser.h>
 
-static enum RISKI_ERROR_CODE extract_request_query(char *query, struct exchange **sec,
-                                            char **security) {
+static enum RISKI_ERROR_CODE
+extract_request_query(char *query, struct exchange **sec, char **security) {
   char *exchange = NULL;
   exchange = strtok(query, ":");
 
@@ -27,9 +27,9 @@ static enum RISKI_ERROR_CODE init_response(char *security, char **resp) {
   TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
-    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, FILENAME_SHORT,
-                       __LINE__, "%s is not a valid security traded on IEX",
-                       security));
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__,
+                       FILENAME_SHORT, __LINE__,
+                       "%s is not a valid security traded on IEX", security));
     return RISKI_ERROR_CODE_UNKNOWN;
   }
   char *cht = NULL;
@@ -49,9 +49,9 @@ static enum RISKI_ERROR_CODE latest_response(char *security, char **resp) {
   TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
-    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, FILENAME_SHORT,
-                       __LINE__, "%s is not a valid security traded on IEX",
-                       security));
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__,
+                       FILENAME_SHORT, __LINE__,
+                       "%s is not a valid security traded on IEX", security));
     return RISKI_ERROR_CODE_UNKNOWN;
   }
 
@@ -74,9 +74,9 @@ static enum RISKI_ERROR_CODE analysis_response(char *security, char **resp) {
   TRACE(exchange_get(working_exchange, security, &sec));
 
   if (!sec) {
-    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__, FILENAME_SHORT,
-                       __LINE__, "%s is not a valid security traded on IEX",
-                       security));
+    TRACE(logger_error(RISKI_ERROR_CODE_INVALID_SYMBOL, __func__,
+                       FILENAME_SHORT, __LINE__,
+                       "%s is not a valid security traded on IEX", security));
     return RISKI_ERROR_CODE_UNKNOWN;
   }
 

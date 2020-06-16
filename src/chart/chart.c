@@ -216,7 +216,6 @@ enum RISKI_ERROR_CODE chart_analysis_json(struct chart *cht, char **json) {
       TRACE(string_builder_append(sb, candle_analysis));
 
       free(candle_analysis);
-
     }
     if (i != cht->cur_candle - 2) {
       TRACE(string_builder_append(sb, ","));
@@ -289,8 +288,8 @@ static enum RISKI_ERROR_CODE chart_new_candle(struct chart *cht, int64_t lst,
     }
   }
 
-  TRACE(candle_new(lst, bid, ask,
-        cht->last_update, &cht->candles[cht->cur_candle]));
+  TRACE(candle_new(lst, bid, ask, cht->last_update,
+                   &cht->candles[cht->cur_candle]));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -304,7 +303,7 @@ enum RISKI_ERROR_CODE chart_get_candle(struct chart *cht, size_t index,
 }
 
 enum RISKI_ERROR_CODE chart_update(struct chart *cht, int64_t price,
-    int64_t bid, int64_t ask, uint64_t ts) {
+                                   int64_t bid, int64_t ask, uint64_t ts) {
   PTR_CHECK(cht, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   // convert ts into the start time of its coorisponding candle
@@ -376,7 +375,7 @@ enum RISKI_ERROR_CODE chart_json(struct chart *cht, char **json) {
 #undef MAX_INT_STR_LEN
   TRACE(string_builder_append(sb, type_str));
   TRACE(string_builder_append(sb, ", \"candles\": ["));
-  
+
   char *tmp_candle_json = NULL;
   for (size_t i = 0; i < num_candles; ++i) {
     TRACE(candle_json(cht->candles[i], &tmp_candle_json));
@@ -388,9 +387,9 @@ enum RISKI_ERROR_CODE chart_json(struct chart *cht, char **json) {
     tmp_candle_json = NULL;
   }
   TRACE(string_builder_append(sb, "]}}"));
- 
+
   char *buf = NULL;
-  TRACE(string_builder_str(sb, &buf)); 
+  TRACE(string_builder_str(sb, &buf));
   *json = buf;
 
   TRACE(string_builder_free(&sb));

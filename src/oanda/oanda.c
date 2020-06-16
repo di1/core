@@ -27,7 +27,8 @@ static enum RISKI_ERROR_CODE oanda_connect(int *ret) {
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
     exit(0);
   } else {
-    logger_info(__func__, FILENAME_SHORT, __LINE__, "connected to oanda server");
+    logger_info(__func__, FILENAME_SHORT, __LINE__,
+                "connected to oanda server");
   }
 
   *ret = sockfd;
@@ -82,8 +83,9 @@ static void SSL_read_http_header(SSL *conn, int *content_length) {
   free(line);
 }
 
-static void SSL_http_request_json(SSL *conn, char *request_body, cJSON **response) {
-  SSL_write(conn, request_body, (int) strlen(request_body));
+static void SSL_http_request_json(SSL *conn, char *request_body,
+                                  cJSON **response) {
+  SSL_write(conn, request_body, (int)strlen(request_body));
 
   int content_length = 0;
   SSL_read_http_header(conn, &content_length);
@@ -103,7 +105,8 @@ static void SSL_http_request_json(SSL *conn, char *request_body, cJSON **respons
   *response = response_json;
 }
 
-static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_body) {
+static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn,
+                                             char *pricing_request_body) {
   long start_time = time(NULL);
   int requests_per_second = 0;
   while (1) {
@@ -173,7 +176,6 @@ static enum RISKI_ERROR_CODE oanda_main_loop(SSL *conn, char *pricing_request_bo
               strlen(ask_str) - idxToDel);
       int64_t ask = (int64_t)atoi(ask_str);
 
-
       struct security *sec = NULL;
       TRACE(exchange_get(exchange_oanda, instrument_name_str, &sec));
       cJSON *ts = cJSON_GetObjectItem(instrument_price_data, "time");
@@ -223,24 +225,42 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
   // perform the SSL/TLS handshake with the server - when on the
   // server side, this would use SSL_accept()
 
- if(!X509_VERIFY_PARAM_set1_host(SSL_get0_param(conn), "api-fxpractice.oanda.com", 0)) abort();
+  if (!X509_VERIFY_PARAM_set1_host(SSL_get0_param(conn),
+                                   "api-fxpractice.oanda.com", 0))
+    abort();
   int err = SSL_connect(conn);
-  if (err <=0)
-  {
-         int errcode = SSL_get_error(conn, err);
-    switch(errcode)
-     {
-        case SSL_ERROR_NONE: break;        // Cannot happen if err <=0
-        case SSL_ERROR_ZERO_RETURN: fprintf(stderr,"SSL connect returned 0.");break;
-        case SSL_ERROR_WANT_READ: fprintf(stderr,"SSL connect: Read Error.");break;
-        case SSL_ERROR_WANT_WRITE: fprintf(stderr,"SSL connect: Write Error.");break;
-        case SSL_ERROR_WANT_CONNECT: fprintf(stderr,"SSL connect: Error connect."); break;
-        case SSL_ERROR_WANT_ACCEPT: fprintf(stderr,"SSL connect: Error accept."); break;
-        case SSL_ERROR_WANT_X509_LOOKUP: fprintf(stderr,"SSL connect error: X509 lookup."); break;
-        case SSL_ERROR_SYSCALL: fprintf(stderr,"SSL connect: Error in system call."); break;
-        case SSL_ERROR_SSL: fprintf(stderr,"SSL connect: Protocol Error."); break;
-        default: fprintf(stderr,"Failed SSL connect.");
-     }
+  if (err <= 0) {
+    int errcode = SSL_get_error(conn, err);
+    switch (errcode) {
+    case SSL_ERROR_NONE:
+      break; // Cannot happen if err <=0
+    case SSL_ERROR_ZERO_RETURN:
+      fprintf(stderr, "SSL connect returned 0.");
+      break;
+    case SSL_ERROR_WANT_READ:
+      fprintf(stderr, "SSL connect: Read Error.");
+      break;
+    case SSL_ERROR_WANT_WRITE:
+      fprintf(stderr, "SSL connect: Write Error.");
+      break;
+    case SSL_ERROR_WANT_CONNECT:
+      fprintf(stderr, "SSL connect: Error connect.");
+      break;
+    case SSL_ERROR_WANT_ACCEPT:
+      fprintf(stderr, "SSL connect: Error accept.");
+      break;
+    case SSL_ERROR_WANT_X509_LOOKUP:
+      fprintf(stderr, "SSL connect error: X509 lookup.");
+      break;
+    case SSL_ERROR_SYSCALL:
+      fprintf(stderr, "SSL connect: Error in system call.");
+      break;
+    case SSL_ERROR_SSL:
+      fprintf(stderr, "SSL connect: Protocol Error.");
+      break;
+    default:
+      fprintf(stderr, "Failed SSL connect.");
+    }
     exit(0);
   }
 
@@ -294,7 +314,6 @@ enum RISKI_ERROR_CODE oanda_live(char *token) {
     TRACE(exchange_put(exchange_oanda, oanda_tradeble_instruments[i],
                        SECURITY_INTERVAL_MINUTE_NANOSECONDS, precision));
     // get the candles we have missed
-
   }
   cJSON_Delete(instruments_json);
 

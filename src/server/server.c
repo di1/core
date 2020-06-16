@@ -74,8 +74,8 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
           lws_get_vhost(wsi), lws_get_protocol(wsi));
   int m;
 
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch-enum"
   switch (reason) {
   case LWS_CALLBACK_PROTOCOL_INIT:
     vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi), lws_get_protocol(wsi),
@@ -87,8 +87,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
   case LWS_CALLBACK_ESTABLISHED:
     /* add ourselves to the list of live pss held in the vhd */
-    lws_ll_fwd_insert(pss, pss_list, vhd->pss_list)
-    pss->wsi = wsi;
+    lws_ll_fwd_insert(pss, pss_list, vhd->pss_list) pss->wsi = wsi;
     pss->last = vhd->current;
     pss->current = pss->last;
     break;
@@ -103,8 +102,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
     }
 
     lws_ll_fwd_remove(struct per_session_data__minimal, pss_list, pss,
-                      vhd->pss_list)
-    break;
+                      vhd->pss_list) break;
 
   case LWS_CALLBACK_SERVER_WRITEABLE:
 
@@ -169,7 +167,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
   default:
     break;
   }
-  #pragma clang diagnostic pop
+#pragma clang diagnostic pop
 
   return 0;
 }
@@ -192,8 +190,8 @@ void *server_start(void *s) {
   lws_set_log_level(logs, NULL);
   // lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use
   // TLS / https)\n");
-  TRACE_HAULT(
-      logger_info(__func__, FILENAME_SHORT, __LINE__, "start http & ws server"));
+  TRACE_HAULT(logger_info(__func__, FILENAME_SHORT, __LINE__,
+                          "start http & ws server"));
 
   memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
   info.port = 7681;

@@ -1,3 +1,3 @@
-init|SYMBOL     # sends the full chart representing a symbol
-latest|SYMBOL   # sends the most recent candle in the symbol chart
-analysis|SYMBOL # sends the analysis of the chart reprenting symbol
+init | SYMBOL #sends the full chart representing a symbol latest |
+    SYMBOL #sends the most recent candle in the symbol chart analysis |
+    SYMBOL #sends the analysis of the chart reprenting symbol

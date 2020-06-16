@@ -140,10 +140,10 @@ static void *analysis_thread_func(void *index) {
       clock_t begin = clock();
       TRACE_HAULT(loaded_funs.funs[i]->run(cht, end_candle));
       clock_t end = clock();
-      long ts = end-begin;
-      TRACE_HAULT(logger_info(__func__, FILENAME_SHORT, __LINE__, 
-            "[TIMIT] %s@%d => %d/cycles",
-            loaded_funs.funs[i]->get_name(), assigned_bin, ts));
+      long ts = end - begin;
+      TRACE_HAULT(logger_info(
+          __func__, FILENAME_SHORT, __LINE__, "[TIMIT] %s@%d => %d/cycles",
+          loaded_funs.funs[i]->get_name(), assigned_bin, ts));
     }
 
     // release the analysis struct lock
@@ -261,7 +261,8 @@ enum RISKI_ERROR_CODE analysis_init() {
     thread_operations[i]->head = NULL;
     thread_operations[i]->tail = NULL;
 
-    atomic_store_explicit(&thread_operations[i]->num_elements, 0, memory_order_seq_cst);
+    atomic_store_explicit(&thread_operations[i]->num_elements, 0,
+                          memory_order_seq_cst);
   }
 
   threads =

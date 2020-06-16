@@ -25,7 +25,8 @@ struct candle;
  * @param cnd Sets *cnd to the newly created candle
  * @return The status
  */
-enum RISKI_ERROR_CODE candle_new(int64_t price, int64_t bid, int64_t ask, uint64_t time, struct candle **cnd);
+enum RISKI_ERROR_CODE candle_new(int64_t price, int64_t bid, int64_t ask,
+                                 uint64_t time, struct candle **cnd);
 
 /**
  * Updates the given candle
@@ -34,8 +35,8 @@ enum RISKI_ERROR_CODE candle_new(int64_t price, int64_t bid, int64_t ask, uint64
  * @param time The timestamp this price happened at
  * @return The status
  */
-enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price, int64_t bid,
-    int64_t ask, uint64_t time);
+enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price,
+                                    int64_t bid, int64_t ask, uint64_t time);
 
 /**
  * Frees the given candle

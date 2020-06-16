@@ -70,11 +70,13 @@ static void remove_lvl(struct level **lvls, int64_t index, int64_t count) {
   }
 }
 
-static void insert_at(struct level **lvls, int64_t len, int64_t at, struct level lvl) {
+static void insert_at(struct level **lvls, int64_t len, int64_t at,
+                      struct level lvl) {
   len += 1;
 
   // create a new array
-  struct level *new_lvl = (struct level *)(malloc((uint64_t)len * sizeof(struct level)));
+  struct level *new_lvl =
+      (struct level *)(malloc((uint64_t)len * sizeof(struct level)));
 
   // put the new data inside
   new_lvl[at] = lvl;

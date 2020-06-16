@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-die "Must run as root to execute 'make install' for libwebsocket library\n" if $> != 0;
-
 use File::Path qw(rmtree);
 use File::Find;
 use File::Basename;
@@ -18,6 +16,7 @@ my $make_path;
 my $clang_path;
 my $perl_script_path = cwd;
 my $npm_path;
+my $clang_format;
 
 my $do_clean = 1;
 my $no_lint = 0;
@@ -35,6 +34,7 @@ sub VerifyPrerequisits {
   $make_path = can_run('make') or die 'cmake is not installed!';
   $clang_path = can_run('clang') or die 'clang is not installed!';
   $npm_path = can_run('npm') or  die 'npm is not installed!';
+  $clang_format = can_run('clang-format') or die 'clang-format is not installed!';
 }
 
 # Removes all used folders and builds the folder tree again
@@ -51,8 +51,39 @@ sub Clean {
   mkdir("build/");
 }
 
+sub LintCCode {
+  if (-f "$_") {
+    my ($name, $dir, $ext) = fileparse("$_", qw(.c));
+    if ($ext eq ".c") {
+      run(command => "$clang_format -i $_", verbose => 1) or die;
+    } else {
+      warn "$_ found in src/ folder probably should not be there";
+    }
+  }
+}
+
+sub LintHCode {
+  if (-f "$_") {
+    my ($name, $dir, $ext) = fileparse("$_", qw(.h));
+    if ($ext eq ".h") {
+      run(command => "$clang_format -i $_", verbose => 1) or die;
+    } else {
+      warn "$_ found in inc/ folder probably should not be there";
+    }
+  }
+}
+
 sub BuildRiskiServer {
   chdir($perl_script_path);
+  find({
+      wanted => \&LintCCode,
+      no_chdir => 1
+    }, "src/");
+  find({
+      wanted => \&LintHCode,
+      no_chdir => 1
+    }, "inc/");
+
   chdir('build/');
 
   # Set compiler to clang
@@ -67,7 +98,7 @@ sub BuildRiskiServer {
 sub LintTypeScript {
   if (-f "$_") {
     my ($name, $dir, $ext) = fileparse("$_", qw(.ts));
-    if ($ext == ".ts") {
+    if ($ext eq ".ts") {
       run(command => "./node_modules/.bin/eslint $_", verbose => 1) or die;
     } else {
       warn "$_ found in ts folder probably should not be there";
@@ -92,7 +123,7 @@ sub BuildFrontEnd {
           no_chdir => 1
          }, "ts/");
    }
-  
+
   run(command => "./node_modules/.bin/tsc", verbose=>1) or die;
   run(command => "./node_modules/.bin/uglifyjs main.js -o main.min.js",
       verbose=>1) or die;
@@ -123,6 +154,7 @@ VerifyPrerequisits;
 if ($do_clean == 1) {
   Clean;
 }
+
 BuildRiskiServer;
 BuildFrontEnd;
 TransferToOut;

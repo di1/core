@@ -15,7 +15,7 @@ enum RISKI_ERROR_CODE iex_stop_parse() {
  * a string that is not NULL terminated
  */
 static enum RISKI_ERROR_CODE symbol_sanitize(const iex_byte_t *s, size_t n,
-    char **ret) {
+                                             char **ret) {
   char st[8];
   for (size_t i = 0; i < n; ++i) {
     if (s[i] == ' ') {
@@ -27,8 +27,8 @@ static enum RISKI_ERROR_CODE symbol_sanitize(const iex_byte_t *s, size_t n,
     }
   }
   TRACE(logger_error(RISKI_ERROR_CODE_INSUFFITIENT_SPACE, __func__,
-                     FILENAME_SHORT, __LINE__, "%.*s must have (nil) appened", n,
-                     s));
+                     FILENAME_SHORT, __LINE__, "%.*s must have (nil) appened",
+                     n, s));
   return RISKI_ERROR_CODE_UNKNOWN;
 }
 
@@ -48,16 +48,17 @@ static enum RISKI_ERROR_CODE iex_tp_handler(const unsigned char *data);
 /**
  * Prints the packet header for debug information
  */
-static enum RISKI_ERROR_CODE print_iex_tp_header(const struct iex_tp_header *header) {
+static enum RISKI_ERROR_CODE
+print_iex_tp_header(const struct iex_tp_header *header) {
   PTR_CHECK(header, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
-  TRACE(
-      logger_info(__func__, FILENAME_SHORT, __LINE__, " === iex_tp_header ==="));
+  TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
+                    " === iex_tp_header ==="));
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "version: 0x%x",
                     header->version));
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "reserved: 0x%x",
                     header->reserved));
-  TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "message_protocol_id: %u",
-                    header->message_protocol_id));
+  TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
+                    "message_protocol_id: %u", header->message_protocol_id));
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "channel_id: %u",
                     header->channel_id));
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "session_id: %u",
@@ -73,8 +74,8 @@ static enum RISKI_ERROR_CODE print_iex_tp_header(const struct iex_tp_header *hea
                     header->first_message_sequence_number));
   TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "send_time: %lu",
                     header->send_time));
-  TRACE(
-      logger_info(__func__, FILENAME_SHORT, __LINE__, " === iex_tp_header ==="));
+  TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
+                    " === iex_tp_header ==="));
   return RISKI_ERROR_CODE_NONE;
 }
 
@@ -144,7 +145,8 @@ void packet_handler(unsigned char *userData, const struct pcap_pkthdr *pkthdr,
     // a udp and not tcp traffic, also it comes from a set IP
     // we will filter out all the other traffic
     const struct ip *ip_header;
-    ip_header = (const struct ip *)((const void*)(packet + sizeof(struct ether_header)));
+    ip_header = (const struct ip *)((
+        const void *)(packet + sizeof(struct ether_header)));
 
     // convert src and dst ip addresses into text form
     char ip_src[INET_ADDRSTRLEN];
@@ -155,9 +157,9 @@ void packet_handler(unsigned char *userData, const struct pcap_pkthdr *pkthdr,
     // verify udp packet and verify src
     if (ip_header->ip_p == IPPROTO_UDP && is_iex_traffic(ip_src, ip_dst)) {
       // extract the packet data
-      const unsigned char *data =
-          (const unsigned char *)((const void*)(packet + sizeof(struct ether_header) +
-                            sizeof(struct ip) + sizeof(struct udphdr)));
+      const unsigned char *data = (const unsigned char *)((
+          const void *)(packet + sizeof(struct ether_header) +
+                        sizeof(struct ip) + sizeof(struct udphdr)));
 
       // offload the udp data processing out of this function
       TRACE_HAULT(iex_tp_handler(data));
@@ -176,8 +178,8 @@ static enum RISKI_ERROR_CODE parse_system_event_message(const void *payload) {
     TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "start of messages"));
     break;
   case START_OF_SYSTEM_HOURS:
-    TRACE(
-        logger_info(__func__, FILENAME_SHORT, __LINE__, "start of system hours"));
+    TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
+                      "start of system hours"));
     break;
   case START_OF_REGULAR_MARKET_HOURS:
     TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__,
@@ -188,7 +190,8 @@ static enum RISKI_ERROR_CODE parse_system_event_message(const void *payload) {
                       "end of regular market hours"));
     break;
   case END_OF_SYSTEM_HOURS:
-    TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "end of system hours"));
+    TRACE(
+        logger_info(__func__, FILENAME_SHORT, __LINE__, "end of system hours"));
     break;
   case END_OF_MESSAGES:
     TRACE(logger_info(__func__, FILENAME_SHORT, __LINE__, "end of messages"));
@@ -201,7 +204,8 @@ static enum RISKI_ERROR_CODE parse_system_event_message(const void *payload) {
  * Tells us that there is something special for this
  * security
  */
-static enum RISKI_ERROR_CODE parse_security_directory_message(const void *payload) {
+static enum RISKI_ERROR_CODE
+parse_security_directory_message(const void *payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   const struct iex_security_directory_message *payload_data =
@@ -243,7 +247,8 @@ static enum RISKI_ERROR_CODE parse_trading_status_message(const void *payload) {
 /**
  * Indicates that the security has been halted
  */
-static enum RISKI_ERROR_CODE parse_operational_hault_status_message(const void *payload) {
+static enum RISKI_ERROR_CODE
+parse_operational_hault_status_message(const void *payload) {
   const struct iex_operational_halt_status_message *payload_data =
       (const struct iex_operational_halt_status_message *)(payload);
   (void)payload_data;
@@ -306,8 +311,8 @@ static enum RISKI_ERROR_CODE parse_security_event_message(const void *payload) {
  * The side was given in the message block and needs to be passed
  * though to this function.
  */
-static enum RISKI_ERROR_CODE parse_price_level_update_message(iex_byte_t side,
-                                                       const void *payload) {
+static enum RISKI_ERROR_CODE
+parse_price_level_update_message(iex_byte_t side, const void *payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   const struct iex_price_level_update_message *payload_data =
@@ -322,8 +327,8 @@ reget_security:
   TRACE(exchange_get(iex_exchange, st, &cur_sec));
 
   if (cur_sec == NULL) {
-    TRACE(exchange_put(iex_exchange, st,
-                       SECURITY_INTERVAL_MINUTE_NANOSECONDS, 4));
+    TRACE(exchange_put(iex_exchange, st, SECURITY_INTERVAL_MINUTE_NANOSECONDS,
+                       4));
     goto reget_security;
   }
 
@@ -353,15 +358,14 @@ reget_security:
   TRACE(exchange_get(iex_exchange, st, &cur_sec));
 
   if (cur_sec == NULL) {
-    TRACE(exchange_put(iex_exchange, st,
-                       SECURITY_INTERVAL_MINUTE_NANOSECONDS, 4));
+    TRACE(exchange_put(iex_exchange, st, SECURITY_INTERVAL_MINUTE_NANOSECONDS,
+                       4));
     goto reget_security;
   }
 
   TRACE(security_chart_update(cur_sec, payload_data->price, payload_data->price,
-        payload_data->price,
-                              payload_data->timestamp));
-  
+                              payload_data->price, payload_data->timestamp));
+
   free(st);
   return RISKI_ERROR_CODE_NONE;
 }
@@ -401,7 +405,8 @@ static enum RISKI_ERROR_CODE parse_trade_break_message(const void *payload) {
   return RISKI_ERROR_CODE_NONE;
 }
 
-static enum RISKI_ERROR_CODE parse_auction_information_message(const void *payload) {
+static enum RISKI_ERROR_CODE
+parse_auction_information_message(const void *payload) {
   PTR_CHECK(payload, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
   const struct iex_auction_information_message *payload_data =

@@ -35,8 +35,8 @@ struct chart;
 
 #include <api.h>
 #include <math/linear_equation.h>
-#include <time.h> // for clock_t
 #include <stdatomic.h>
+#include <time.h> // for clock_t
 
 /*
  * Private struct holding the needed information to perform an analysis
