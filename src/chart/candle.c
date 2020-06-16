@@ -66,7 +66,6 @@ enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price,
                                     int64_t bid, int64_t ask, uint64_t time) {
   PTR_CHECK(c, RISKI_ERROR_CODE_NULL_PTR, RISKI_ERROR_TEXT);
 
-  c->volume += 1;
   // set the close time only if the last price time
   // is greater than the most recent price also the same applies for best
   // bid and ask
@@ -75,6 +74,11 @@ enum RISKI_ERROR_CODE candle_update(struct candle *c, int64_t price,
     c->close = price;
     c->best_bid = bid;
     c->best_ask = ask;
+  }
+
+  // only update volume if the lastest time is greater than the previous
+  if (time > c->end_time) {
+    c->volume += 1;
   }
 
   // update the high and low

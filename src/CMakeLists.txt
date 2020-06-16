@@ -18,5 +18,5 @@ SET(CMAKE_ENABLE_EXPORTS TRUE)
 ADD_EXECUTABLE(riski main.c)
 TARGET_LINK_LIBRARIES(
     riski cjson string_builder oanda logger book iex chart security exchange
-        server math analysis Threads::Threads OpenSSL::SSL OpenSSL::Crypto 
+        server math analysis Threads::Threads OpenSSL::SSL OpenSSL::Crypto
         ${CMAKE_DL_LIBS})
