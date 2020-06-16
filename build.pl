@@ -35,6 +35,7 @@ sub VerifyPrerequisits {
   $clang_path = can_run('clang') or die 'clang is not installed!';
   $npm_path = can_run('npm') or  die 'npm is not installed!';
   $clang_format = can_run('clang-format') or warn 'clang-format is not installed!';
+  print "$clang_format\n"
 }
 
 # Removes all used folders and builds the folder tree again
