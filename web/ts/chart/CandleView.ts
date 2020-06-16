@@ -283,13 +283,13 @@ class ChartCandleView { // eslint-disable-line no-unused-vars
     this.Renderer.closePath();
     this.Renderer.stroke();
 
-    // for (let i: number = pmin;
-    //  i <= pmax; i += 1) {
-    // draw a major axis every 5 pips to show order book levels
-    //  if (i % 50 == 0) {
-    //    this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.4);
-    //  }
-    // }
+    for (let i: number = pmin;
+      i <= pmax; i += 1) {
+      // draw a major axis every 5 pips to show order book levels
+      if (i % 50 == 0) {
+        this.drawPriceBarBox(pt, i, DarkTheme.special, DarkTheme.bg, 0.4);
+      }
+    }
   }
 
   /**
