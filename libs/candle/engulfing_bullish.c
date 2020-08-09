@@ -1,7 +1,7 @@
 #include <api.h>
 
 static const char* name = "Bullish Engulfing";
-static const char* author = "Vittorio Papandrea";
+static const char* author = "washcloth";
 
 const char* get_name() {
   return name;
