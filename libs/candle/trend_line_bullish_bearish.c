@@ -3,7 +3,7 @@
 #include <api.h>
 
 static const char* name = "Orbitally Trends";
-static const char* author = "Vittorio Papandrea";
+static const char* author = "washcloth";
 
 enum RISKI_ERROR_CODE get_working_value (struct candle *cnd, int64_t *res, enum DIRECTION type);
 
